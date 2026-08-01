@@ -35,3 +35,9 @@
 - Modal-/Scroll-Fix für iOS Safari
 - Vollständige Sprachbereinigung Deutsch/Arabisch
 - Lernfächer direkt aus dem LP-Plan oder manuell hinzufügen
+
+
+## Version 3.1 – Deutsch
+- Die App ist vollständig auf Deutsch.
+- Die arabische Sprachumschaltung wurde entfernt.
+- Bestehende Daten bleiben erhalten.
