@@ -29,3 +29,9 @@
 ## حفظ البيانات
 
 البيانات محفوظة داخل متصفح الجهاز باستخدام `localStorage`. استخدم زر **تصدير نسخة احتياطية** من الإعدادات قبل تغيير الجهاز أو مسح بيانات المتصفح.
+
+
+## Version 3
+- Modal-/Scroll-Fix für iOS Safari
+- Vollständige Sprachbereinigung Deutsch/Arabisch
+- Lernfächer direkt aus dem LP-Plan oder manuell hinzufügen

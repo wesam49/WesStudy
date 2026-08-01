@@ -63,7 +63,17 @@
     html[dir="ltr"] .day{text-align:left}
     @media(max-width:720px){.lp-summary{grid-template-columns:1fr 1fr}.lp-row{grid-template-columns:minmax(0,1fr) 54px 92px auto}.lp-row .lp-origin{display:none}.nav button{font-size:.64rem}.nav button span{font-size:1.1rem}.topbar{padding-inline:2px}.actions{gap:6px}.icon-btn{width:42px;height:42px}.section-head{align-items:flex-start}.timer-controls{gap:8px}.timer-controls .btn{min-width:0;flex:1;padding:11px 8px}}
     @media(max-width:430px){.app{padding-inline:10px}.card{padding:14px}.timer-display{font-size:clamp(3.5rem,20vw,5.5rem)}.lp-summary{gap:8px}.lp-row{grid-template-columns:minmax(0,1fr) 46px 78px auto;padding:8px}.nav{width:calc(100% - 12px);gap:2px}.nav button{padding:7px 1px}.brand h1{font-size:1.05rem}}
-  </style>
+  
+/* ===== WesStudy v3 fixes ===== */
+html,body{overscroll-behavior-y:auto}
+body.ws-dialog-open{overflow:hidden!important;position:fixed!important;inset:0!important;width:100%!important}
+dialog[open]{position:fixed;inset:0;margin:auto}
+.lp-picker-list{display:grid;gap:10px;max-height:52vh;overflow:auto;padding:2px}
+.lp-picker-item{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:13px;border:1px solid var(--line);background:var(--panel2);border-radius:16px}
+.lp-picker-item input{width:22px;height:22px}.lp-picker-item small{display:block;color:var(--muted);margin-top:3px}
+.add-methods{display:grid;grid-template-columns:1fr 1fr;gap:12px}.add-method{padding:18px 12px;min-height:112px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center}.add-method .emoji{font-size:1.8rem}
+@media(max-width:480px){.add-methods{grid-template-columns:1fr}.lp-picker-item{grid-template-columns:auto minmax(0,1fr)}}
+</style>
 </head>
 <body>
 <div class="app" id="app">
@@ -291,6 +301,104 @@ $('#settingsBtn').onclick=()=>{syncTimerSettings();$('#settingsDialog').showModa
 
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&timer.running)acquireWakeLock()});
 const originalRenderAll=renderAll;renderAll=function(){originalRenderAll();renderStudyProgress();applyLanguage()};
+
+
+/* ===== WesStudy v3: modal, locale and LP-to-study fixes ===== */
+(function v3Fixes(){
+  const txt={
+    de:{choose:'Fach hinzufügen',lp:'Aus LP-Plan auswählen',lpSub:'Vorhandene Module übernehmen',manual:'Manuell hinzufügen',manualSub:'Name und Credits selbst eingeben',select:'Module aus dem LP-Plan',addSelected:'Auswahl hinzufügen',none:'Keine weiteren Module verfügbar.',cancel:'Abbrechen',added:'Fächer wurden hinzugefügt',semester:'Semester',credits:'LP'},
+    ar:{choose:'إضافة مادة',lp:'اختيار من خطة LP',lpSub:'إضافة مواد موجودة في الخطة',manual:'إضافة يدويًا',manualSub:'إدخال الاسم والكريدت بنفسك',select:'اختيار مواد من خطة LP',addSelected:'إضافة المواد المحددة',none:'لا توجد مواد أخرى متاحة.',cancel:'إلغاء',added:'تمت إضافة المواد',semester:'الفصل',credits:'نقطة'}
+  };
+  const L=()=>txt[state.lang==='ar'?'ar':'de'];
+
+  // Robustly restore page scrolling after every dialog close (especially iOS Safari).
+  let lockedY=0;
+  function lockPage(){
+    if(document.body.classList.contains('ws-dialog-open'))return;
+    lockedY=window.scrollY||0;
+    document.body.style.top=`-${lockedY}px`;
+    document.body.classList.add('ws-dialog-open');
+  }
+  function unlockPage(){
+    if(!document.body.classList.contains('ws-dialog-open'))return;
+    document.body.classList.remove('ws-dialog-open');
+    document.body.style.top='';
+    document.body.style.overflow='';
+    document.documentElement.style.overflow='';
+    requestAnimationFrame(()=>window.scrollTo(0,lockedY));
+  }
+  function wireDialog(d){
+    if(!d||d.dataset.v3wired)return; d.dataset.v3wired='1';
+    d.addEventListener('close',()=>setTimeout(unlockPage,0));
+    d.addEventListener('cancel',()=>setTimeout(unlockPage,0));
+    d.addEventListener('click',e=>{if(e.target===d){d.close();unlockPage()}});
+  }
+  document.querySelectorAll('dialog').forEach(wireDialog);
+  const nativeShow=HTMLDialogElement.prototype.showModal;
+  HTMLDialogElement.prototype.showModal=function(){wireDialog(this);lockPage();try{return nativeShow.call(this)}catch(e){unlockPage();throw e}};
+  const nativeClose=HTMLDialogElement.prototype.close;
+  HTMLDialogElement.prototype.close=function(...a){try{return nativeClose.apply(this,a)}finally{setTimeout(unlockPage,0)}};
+
+  // Add the two-step subject picker.
+  document.body.insertAdjacentHTML('beforeend',`<dialog id="subjectMethodDialog"><div class="modal"><div class="modal-head"><h3 id="subjectMethodTitle"></h3><button type="button" class="close" id="subjectMethodClose">✕</button></div><div class="add-methods"><button type="button" class="btn soft add-method" id="chooseLpMethod"><span class="emoji">🎓</span><strong id="chooseLpTitle"></strong><small id="chooseLpSub"></small></button><button type="button" class="btn soft add-method" id="chooseManualMethod"><span class="emoji">✍️</span><strong id="chooseManualTitle"></strong><small id="chooseManualSub"></small></button></div></div></dialog>
+  <dialog id="lpSubjectPickerDialog"><div class="modal"><div class="modal-head"><h3 id="lpPickerTitle"></h3><button type="button" class="close" id="lpPickerClose">✕</button></div><div class="lp-picker-list" id="lpPickerList"></div><div class="timer-controls"><button type="button" class="btn primary" id="lpPickerAdd"></button><button type="button" class="btn soft" id="lpPickerCancel"></button></div></div></dialog>`);
+  wireDialog($('#subjectMethodDialog'));wireDialog($('#lpSubjectPickerDialog'));
+
+  function updateV3Labels(){
+    const t=L();
+    $('#subjectMethodTitle').textContent=t.choose;$('#chooseLpTitle').textContent=t.lp;$('#chooseLpSub').textContent=t.lpSub;$('#chooseManualTitle').textContent=t.manual;$('#chooseManualSub').textContent=t.manualSub;
+    $('#lpPickerTitle').textContent=t.select;$('#lpPickerAdd').textContent=t.addSelected;$('#lpPickerCancel').textContent=t.cancel;
+  }
+  function availableLpModules(){
+    return (state.studyProgress?.modules||[]).filter(m=>{
+      const linked=m.subjectId&&state.subjects.some(s=>s.id===m.subjectId);
+      const same=state.subjects.some(s=>s.name.trim().toLowerCase()===String(m.name).trim().toLowerCase());
+      return !linked&&!same;
+    });
+  }
+  function renderLpPicker(){
+    const mods=availableLpModules(),t=L();
+    $('#lpPickerList').innerHTML=mods.length?mods.map(m=>`<label class="lp-picker-item"><input type="checkbox" value="${esc(m.id)}"><span><strong>${esc(m.name)}</strong><small>${t.semester} ${esc(m.originSemester||'—')} · ${esc(m.planSemester||'—')}. ${t.semester}</small></span><b>${Number(m.lp||0)} LP</b></label>`).join(''):`<div class="empty">${t.none}</div>`;
+    $('#lpPickerAdd').disabled=!mods.length;
+  }
+  function openMethodPicker(){updateV3Labels();$('#subjectMethodDialog').showModal()}
+  $('#subjectMethodClose').onclick=()=>$('#subjectMethodDialog').close();
+  $('#chooseManualMethod').onclick=()=>{$('#subjectMethodDialog').close();setTimeout(()=>openDialog('subjectDialog'),30)};
+  $('#chooseLpMethod').onclick=()=>{$('#subjectMethodDialog').close();renderLpPicker();setTimeout(()=>$('#lpSubjectPickerDialog').showModal(),30)};
+  $('#lpPickerClose').onclick=$('#lpPickerCancel').onclick=()=>$('#lpSubjectPickerDialog').close();
+  $('#lpPickerAdd').onclick=()=>{
+    const ids=[...$('#lpPickerList').querySelectorAll('input:checked')].map(x=>x.value);if(!ids.length)return;
+    for(const id of ids){const m=state.studyProgress.modules.find(x=>x.id===id);if(!m)continue;const sid=uid();state.subjects.push({id:sid,name:m.name,credits:Number(m.lp||0),color:'#6d5dfc',start:state.semester.start||'',end:state.semester.end||''});m.subjectId=sid;m.useInStudy=true}
+    save();$('#lpSubjectPickerDialog').close();toast(L().added);
+  };
+  // Intercept only "new subject" buttons; editing continues to use the original form.
+  document.addEventListener('click',e=>{const b=e.target.closest('[data-open="subjectDialog"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();$('#subjectId').value='';openMethodPicker()},true);
+
+  // Complete dynamic locale cleanup so one language never leaks into the other.
+  const extraDe=new Map([['س','Std.'],['مواد','Fächer'],['مادة','Fach'],['متبقي','verbleibend'],['منجزة','erledigt'],['مخططة','geplant'],['الإنجاز','Fortschritt'],['المطلوب في الأيام المتبقية','Erforderlich an verbleibenden Tagen'],['المتبقي الفعلي','Tatsächlich verbleibend'],['حصة تقديرية من خطة العطلة','Geschätzter Ferienanteil'],['المتبقي المتوقع بعد الخطة','Voraussichtlich verbleibend'],['أضف أول مادة','Erstes Fach hinzufügen'],['أدخل اسم المادة وعدد الكريدت، وسيُحسب المطلوب تلقائيًا.','Fachname und Credits eingeben; der Lernumfang wird automatisch berechnet.'],['مادة محذوفة','Gelöschtes Fach']]);
+  const extraAr=new Map([...extraDe].map(([a,d])=>[d,a]));
+  function localizeDynamic(v){
+    if(typeof v!=='string')return v;let out=v;
+    if(state.lang==='de'){
+      out=out.replace(/([0-9]+(?:[.,:][0-9]+)?)\s*س\b/g,'$1 Std.');
+      for(const[a,d]of extraDe)out=out.split(a).join(d);
+    }else{
+      out=out.replace(/([0-9]+(?:[.,:][0-9]+)?)\s*(?:Std\.|Stunden?)\b/g,'$1 س');
+      for(const[d,a]of extraAr)out=out.split(d).join(a);
+    }
+    return out;
+  }
+  function cleanLocale(root=document.body){
+    const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let n;
+    while(n=walker.nextNode()){if(n.parentElement?.closest('script,style'))continue;const v=localizeDynamic(n.nodeValue);if(v!==n.nodeValue)n.nodeValue=v}
+    root.querySelectorAll?.('[placeholder],[title],[aria-label]').forEach(el=>['placeholder','title','aria-label'].forEach(a=>{if(el.hasAttribute(a))el.setAttribute(a,localizeDynamic(el.getAttribute(a)))}));
+    updateV3Labels();
+  }
+  const oldApplyV3=applyLanguage;applyLanguage=function(){oldApplyV3();cleanLocale()};
+  const oldRenderV3=renderAll;renderAll=function(){oldRenderV3();cleanLocale()};
+  const localeObserver=new MutationObserver(()=>requestAnimationFrame(()=>cleanLocale()));localeObserver.observe(document.body,{childList:true,subtree:true});
+  cleanLocale();
+})();
 
 renderAll();resetTimer();
 })();
