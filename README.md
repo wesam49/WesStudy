@@ -15,9 +15,3 @@ Persönliche PWA zur flexiblen Studienplanung.
 ## GitHub Pages
 
 Alle Dateien direkt in das Stammverzeichnis des Repositorys hochladen. Unter **Settings → Pages** den Branch `main` und `/ (root)` auswählen.
-
-## Version 3.3
-- Robuster Timer mit absoluter Endzeit und Wiederherstellung nach Sperren/Verlassen.
-- Tonaktivierung und Testton.
-- Gesamt-LP automatisch aus Modulen; nicht bestandene Versuche werden ausgeschlossen.
-- Alle Sessions innerhalb des Ferienzeitraums zählen zum Ferienfortschritt.
