@@ -119,12 +119,12 @@ dialog[open]{position:fixed;inset:0;margin:auto}
           <div class="field"><label>Pausenminuten</label><input id="breakMinutes" type="number" min="0" max="90" value="5"></div>
           <div class="field"><label>Anzahl der Runden</label><input id="roundCount" type="number" min="1" max="12" value="4"></div>
           <div class="field"><label>Modus</label><select id="timerPreset"><option value="custom">Benutzerdefiniert</option><option value="25,5,4">Pomodoro 25/5</option><option value="50,10,3">Tiefer Fokus 50/10</option><option value="90,20,2">Lange Session 90/20</option><option value="open">Offener Timer</option></select></div>
-        </div><div style="margin-top:16px;padding:14px;background:var(--panel2);border-radius:15px"><strong>Wie werden die Stunden berechnet?</strong><p class="muted" style="margin-bottom:0">Nur die tatsächliche Lernzeit wird dem Fach gutgeschrieben. Pausen zählen nicht. An ausgewählten Ferientagen wird die Session zusätzlich im Ferienplan erfasst.</p></div></div>
+        </div><div style="margin-top:16px;padding:14px;background:var(--panel2);border-radius:15px"><strong>Wie werden die Stunden berechnet?</strong><p class="muted" style="margin-bottom:0">Nur die tatsächliche Lernzeit wird dem Fach gutgeschrieben. Pausen zählen nicht. Jede Session innerhalb des Ferienzeitraums wird automatisch zusätzlich im Ferienplan erfasst – auch an nicht eingeplanten Tagen.</p></div></div>
       </div>
     </section>
 
     <section class="page" data-page="holiday">
-      <div class="section-head"><div><h2>Ferienlernplan</h2><div class="muted">Wähle verfügbare Tage und lege die möglichen Stunden pro Tag fest.</div></div><button class="btn primary" data-open="holidayDialog">Ferien planen</button></div>
+      <div class="section-head"><div><h2>Ferienlernplan</h2><div class="muted">Plane verfügbare Tage und Stunden. Tatsächliche Lernzeit wird innerhalb des gesamten Ferienzeitraums automatisch erfasst.</div></div><button class="btn primary" data-open="holidayDialog">Ferien planen</button></div>
       <div id="holidayEmpty" class="card empty"><div class="emoji">🏖️</div><h3>Noch kein Ferienplan vorhanden</h3><p>Lege einen Ferienzeitraum sowie verfügbare Tage und Stunden fest.</p><button class="btn primary" data-open="holidayDialog">Plan erstellen</button></div>
       <div id="holidayContent" class="hidden">
         <div class="grid cols-4" style="margin-bottom:16px"><div class="card"><div class="eyebrow">Geplante Stunden</div><div class="big-number" id="holidayPlanned">0</div></div><div class="card"><div class="eyebrow">In den Ferien erledigt</div><div class="big-number" id="holidayDone">0</div></div><div class="card"><div class="eyebrow">Verbleibend</div><div class="big-number" id="holidayRemaining">0</div></div><div class="card"><div class="eyebrow">Ausgewählte Tage</div><div class="big-number" id="holidayDays">0</div></div></div>
@@ -162,7 +162,7 @@ dialog[open]{position:fixed;inset:0;margin:auto}
 
 <dialog id="lpDialog"><form method="dialog" class="modal" id="lpForm"><div class="modal-head"><h3 id="lpDialogTitle">Modul bearbeiten</h3><button class="close" value="cancel">✕</button></div><input type="hidden" id="lpId"><div class="form-grid"><div class="field full"><label>Modulname</label><input id="lpName" required></div><div class="field"><label>Leistungspunkte</label><input id="lpCredits" type="number" min="0" step="0.5" required></div><div class="field"><label>Ursprüngliches Semester</label><input id="lpOriginSemester" placeholder="z. B. 3"></div><div class="field"><label>Geplantes Semester</label><select id="lpPlanSemester"><option value="1">1. Semester</option><option value="2">2. Semester</option><option value="3">3. Semester</option><option value="Sommer">Sommer</option><option value="4">4. Semester</option><option value="5">5. Semester</option><option value="6">6. Semester</option><option value="7">7. Semester</option></select></div><div class="field"><label>Status</label><select id="lpStatus"><option value="open">Offen</option><option value="planned">Geplant</option><option value="active">In Bearbeitung</option><option value="exam">Prüfung abgelegt</option><option value="passed">Bestanden</option><option value="failed">Nicht bestanden / Wiederholung</option><option value="postponed">Verschoben</option></select></div><div class="field"><label>Prüfungsdatum (optional)</label><input id="lpExamDate" type="date"></div><div class="field full"><label><input id="lpUseInStudy" type="checkbox"> In den Lernplan übernehmen</label></div></div><div class="timer-controls"><button class="btn primary" value="default">Speichern</button><button class="btn soft" value="cancel">Abbrechen</button><button type="button" class="btn danger hidden" id="lpDelete">Löschen</button></div></form></dialog>
 
-<dialog id="settingsDialog"><form method="dialog" class="modal"><div class="modal-head"><h3>Einstellungen und Daten</h3><button class="close" value="cancel">✕</button></div><div class="grid" style="margin-bottom:14px"><label class="setting-row"><span>🔔 Benachrichtigungen</span><input type="checkbox" id="notifySetting"></label><label class="setting-row"><span>🔊 Ton</span><input type="checkbox" id="soundSetting" checked></label><label class="setting-row"><span>📳 Vibration</span><input type="checkbox" id="vibrateSetting" checked></label><label class="setting-row"><span>▶️ Nächste Phase automatisch</span><input type="checkbox" id="autoNextSetting" checked></label></div><div class="grid"><button type="button" class="btn soft" id="exportBtn">📤 Backup exportieren</button><label class="btn soft" style="text-align:center">📥 Backup importieren<input id="importInput" type="file" accept="application/json" hidden></label><button type="button" class="btn danger" id="resetBtn">🗑️ Alle Daten löschen</button></div><p class="muted">Deine Daten werden lokal in diesem Browser gespeichert. Exportiere vor einem Gerätewechsel oder dem Löschen der Browserdaten ein Backup.</p></form></dialog>
+<dialog id="settingsDialog"><form method="dialog" class="modal"><div class="modal-head"><h3>Einstellungen und Daten</h3><button class="close" value="cancel">✕</button></div><div class="grid" style="margin-bottom:14px"><label class="setting-row"><span>🔔 Benachrichtigungen</span><input type="checkbox" id="notifySetting"></label><label class="setting-row"><span>🔊 Ton</span><input type="checkbox" id="soundSetting" checked></label><button type="button" class="btn soft" id="soundTestBtn">🔊 Ton aktivieren und testen</button><label class="setting-row"><span>📳 Vibration</span><input type="checkbox" id="vibrateSetting" checked></label><label class="setting-row"><span>▶️ Nächste Phase automatisch</span><input type="checkbox" id="autoNextSetting" checked></label></div><div class="grid"><button type="button" class="btn soft" id="exportBtn">📤 Backup exportieren</button><label class="btn soft" style="text-align:center">📥 Backup importieren<input id="importInput" type="file" accept="application/json" hidden></label><button type="button" class="btn danger" id="resetBtn">🗑️ Alle Daten löschen</button></div><p class="muted">Deine Daten werden lokal in diesem Browser gespeichert. Exportiere vor einem Gerätewechsel oder dem Löschen der Browserdaten ein Backup.</p></form></dialog>
 
 <script>
 (()=>{
@@ -365,6 +365,137 @@ const originalRenderAll=renderAll;renderAll=function(){originalRenderAll();rende
   };
   // Intercept only "new subject" buttons; editing continues to use the original form.
   document.addEventListener('click',e=>{const b=e.target.closest('[data-open="subjectDialog"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();$('#subjectId').value='';openMethodPicker()},true);
+})();
+
+
+/* ===== WesStudy v3.3: resilient timer, sound, dynamic LP and holiday accounting ===== */
+(function v33Fixes(){
+  const TIMER_KEY='wesstudy_timer_runtime_v33';
+
+  // Every session whose date lies inside the holiday period counts as holiday study.
+  holidayDoneMins=function(){
+    if(!state.holiday)return 0;
+    return state.sessions.filter(x=>overlapDate(x.date,state.holiday.start,state.holiday.end)).reduce((a,x)=>a+Number(x.minutes||0),0);
+  };
+  isHolidayStudyDate=function(date=todayISO()){
+    return !!state.holiday&&overlapDate(date,state.holiday.start,state.holiday.end);
+  };
+
+  // Gesamt-LP is derived from entered modules. Failed attempts are excluded to avoid double counting after rescheduling.
+  renderStudyProgress=function(){
+    const sp=state.studyProgress,mods=sp.modules||[];
+    const counted=mods.filter(m=>m.status!=='failed');
+    const total=counted.reduce((a,m)=>a+Number(m.lp||0),0);
+    const passed=counted.filter(m=>m.status==='passed').reduce((a,m)=>a+Number(m.lp||0),0);
+    const current=counted.filter(m=>String(m.planSemester)===String(sp.currentSemester)&&m.status!=='passed').reduce((a,m)=>a+Number(m.lp||0),0);
+    sp.degreeTotal=total;
+    $('#lpTotal').textContent=total+' LP';$('#lpPassed').textContent=passed+' LP';$('#lpOpen').textContent=Math.max(0,total-passed)+' LP';$('#lpCurrent').textContent=current+' LP';
+    $('#degreeTotalLp').value=total;$('#degreeTotalLp').readOnly=true;$('#degreeTotalLp').title='Wird automatisch aus den Modulen berechnet';
+    $('#currentPlanSemester').value=sp.currentSemester;
+    const order=['1','2','3','Sommer','4','5','6','7'];
+    $('#lpGroups').innerHTML=order.map(sem=>{const rows=mods.filter(m=>String(m.planSemester)===sem);if(!rows.length)return'';const valid=rows.filter(m=>m.status!=='failed'),sum=valid.reduce((a,m)=>a+Number(m.lp||0),0),done=valid.filter(m=>m.status==='passed').reduce((a,m)=>a+Number(m.lp||0),0);return `<div class="card lp-semester"><div class="lp-semester-head"><div><h3>${sem==='Sommer'?'Sommer':sem+'. Semester'}</h3><div class="muted">${done}/${sum} LP</div></div><span class="status ${sem===String(sp.currentSemester)?'good':''}">${sem===String(sp.currentSemester)?'Aktuell':sum+' LP'}</span></div><div class="lp-table">${rows.map(m=>`<div class="lp-row ${sem===String(sp.currentSemester)?'lp-current':''}"><div><strong>${esc(m.name)}</strong><div class="muted lp-origin">Aus Semester ${esc(m.originSemester||'—')}</div></div><b>${m.lp} LP</b><span class="lp-status ${m.status}">${statusLabel(m.status)}</span><button class="mini-btn" data-edit-lp="${m.id}">✏️</button></div>`).join('')}</div></div>`}).join('');
+  };
+  $('#degreeTotalLp').onchange=null;
+
+  // A reusable AudioContext must be unlocked by a user gesture on iOS.
+  let audioCtx=null;
+  async function unlockAudio(){
+    if(!state.timerSettings.sound)return false;
+    try{
+      audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();
+      if(audioCtx.state==='suspended')await audioCtx.resume();
+      const b=audioCtx.createBuffer(1,1,22050),src=audioCtx.createBufferSource();src.buffer=b;src.connect(audioCtx.destination);src.start(0);
+      return audioCtx.state==='running';
+    }catch{return false}
+  }
+  function playToneSequence(kind='focus'){
+    if(!state.timerSettings.sound)return;
+    unlockAudio().then(ok=>{
+      if(!ok||!audioCtx)return;
+      const notes=kind==='focus'?[880,1040,1320]:[620,760];
+      notes.forEach((freq,i)=>{
+        const start=audioCtx.currentTime+i*.18,o=audioCtx.createOscillator(),g=audioCtx.createGain();
+        o.type='sine';o.frequency.setValueAtTime(freq,start);o.connect(g);g.connect(audioCtx.destination);
+        g.gain.setValueAtTime(.0001,start);g.gain.exponentialRampToValueAtTime(.24,start+.025);g.gain.exponentialRampToValueAtTime(.0001,start+.15);
+        o.start(start);o.stop(start+.17);
+      });
+    });
+  }
+  tone=function(freq,duration=.28){playToneSequence(freq>700?'focus':'break')};
+  notifyPhase=function(ended){const focusEnded=ended==='focus',title=focusEnded?'Lernzeit beendet':'Pause beendet',body=focusEnded?'Zeit für eine Pause':'Nächste Lernrunde starten';playToneSequence(focusEnded?'focus':'break');if(state.timerSettings.vibrate&&navigator.vibrate)navigator.vibrate(focusEnded?[180,90,180]:[120,60,120]);if(state.timerSettings.notifications&&Notification.permission==='granted')try{new Notification(title,{body,icon:'icon-192.png'})}catch{}toast(title)};
+  $('#soundTestBtn').onclick=async()=>{state.timerSettings.sound=true;$('#soundSetting').checked=true;localStorage.setItem(KEY,JSON.stringify(state));const ok=await unlockAudio();if(ok){playToneSequence('focus');toast('Ton ist aktiviert')}else toast('Ton konnte nicht aktiviert werden')};
+  $('#soundSetting').addEventListener('change',()=>{if($('#soundSetting').checked)unlockAudio()});
+
+  let rt=null;
+  function persistRT(){if(rt&&rt.running)localStorage.setItem(TIMER_KEY,JSON.stringify(rt));else localStorage.removeItem(TIMER_KEY)}
+  function loadRT(){try{return JSON.parse(localStorage.getItem(TIMER_KEY)||'null')}catch{return null}}
+  function bindRuntimeToTimer(){if(!rt)return;timer.running=!!rt.running;timer.paused=!!rt.paused;timer.mode=rt.mode;timer.round=rt.round;timer.totalRounds=rt.totalRounds;timer.focusSec=rt.focusSec;timer.breakSec=rt.breakSec;timer.open=rt.open;timer.startedAt=rt.startedAt;timer.accumulatedFocus=Math.floor((rt.accumulatedFocusMs||0)/1000)}
+  function saveCompletedSession(minutes){if(minutes<=0)return;state.sessions.push({id:uid(),subjectId:rt.subjectId,date:rt.sessionDate||todayISO(),minutes,createdAt:new Date().toISOString(),source:'timer'});save();toast(`${minsText(minutes)} Lernzeit gespeichert${isHolidayStudyDate(rt.sessionDate||todayISO())?' und im Ferienplan erfasst':''}`)}
+  function endRuntime(auto=false){clearInterval(timer.interval);const mins=Math.max(1,Math.round((rt.open?(rt.openElapsedMs||0):(rt.accumulatedFocusMs||0))/60000));saveCompletedSession(mins);rt.running=false;persistRT();rt=null;originalResetTimer();releaseWakeLock();if(auto)toast('Alle Runden abgeschlossen 🎉')}
+  function transitionAt(ts,withNotice=true){
+    const ended=rt.mode;
+    if(withNotice)notifyPhase(ended);
+    if(ended==='focus'){
+      if(rt.round>=rt.totalRounds){endRuntime(true);return false}
+      rt.mode='break';rt.phaseStartAt=ts;rt.phaseEndAt=ts+rt.breakSec*1000;
+    }else{
+      rt.mode='focus';rt.round++;rt.phaseStartAt=ts;rt.phaseEndAt=ts+rt.focusSec*1000;
+    }
+    return true;
+  }
+  function syncAbsoluteTimer(withNotice=true){
+    if(!rt||!rt.running||rt.paused)return;
+    const now=Date.now();
+    if(rt.open){rt.openElapsedMs=(rt.openElapsedMs||0)+Math.max(0,now-(rt.lastSyncAt||now));rt.lastSyncAt=now;timer.remaining=Math.floor(rt.openElapsedMs/1000);persistRT();renderTimerDisplay();return}
+    let cursor=rt.lastSyncAt||now;
+    let guard=0;
+    while(cursor<now&&rt&&rt.running&&!rt.paused&&guard++<100){
+      const end=Math.min(now,rt.phaseEndAt);
+      if(rt.mode==='focus')rt.accumulatedFocusMs=(rt.accumulatedFocusMs||0)+Math.max(0,end-cursor);
+      cursor=end;
+      if(cursor>=rt.phaseEndAt){
+        if(!state.timerSettings.autoNext){notifyPhase(rt.mode);rt.paused=true;rt.pendingTransition=true;rt.remainingAtPause=0;break}
+        if(!transitionAt(cursor,withNotice))return;
+      }
+    }
+    if(!rt)return;
+    rt.lastSyncAt=now;timer.mode=rt.mode;timer.round=rt.round;timer.accumulatedFocus=Math.floor((rt.accumulatedFocusMs||0)/1000);timer.remaining=rt.paused?(rt.remainingAtPause||0):Math.max(0,Math.ceil((rt.phaseEndAt-now)/1000));persistRT();renderRounds();renderTimerDisplay();
+    $('#timerPause').textContent=rt.paused?'Fortsetzen':'Pausieren';
+  }
+  setupTimer=async function(){
+    if(rt?.running)return;
+    const subj=$('#timerSubject').value;if(!subj)return toast('Füge zuerst ein Fach hinzu und wähle es aus.');
+    await unlockAudio();
+    const preset=$('#timerPreset').value,open=preset==='open',now=Date.now(),focusSec=Math.max(60,Number($('#focusMinutes').value||25)*60),breakSec=Math.max(0,Number($('#breakMinutes').value||5)*60),rounds=Math.max(1,Number($('#roundCount').value||1));
+    rt={running:true,paused:false,open,subjectId:subj,sessionDate:todayISO(),mode:'focus',round:1,totalRounds:rounds,focusSec,breakSec,phaseStartAt:now,phaseEndAt:now+focusSec*1000,lastSyncAt:now,accumulatedFocusMs:0,openElapsedMs:0,startedAt:now,pendingTransition:false};
+    bindRuntimeToTimer();lockTimerSettings(true);$('#timerStart').textContent='Läuft';$('#timerStart').disabled=true;$('#timerPause').disabled=false;$('#timerStop').disabled=false;syncAbsoluteTimer(false);timer.interval=setInterval(()=>syncAbsoluteTimer(true),500);renderRounds();persistRT();acquireWakeLock();
+  };
+  tick=function(){syncAbsoluteTimer(true)};
+  pauseTimer=function(){
+    if(!rt?.running)return;
+    syncAbsoluteTimer(false);
+    if(rt.paused){
+      const now=Date.now();
+      if(rt.pendingTransition){rt.pendingTransition=false;if(!transitionAt(now,false))return}
+      else if(!rt.open){rt.phaseStartAt=now;rt.phaseEndAt=now+(rt.remainingAtPause||timer.remaining)*1000}
+      rt.lastSyncAt=now;rt.paused=false;
+    }else{
+      rt.paused=true;rt.remainingAtPause=rt.open?0:Math.max(0,Math.ceil((rt.phaseEndAt-Date.now())/1000));
+    }
+    bindRuntimeToTimer();persistRT();$('#timerPause').textContent=rt.paused?'Fortsetzen':'Pausieren';$('#timerMode').textContent=rt.paused?'Pausiert':rt.mode==='focus'?'Lernzeit':'Pause';
+  };
+  finishTimer=function(auto=false){if(!rt?.running)return;syncAbsoluteTimer(false);endRuntime(auto)};
+  resetTimer=function(){rt=null;persistRT();originalResetTimer();releaseWakeLock()};
+  $('#timerStart').onclick=setupTimer;$('#timerPause').onclick=pauseTimer;$('#timerStop').onclick=()=>finishTimer(false);
+
+  function restoreRuntime(){
+    const saved=loadRT();if(!saved?.running)return;
+    if(!state.subjects.some(s=>s.id===saved.subjectId)){localStorage.removeItem(TIMER_KEY);return}
+    rt=saved;bindRuntimeToTimer();$('#timerSubject').value=rt.subjectId;lockTimerSettings(true);$('#timerStart').textContent='Läuft';$('#timerStart').disabled=true;$('#timerPause').disabled=false;$('#timerStop').disabled=false;timer.interval=setInterval(()=>syncAbsoluteTimer(true),500);syncAbsoluteTimer(false);if(rt?.running)acquireWakeLock();
+  }
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&rt?.running){syncAbsoluteTimer(true);acquireWakeLock()}else if(rt?.running){syncAbsoluteTimer(false);persistRT()}});
+  window.addEventListener('pagehide',()=>{if(rt?.running){syncAbsoluteTimer(false);persistRT()}});
+  setTimeout(restoreRuntime,0);
 })();
 
 renderAll();resetTimer();
