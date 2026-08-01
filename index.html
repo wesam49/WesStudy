@@ -104,7 +104,8 @@ dialog[open]{position:fixed;inset:0;margin:auto}
         <div class="card"><div class="eyebrow" id="todayStudiedLabel">Heute gelernt</div><div class="big-number" id="todayStudied">0:00</div><div class="muted" id="todayStatus">Starte deine erste Session</div></div>
         <div class="card"><div class="eyebrow">Fächer und Credits</div><div class="big-number" id="creditsTotal">0 CP</div><div class="muted" id="subjectsCount">0 Fächer</div></div>
       </div>
-      <div class="card semester-preview hidden" id="semesterPreview"><div class="section-head"><div><h2>Semester-Vorschau</h2><div class="muted">Die Semesterplanung bleibt auch im Ferienmodus sichtbar.</div></div></div><div class="metrics"><span class="pill" id="previewRequired">Gesamt 0 Std.</span><span class="pill" id="previewDone">Erledigt 0 Std.</span><span class="pill" id="previewRemaining">Verbleibend 0 Std.</span><span class="pill" id="previewDaily">Ab Semesterbeginn 0:00/Tag</span></div><div class="dashboard-status" id="planStatus"></div></div>
+      <div class="card" id="planStatusCard" style="margin-bottom:16px"><div class="dashboard-status" id="planStatus"></div></div>
+      <div class="card semester-preview hidden" id="semesterPreview"><div class="section-head"><div><h2>Semester-Vorschau</h2><div class="muted">Die Semesterplanung bleibt auch im Ferienmodus sichtbar.</div></div></div><div class="metrics"><span class="pill" id="previewRequired">Gesamt 0 Std.</span><span class="pill" id="previewDone">Erledigt 0 Std.</span><span class="pill" id="previewRemaining">Verbleibend 0 Std.</span><span class="pill" id="previewDaily">Ab Semesterbeginn 0:00/Tag</span></div></div>
       <div class="grid cols-2">
         <div class="card"><div class="section-head"><h2>Fächerfortschritt</h2><button class="btn soft" data-nav="subjects">Alle anzeigen</button></div><div id="homeSubjects" class="subject-list"></div></div>
         <div class="card"><div class="section-head"><h2>Letzte Sessions</h2><button class="btn soft" data-nav="history">Verlauf</button></div><div id="recentSessions"></div></div>
@@ -180,7 +181,7 @@ dialog[open]{position:fixed;inset:0;margin:auto}
 (()=>{
 'use strict';
 const KEY='wesstudy_v1';
-const defaultState={version:3,theme:'light',lang:'de',dashboardMode:'auto',semester:{name:'',start:'',end:'',hoursPerCredit:17},subjects:[],sessions:[],holiday:null,timerSettings:{sound:true,vibrate:true,notifications:false,autoNext:true},studyProgress:null};
+const defaultState={version:3.5,theme:'light',lang:'de',dashboardMode:'auto',semester:{name:'',start:'',end:'',hoursPerCredit:17},subjects:[],sessions:[],holiday:null,timerSettings:{sound:true,vibrate:true,notifications:false,autoNext:true},studyProgress:null};
 let state=load(); let timer={running:false,paused:false,mode:'focus',round:1,totalRounds:4,focusSec:1500,breakSec:300,remaining:1500,startedAt:null,accumulatedFocus:0,interval:null,open:false};
 let calDate=new Date(); let holidayDraft={days:{}}; let deferredPrompt=null;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
@@ -216,7 +217,11 @@ function activeDashboardMode(){return state.dashboardMode==='holiday'||state.das
 function daysUntil(date){if(!date)return null;return Math.max(0,Math.ceil((parseDate(date)-parseDate(todayISO()))/86400000))}
 function holidayFuturePlanDays(){if(!state.holiday)return [];return Object.entries(state.holiday.days||{}).filter(([d])=>d>=todayISO()&&d<=state.holiday.end).sort(([a],[b])=>a.localeCompare(b))}
 function holidayDailyNeed(){const rem=Math.max(0,holidayPlannedMins()-holidayDoneMins()),days=holidayFuturePlanDays().length;return days?rem/days:0}
-function semesterPlanPosition(){const s=state.semester;if(!s.start||!s.end)return 0;const totalDays=daysInclusive(s.start,s.end);if(!totalDays)return 0;const elapsed=todayISO()<s.start?0:Math.min(totalDays,daysInclusive(s.start,todayISO()));const expected=totalRequired()*(elapsed/totalDays);return totalStudied()-expected}
+function holidayPlannedToDate(){if(!state.holiday)return 0;const today=todayISO();return Object.entries(state.holiday.days||{}).filter(([date])=>date<=today).reduce((sum,[,hours])=>sum+Number(hours||0)*60,0)}
+function holidayDoneToDate(){if(!state.holiday)return 0;const today=todayISO();return state.sessions.filter(x=>x.date<=today&&overlapDate(x.date,state.holiday.start,state.holiday.end)).reduce((sum,x)=>sum+Number(x.minutes||0),0)}
+function holidayPlanPosition(){return holidayDoneToDate()-holidayPlannedToDate()}
+function totalPlanExpectedToDate(){const s=state.semester,today=todayISO(),holidayTarget=Math.min(totalRequired(),holidayPlannedMins());let expectedHoliday=0;if(state.holiday){expectedHoliday=today>=state.holiday.end?holidayTarget:Math.min(holidayTarget,holidayPlannedToDate())}if(!s.start||!s.end||today<s.start)return expectedHoliday;const totalDays=daysInclusive(s.start,s.end);if(!totalDays)return expectedHoliday;const elapsed=Math.min(totalDays,daysInclusive(s.start,today));const semesterTarget=Math.max(0,totalRequired()-holidayTarget);return holidayTarget+semesterTarget*(elapsed/totalDays)}
+function totalPlanPosition(){return totalStudied()-totalPlanExpectedToDate()}
 function renderAll(){applyTheme();renderSemester();renderSubjects();renderHome();renderHoliday();renderHistory();populateSubjectSelects();renderTimerMeta()}
 function applyTheme(){document.documentElement.dataset.theme=state.theme;$('#themeBtn').textContent=state.theme==='dark'?'☀️':'🌙'}
 function renderSemester(){const sem=state.semester;$('#hoursPerCreditText').textContent=sem.hoursPerCredit||17;$('#setupNotice').style.display=sem.start&&sem.end?'none':'block'}
@@ -239,7 +244,7 @@ function renderHome(){
    $('#todayStudiedLabel').textContent='Heute gelernt';$('#todayStudied').textContent=minsText(todayMins);$('#todayStatus').textContent=todayMins>=dNeed&&dNeed>0?'Tagesziel erreicht 🎉':todayMins?`verbleibend ${minsText(Math.max(0,dNeed-todayMins))}`:'Starte deine erste Session';
    $('#semesterPreview').classList.add('hidden');const endDays=daysUntil(state.semester.end);$('#countdownNumber').textContent=endDays===null?'—':endDays;$('#countdownTitle').textContent=endDays===0?'Das Semester endet heute':`Noch ${endDays??'—'} Tage bis Semesterende`;$('#countdownDate').textContent=state.semester.end?fmtDate(state.semester.end):'Semesterende noch nicht festgelegt';
  }
- const pos=semesterPlanPosition();$('#planStatus').textContent=pos>=0?`Du bist ${hoursText(pos)} vor dem Semesterplan`:`Du bist ${hoursText(Math.abs(pos))} hinter dem Semesterplan`;$('#planStatus').className='dashboard-status '+(pos>=0?'good':'bad');
+ const pos=mode==='holiday'?holidayPlanPosition():totalPlanPosition();const planName=mode==='holiday'?'Ferienplan':'Gesamtplan';if(Math.abs(pos)<1){$('#planStatus').textContent=`Du bist genau im ${planName}`}else{$('#planStatus').textContent=pos>0?`Du bist ${hoursText(pos)} vor dem ${planName}`:`Du bist ${hoursText(Math.abs(pos))} hinter dem ${planName}`};$('#planStatus').className='dashboard-status '+(pos>=0?'good':'bad');
  $('#creditsTotal').textContent=`${state.subjects.reduce((a,s)=>a+Number(s.credits),0)} CP`;$('#subjectsCount').textContent=`${state.subjects.length} Fächer`;$('#homeSubjects').innerHTML=state.subjects.length?state.subjects.slice().sort((a,b)=>(subjectRequired(b)-studiedForSubject(b.id))-(subjectRequired(a)-studiedForSubject(a.id))).slice(0,3).map(s=>subjectHTML(s,true)).join(''):`<div class="empty">Noch keine Fächer vorhanden</div>`;renderRecent()
 }
 function renderRecent(){const rows=state.sessions.slice().sort((a,b)=>(b.date+b.createdAt).localeCompare(a.date+a.createdAt)).slice(0,5);$('#recentSessions').innerHTML=rows.length?rows.map(sessionHTML).join(''):`<div class="empty">Noch keine Sessions vorhanden</div>`}
