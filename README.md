@@ -1,43 +1,17 @@
-# WesStudy
+# WesStudy v3.2 – Deutsch
 
-تطبيق ويب شخصي لمتابعة الدراسة، يعمل مباشرة من GitHub Pages ويحفظ البيانات محليًا على الجهاز.
+Persönliche PWA zur flexiblen Studienplanung.
 
-## الوظائف
+## Funktionen
 
-- إعداد بداية ونهاية فترة الفصل الدراسي.
-- حساب ساعات المادة تلقائيًا: عدد الكريدت × 17 ساعة (قابل للتعديل).
-- إضافة وتعديل وحذف المواد.
-- حساب إجمالي الساعات، المنجز، المتبقي، والمطلوب يوميًا وأسبوعيًا.
-- مؤقت دراسة وراحة بجولات، مع أوضاع جاهزة ووضع مفتوح.
-- خصم وقت الدراسة تلقائيًا من ساعات المادة.
-- خطة عطلة مستقلة باختيار الأيام من التقويم وتحديد ساعات كل يوم.
-- تسجيل دراسة أيام العطلة في تقدم المادة وفي متابعة العطلة معًا.
-- إضافة جلسات يدويًا وتعديلها أو حذفها.
-- تصدير واستيراد نسخة احتياطية بصيغة JSON.
-- الوضع الداكن.
-- PWA: يمكن تثبيته على شاشة الهاتف والعمل دون اتصال بعد أول فتح.
+- Semesterzeitraum und Lernfächer verwalten
+- Lernaufwand automatisch mit Credits × Stunden pro Credit berechnen
+- Lern- und Pausentimer mit Runden und Vollbildmodus
+- Ferienlernplan mit ausgewählten Kalendertagen
+- LP-Plan und Studienfortschritt verwalten
+- Sessions speichern, bearbeiten und löschen
+- Lokale Datenspeicherung sowie JSON-Backup
 
-## الرفع على GitHub Pages
+## GitHub Pages
 
-1. أنشئ Repository جديدًا، مثل `WesStudy`.
-2. ارفع **كل الملفات الموجودة هنا مباشرة** إلى جذر الـRepository.
-3. من GitHub افتح: `Settings → Pages`.
-4. عند `Build and deployment` اختر `Deploy from a branch`.
-5. اختر الفرع `main` والمجلد `/ (root)` ثم `Save`.
-6. بعد النشر سيظهر رابط التطبيق داخل صفحة Pages.
-
-## حفظ البيانات
-
-البيانات محفوظة داخل متصفح الجهاز باستخدام `localStorage`. استخدم زر **تصدير نسخة احتياطية** من الإعدادات قبل تغيير الجهاز أو مسح بيانات المتصفح.
-
-
-## Version 3
-- Modal-/Scroll-Fix für iOS Safari
-- Vollständige Sprachbereinigung Deutsch/Arabisch
-- Lernfächer direkt aus dem LP-Plan oder manuell hinzufügen
-
-
-## Version 3.1 – Deutsch
-- Die App ist vollständig auf Deutsch.
-- Die arabische Sprachumschaltung wurde entfernt.
-- Bestehende Daten bleiben erhalten.
+Alle Dateien direkt in das Stammverzeichnis des Repositorys hochladen. Unter **Settings → Pages** den Branch `main` und `/ (root)` auswählen.
