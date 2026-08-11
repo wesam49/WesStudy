@@ -1,17 +1,11 @@
-# WesStudy v3.2 – Deutsch
+# WesStudy v3.7
 
-Persönliche PWA zur flexiblen Studienplanung.
+Neue Semesterplanung:
+- einzelne Tage per Schnellplanung anklicken
+- Stunden pro geplantem Tag ändern oder löschen
+- wiederkehrende Wochentage automatisch über den gesamten Vorlesungszeitraum eintragen
+- Semesterbedarf, bereits verplante Stunden, noch nicht verplante Stunden und Durchschnitt pro freiem Tag
+- Ferienplanung bleibt mit der Semesterprognose verknüpft
+- Gesamt-LP werden aus den Modulen berechnet; Einträge mit Status „Nicht bestanden/Wiederholung“ zählen nicht doppelt
 
-## Funktionen
-
-- Semesterzeitraum und Lernfächer verwalten
-- Lernaufwand automatisch mit Credits × Stunden pro Credit berechnen
-- Lern- und Pausentimer mit Runden und Vollbildmodus
-- Ferienlernplan mit ausgewählten Kalendertagen
-- LP-Plan und Studienfortschritt verwalten
-- Sessions speichern, bearbeiten und löschen
-- Lokale Datenspeicherung sowie JSON-Backup
-
-## GitHub Pages
-
-Alle Dateien direkt in das Stammverzeichnis des Repositorys hochladen. Unter **Settings → Pages** den Branch `main` und `/ (root)` auswählen.
+Für GitHub Pages alle Dateien in das Repository-Root hochladen.
