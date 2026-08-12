@@ -1,13 +1,14 @@
 {
-  "name":"WesStudy",
-  "short_name":"WesStudy",
-  "start_url":"./",
-  "scope":"./",
-  "display":"standalone",
-  "background_color":"#f4f5fb",
-  "theme_color":"#6d5dfc",
-  "icons":[
-    {"src":"icon-192.png","sizes":"192x192","type":"image/png"},
-    {"src":"icon-512.png","sizes":"512x512","type":"image/png"}
+  "name": "WesStudy",
+  "short_name": "WesStudy",
+  "start_url": "./?v=3.8",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0b1020",
+  "theme_color": "#6d5dfc",
+  "lang": "de",
+  "icons": [
+    {"src":"./icon-192.png","sizes":"192x192","type":"image/png"},
+    {"src":"./icon-512.png","sizes":"512x512","type":"image/png"}
   ]
 }

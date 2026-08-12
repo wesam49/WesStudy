@@ -1,11 +1,14 @@
-# WesStudy v3.7
+# WesStudy v4.0 – Cloud Sync vorbereitet
 
-Neue Semesterplanung:
-- einzelne Tage per Schnellplanung anklicken
-- Stunden pro geplantem Tag ändern oder löschen
-- wiederkehrende Wochentage automatisch über den gesamten Vorlesungszeitraum eintragen
-- Semesterbedarf, bereits verplante Stunden, noch nicht verplante Stunden und Durchschnitt pro freiem Tag
-- Ferienplanung bleibt mit der Semesterprognose verknüpft
-- Gesamt-LP werden aus den Modulen berechnet; Einträge mit Status „Nicht bestanden/Wiederholung“ zählen nicht doppelt
+Neu: Firebase Authentication (E-Mail/Passwort + Google) und Firestore-Cloud-Sync. Die App speichert weiterhin lokal und synchronisiert bei Anmeldung automatisch zusätzlich in die Cloud.
 
-Für GitHub Pages alle Dateien in das Repository-Root hochladen.
+## Einmalige Firebase-Einrichtung
+1. Firebase-Projekt erstellen und eine Web-App registrieren.
+2. Authentication: Email/Password und Google aktivieren.
+3. Authentication > Settings > Authorized domains: `wesam49.github.io` hinzufügen.
+4. Firestore-Datenbank erstellen.
+5. Inhalt aus `firestore.rules` in Firestore > Rules einsetzen und veröffentlichen.
+6. Firebase-Web-Konfiguration in `firebase-config.js` eintragen.
+7. Alle Dateien auf GitHub Pages hochladen.
+
+Beim ersten Login: Existieren noch keine Cloud-Daten, wird der aktuelle lokale WesStudy-Stand hochgeladen. Gibt es bereits Cloud-Daten, gleicht die App anhand des lokalen Änderungszeitpunkts ab und fragt bei Konflikten nach.
