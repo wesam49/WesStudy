@@ -108,6 +108,10 @@ dialog[open]{position:fixed;inset:0;margin:auto}
         <div class="card"><div class="eyebrow">Fächer und Credits</div><div class="big-number" id="creditsTotal">0 CP</div><div class="muted" id="subjectsCount">0 Fächer</div></div>
       </div>
       <div class="card" id="planStatusCard" style="margin-bottom:16px"><div class="dashboard-status" id="planStatus"></div></div>
+      <div class="card" id="semesterPlanHomeCard" style="margin-bottom:16px">
+        <div class="section-head"><div><h2>📘 Semesterplanung</h2><div class="muted">Plane deine Lerntage während des Semesters – einzeln oder automatisch nach Wochentag.</div></div><button class="btn primary" id="openSemesterPlanHome">Semester planen</button></div>
+        <div class="metrics" id="semesterPlanHomeMetrics"><span class="pill">Noch kein Semesterplan</span></div>
+      </div>
       <div class="card semester-preview hidden" id="semesterPreview"><div class="section-head"><div><h2>Semester-Vorschau</h2><div class="muted">Prognose: So sieht dein Semester aus, wenn du den geplanten Ferienlernplan vollständig schaffst.</div></div></div><div class="metrics"><span class="pill" id="previewRequired">Gesamt 0 Std.</span><span class="pill" id="previewHolidayPlanned">Ferien geplant 0 Std.</span><span class="pill" id="previewRemaining">Im Semester 0 Std.</span><span class="pill" id="previewDaily">0:00/Tag</span><span class="pill" id="previewWeekly">0:00/Woche</span></div></div>
       <div class="grid cols-2">
         <div class="card"><div class="section-head"><h2>Fächerfortschritt</h2><button class="btn soft" data-nav="subjects">Alle anzeigen</button></div><div id="homeSubjects" class="subject-list"></div></div>
@@ -419,7 +423,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-open="subj
 })();
 
 
-/* ===== WesStudy v3.8: Semesterplanung ===== */
+/* ===== WesStudy v4.3: Semesterplanung ===== */
 (function v37SemesterPlanning(){
   state.semesterPlan=state.semesterPlan||{days:{}};
   let semesterDraft={days:{}};
@@ -471,6 +475,8 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-open="subj
     const pct=st.target?clamp(st.planned/st.target*100,0,100):0;document.getElementById('semesterPlanProgress').style.width=pct+'%';
     const today=todayISO(),future=entries.filter(([d])=>d>=today).slice(0,8);
     document.getElementById('semesterPlanUpcoming').innerHTML=future.length?future.map(([d,h])=>`<div class="holiday-day-row"><span>📘</span><strong>${fmtDate(d)}</strong><span class="muted" style="margin-inline-start:auto">${Number(h)} Std. geplant</span></div>`).join(''):`<div class="muted" style="text-align:center;padding:10px">Noch keine Semestertage geplant.</div>`;
+    const hm=document.getElementById('semesterPlanHomeMetrics');
+    if(hm) hm.innerHTML=`<span class="pill">Semesterbedarf ${hoursText(st.target)}</span><span class="pill">Verplant ${hoursText(st.planned)}</span><span class="pill">Noch offen ${hoursText(st.unplanned)}</span><span class="pill">Rest Ø ${minsText(st.avg)}/Tag</span>`;
   }
   function prepareSemesterPlanDialog(){
     semesterDraft={days:{...(state.semesterPlan?.days||{})}};semesterCalDate=parseDate(state.semester.start)||new Date();renderSemesterCalendar();renderSelectedSemesterDays();
@@ -494,6 +500,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-open="subj
     semesterAllDates().forEach(iso=>{if(parseDate(iso).getDay()===weekday)semesterDraft.days[iso]=hours});renderSemesterCalendar();renderSelectedSemesterDays();
   }
   document.getElementById('openSemesterPlan').onclick=()=>{if(!state.semester.start||!state.semester.end)return toast('Lege zuerst den Semesterzeitraum fest.');prepareSemesterPlanDialog();document.getElementById('semesterPlanDialog').showModal()};
+  document.getElementById('openSemesterPlanHome').onclick=document.getElementById('openSemesterPlan').onclick;
   document.getElementById('semCalPrev').onclick=()=>{semesterCalDate=new Date(semesterCalDate.getFullYear(),semesterCalDate.getMonth()-1,1);renderSemesterCalendar()};
   document.getElementById('semCalNext').onclick=()=>{semesterCalDate=new Date(semesterCalDate.getFullYear(),semesterCalDate.getMonth()+1,1);renderSemesterCalendar()};
   document.getElementById('applySemesterWeekday').onclick=applyWeekday;
