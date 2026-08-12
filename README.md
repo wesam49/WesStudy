@@ -1,4 +1,4 @@
-# WesStudy v4.1 – Google Cloud Sync
+# WesStudy v4.2 – Google Cloud Sync
 
 Diese Version ist bereits mit dem Firebase-Projekt `wesstudy-1` verbunden.
 

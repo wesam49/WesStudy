@@ -62,18 +62,33 @@ async function reconcileAfterLogin(){
 }
 
 async function googleLogin(){
+  const btn=el('cloudGoogleBtn');
+  if(!auth||!mods){
+    bridge()?.toast?.('Firebase ist noch nicht bereit. Bitte Seite neu laden.');
+    return;
+  }
   try{
+    if(btn){btn.disabled=true;btn.dataset.oldText=btn.textContent;btn.textContent='Google-Anmeldung läuft…';}
     const provider=new mods.GoogleAuthProvider();
     provider.setCustomParameters({prompt:'select_account'});
-    const isiOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(/Macintosh/.test(navigator.userAgent)&&navigator.maxTouchPoints>1);
-    const standalone=window.matchMedia?.('(display-mode: standalone)').matches||navigator.standalone===true;
-    if(isiOS||standalone){
-      await mods.signInWithRedirect(auth,provider);
-    }else{
-      try{await mods.signInWithPopup(auth,provider)}
-      catch(e){if(['auth/popup-blocked','auth/cancelled-popup-request','auth/operation-not-supported-in-this-environment'].includes(e?.code))await mods.signInWithRedirect(auth,provider);else throw e;}
+    // GitHub Pages + Safari/iOS: Popup avoids the cross-origin redirect-storage limitation.
+    const result=await mods.signInWithPopup(auth,provider);
+    if(result?.user){
+      bridge()?.toast?.(`Angemeldet als ${result.user.email||result.user.displayName||'Google-Konto'}`);
     }
-  }catch(e){console.error(e);bridge()?.toast?.(firebaseError(e));}
+  }catch(e){
+    console.error('Google login failed:',e?.code,e?.message,e);
+    const msg=firebaseError(e);
+    setStatus('Google-Anmeldung fehlgeschlagen','bad','Fehler');
+    bridge()?.toast?.(msg);
+    alert(`Google-Anmeldung fehlgeschlagen
+
+${msg}
+
+Fehlercode: ${e?.code||'unbekannt'}`);
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent=btn.dataset.oldText||'🔐 Mit Google anmelden';}
+  }
 }
 
 async function init(){
@@ -92,7 +107,7 @@ async function init(){
     ]);
     mods={...authM,...fsM};
     const app=appM.initializeApp(cfg);auth=authM.getAuth(app);db=fsM.getFirestore(app);
-    try{await authM.getRedirectResult(auth)}catch(e){console.warn('Redirect result',e);}
+    try{await authM.setPersistence(auth,authM.browserLocalPersistence)}catch(e){console.warn('Auth persistence',e);}
     window.WesStudyCloud={queueSave:(s)=>{if(!user)return;clearTimeout(saveTimer);saveTimer=setTimeout(()=>uploadState(s),900);}};
     authM.onAuthStateChanged(auth,async u=>{
       user=u||null;signedUI();
@@ -113,7 +128,10 @@ el('cloudDownloadBtn')?.addEventListener('click',async()=>{await downloadState({
 
 function firebaseError(e){
   const c=e?.code||'';
-  if(c.includes('popup-blocked'))return 'Das Google-Anmeldefenster wurde blockiert. Bitte erneut versuchen.';
+  if(c.includes('popup-blocked'))return 'Safari hat das Google-Anmeldefenster blockiert. Bitte Pop-ups für wesam49.github.io erlauben und erneut versuchen.';
+  if(c.includes('popup-closed-by-user'))return 'Das Google-Anmeldefenster wurde geschlossen, bevor die Anmeldung abgeschlossen war.';
+  if(c.includes('web-storage-unsupported'))return 'Safari blockiert den für die Anmeldung benötigten Web-Speicher. Bitte nicht im privaten Modus öffnen.';
+  if(c.includes('operation-not-supported-in-this-environment'))return 'Google-Anmeldung wird in dieser Browseransicht nicht unterstützt. Bitte direkt in Safari öffnen.';
   if(c.includes('unauthorized-domain'))return 'wesam49.github.io ist in Firebase Authentication nicht freigegeben.';
   if(c.includes('permission-denied'))return 'Firestore-Zugriff wurde durch die Sicherheitsregeln abgelehnt.';
   if(c.includes('network-request-failed'))return 'Netzwerkfehler. Bitte Internetverbindung prüfen.';
