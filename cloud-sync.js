@@ -23,13 +23,36 @@ function cloneState(s){
 function cleanStateForCloud(s){const c=cloneState(s);c.meta={...(c.meta||{}),updatedAt:Number(c.meta?.updatedAt||Date.now())};return c}
 function userDocRef(){return mods.doc(db,'users',user.uid,'data','wesstudy')}
 
+function stateSummary(s){
+  s=s||{};
+  const subjects=Array.isArray(s.subjects)?s.subjects.length:0;
+  const credits=(Array.isArray(s.subjects)?s.subjects:[]).reduce((a,x)=>a+Number(x.credits||x.cp||0),0);
+  const sessions=Array.isArray(s.sessions)?s.sessions.length:0;
+  const semester=Boolean(s.semester?.start||s.semester?.end);
+  const holidayDays=Object.keys(s.holiday?.days||{}).length;
+  const semesterDays=Object.keys(s.semesterPlan?.days||{}).length;
+  return {subjects,credits,sessions,semester,holidayDays,semesterDays,meaningful:Boolean(subjects||sessions||semester||holidayDays||semesterDays)};
+}
+function showCloudSummary(s,updatedAt){
+  const e=el('cloudDataSummary'); if(!e)return;
+  if(!s){e.textContent='Cloud: keine WesStudy-Daten gespeichert';return;}
+  const x=stateSummary(s);
+  const when=updatedAt?.toDate?updatedAt.toDate():null;
+  e.textContent=`Cloud: ${x.subjects} Fächer · ${x.credits} CP · ${x.sessions} Sitzungen · Ferien ${x.holidayDays} Tage · Semesterplan ${x.semesterDays} Tage${when?' · Stand '+when.toLocaleString('de-DE',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):''}`;
+}
+async function refreshCloudSummary(){
+  if(!user||!db)return;
+  try{const snap=await mods.getDoc(userDocRef()); if(!snap.exists()){showCloudSummary(null);return;} const d=snap.data(); showCloudSummary(d?.state,d?.updatedAt);}catch(e){console.warn('Cloud summary',e);}
+}
+
+
 async function uploadState(state=bridge()?.getState()){
   if(!user||!db||syncing||!state)return;
   syncing=true;setStatus('Synchronisiere…','warn','Sync');
   try{
     const payload=cleanStateForCloud(state);
     await mods.setDoc(userDocRef(),{state:payload,updatedAt:mods.serverTimestamp(),clientUpdatedAt:Number(payload.meta?.updatedAt||Date.now())},{merge:false});
-    lastSyncedAt=Date.now();setStatus('Cloud-Sync aktiv','good','Cloud');signedUI();
+    lastSyncedAt=Date.now();setStatus('Cloud-Sync aktiv','good','Cloud');signedUI();showCloudSummary(payload);
   }catch(e){console.error(e);setStatus('Sync fehlgeschlagen','bad','Fehler');bridge()?.toast?.(firebaseError(e));}
   finally{syncing=false;}
 }
@@ -38,7 +61,7 @@ async function downloadState({ask=true}={}){
   try{
     const snap=await mods.getDoc(userDocRef());
     if(!snap.exists())return false;
-    const cloud=snap.data()?.state;if(!cloud)return false;
+    const cloud=snap.data()?.state;if(!cloud){showCloudSummary(null);return false;} showCloudSummary(cloud,snap.data()?.updatedAt);
     if(ask&&!confirm('Cloud-Daten auf dieses Gerät laden? Lokale Änderungen seit dem letzten Sync werden ersetzt.'))return false;
     bridge()?.applyCloudState(cloud);lastSyncedAt=Date.now();setStatus('Cloud-Daten geladen','good','Cloud');signedUI();return true;
   }catch(e){console.error(e);setStatus('Cloud konnte nicht geladen werden','bad','Fehler');return false;}
@@ -111,7 +134,7 @@ async function init(){
     window.WesStudyCloud={queueSave:(s)=>{if(!user)return;clearTimeout(saveTimer);saveTimer=setTimeout(()=>uploadState(s),900);}};
     authM.onAuthStateChanged(auth,async u=>{
       user=u||null;signedUI();
-      if(user){setStatus('Angemeldet – Daten werden abgeglichen','warn','Sync');await reconcileAfterLogin();}
+      if(user){setStatus('Angemeldet – Daten werden abgeglichen','warn','Sync');await reconcileAfterLogin();await refreshCloudSummary();}
       else setStatus('Nicht angemeldet – lokale Speicherung','warn','Lokal');
     });
     if(el('cloudSetupHint'))el('cloudSetupHint').textContent='Mit Google anmelden. Danach werden Änderungen automatisch lokal und in Firestore gespeichert.';
@@ -123,7 +146,13 @@ async function init(){
 
 el('cloudGoogleBtn')?.addEventListener('click',googleLogin);
 el('cloudLogoutBtn')?.addEventListener('click',async()=>{if(auth)await mods.signOut(auth)});
-el('cloudUploadBtn')?.addEventListener('click',async()=>{if(confirm('Lokale Daten jetzt als Cloud-Stand speichern?'))await uploadState()});
+el('cloudUploadBtn')?.addEventListener('click',async()=>{
+  const local=bridge()?.getState()||{}; const ls=stateSummary(local);
+  let cloud=null; try{const snap=await mods.getDoc(userDocRef());cloud=snap.exists()?snap.data()?.state:null;}catch{}
+  const cs=stateSummary(cloud||{});
+  if(!ls.meaningful&&cs.meaningful){alert('Sicherheitsstopp: Dieses Gerät enthält keine WesStudy-Daten, die Cloud aber schon. Ein leerer Stand wird nicht über deine Cloud-Daten geschrieben.');return;}
+  if(confirm(`Lokale Daten jetzt als Cloud-Stand speichern?\n\nDieses Gerät: ${ls.subjects} Fächer · ${ls.credits} CP · ${ls.sessions} Sitzungen`)){await uploadState(local);await refreshCloudSummary();}
+});
 el('cloudDownloadBtn')?.addEventListener('click',async()=>{await downloadState({ask:true})});
 
 function firebaseError(e){
