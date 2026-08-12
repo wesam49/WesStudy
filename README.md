@@ -1,14 +1,22 @@
-# WesStudy v4.0 – Cloud Sync vorbereitet
+# WesStudy v4.1 – Google Cloud Sync
 
-Neu: Firebase Authentication (E-Mail/Passwort + Google) und Firestore-Cloud-Sync. Die App speichert weiterhin lokal und synchronisiert bei Anmeldung automatisch zusätzlich in die Cloud.
+Diese Version ist bereits mit dem Firebase-Projekt `wesstudy-1` verbunden.
 
-## Einmalige Firebase-Einrichtung
-1. Firebase-Projekt erstellen und eine Web-App registrieren.
-2. Authentication: Email/Password und Google aktivieren.
-3. Authentication > Settings > Authorized domains: `wesam49.github.io` hinzufügen.
-4. Firestore-Datenbank erstellen.
-5. Inhalt aus `firestore.rules` in Firestore > Rules einsetzen und veröffentlichen.
-6. Firebase-Web-Konfiguration in `firebase-config.js` eintragen.
-7. Alle Dateien auf GitHub Pages hochladen.
+## Firebase Voraussetzungen
+- Google Sign-In: aktiviert
+- Authorized Domain: `wesam49.github.io`
+- Cloud Firestore: `(default)`
+- Firestore-Regeln: Zugriff nur auf `/users/{uid}/...` für den angemeldeten Benutzer
 
-Beim ersten Login: Existieren noch keine Cloud-Daten, wird der aktuelle lokale WesStudy-Stand hochgeladen. Gibt es bereits Cloud-Daten, gleicht die App anhand des lokalen Änderungszeitpunkts ab und fragt bei Konflikten nach.
+## Erstes Anmelden
+1. WesStudy öffnen.
+2. Einstellungen öffnen.
+3. **Mit Google anmelden** drücken.
+4. Beim ersten Login werden vorhandene lokale WesStudy-Daten automatisch in Firestore gespeichert, wenn dort noch keine Cloud-Daten existieren.
+5. Danach werden Änderungen automatisch synchronisiert.
+
+## GitHub Pages
+Alle Dateien aus diesem ZIP in das Root-Verzeichnis des `WesStudy`-Repositories hochladen und vorhandene Dateien ersetzen.
+
+Zum Umgehen alter Browser-Caches:
+`https://wesam49.github.io/WesStudy/?v=4.1`
