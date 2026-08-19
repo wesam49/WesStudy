@@ -105,6 +105,7 @@ dialog[open]{position:fixed;inset:0;margin:auto}
         <div class="card"><div class="eyebrow" id="dailyNeedLabel">Täglich erforderlich</div><div class="big-number" id="dailyNeed">0:00</div><div class="muted" id="dailyNeedHint">Nach verbleibenden Tagen</div></div>
         <div class="card"><div class="eyebrow" id="weeklyNeedLabel">Wöchentlich erforderlich</div><div class="big-number" id="weeklyNeed">0:00</div><div class="muted" id="weeklyNeedHint">Um im Plan zu bleiben</div></div>
         <div class="card"><div class="eyebrow" id="todayStudiedLabel">Heute gelernt</div><div class="big-number" id="todayStudied">0:00</div><div class="muted" id="todayStatus">Starte deine erste Session</div></div>
+        <div class="card"><div class="eyebrow">Heute geplant</div><div class="big-number" id="todayPlanned">0:00</div><div class="muted" id="todayPlannedStatus">Aus der Semesterplanung</div></div>
         <div class="card"><div class="eyebrow">Fächer und Credits</div><div class="big-number" id="creditsTotal">0 CP</div><div class="muted" id="subjectsCount">0 Fächer</div></div>
       </div>
       <div class="card" id="planStatusCard" style="margin-bottom:16px"><div class="dashboard-status" id="planStatus"></div></div>
@@ -240,6 +241,7 @@ function subjectHTML(s,compact=false){const req=subjectRequired(s),done=studiedF
 function renderSubjects(){const el=$('#subjectsList');el.innerHTML=state.subjects.length?state.subjects.map(s=>subjectHTML(s)).join(''):`<div class="card empty"><div class="emoji">📚</div><h3>Füge dein erstes Fach hinzu</h3><p>Gib Fachname und Credits ein; die benötigte Lernzeit wird automatisch berechnet.</p><button class="btn primary" data-open="subjectDialog">Fach hinzufügen</button></div>`;$('#subCredits').textContent=state.subjects.reduce((a,s)=>a+Number(s.credits),0);$('#subRequired').textContent=hoursText(totalRequired());$('#subStudied').textContent=hoursText(totalStudied());$('#subRemaining').textContent=hoursText(totalRemaining())}
 function renderHome(){
  const req=totalRequired(),done=totalStudied(),rem=Math.max(0,req-done),p=req?clamp(done/req*100,0,100):0,mode=activeDashboardMode(),today=todayISO(),todayMins=sessionsOn(today);
+ const todayPlannedHours=Number(state.semesterPlan?.days?.[today]||0),todayPlannedMins=todayPlannedHours*60;$('#todayPlanned').textContent=minsText(todayPlannedMins);$('#todayPlannedStatus').textContent=todayPlannedMins?(todayMins>=todayPlannedMins?'Geplante Lernzeit erreicht 🎉':`Noch ${minsText(Math.max(0,todayPlannedMins-todayMins))} von deinem Tagesplan`):'Für heute nichts geplant';
  $$('#dashboardMode button').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));
  $('#heroStudied').textContent=hoursText(done);$('#heroRemaining').textContent=`verbleibend ${hoursText(rem)}`;$('#overallPercent').textContent=`${p.toFixed(0)}%`;$('#overallRing').style.setProperty('--p',p);
  if(mode==='holiday'){
