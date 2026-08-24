@@ -20,3 +20,7 @@ Alle Dateien aus diesem ZIP in das Root-Verzeichnis des `WesStudy`-Repositories 
 
 Zum Umgehen alter Browser-Caches:
 `https://wesam49.github.io/WesStudy/?v=4.1`
+
+
+## v4.4 – Tagesplan
+Neue unabhängige Tagesplan-Seite mit Timeline, Kategorien, Wiederholungen, Vorlagen und Tages-Lernziel-Vergleich. Der Tagesplan startet keinen Timer und verändert keine Lernstunden.
