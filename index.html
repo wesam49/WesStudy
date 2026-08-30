@@ -29,7 +29,7 @@
     .brand{display:flex;align-items:center;gap:12px}.logo{width:48px;height:48px;border-radius:16px;background:linear-gradient(135deg,var(--primary),#9b8fff);display:grid;place-items:center;color:white;font-weight:900;box-shadow:0 10px 24px rgba(109,93,252,.28)}
     .brand h1{font-size:1.15rem;margin:0}.brand p{font-size:.82rem;color:var(--muted);margin:3px 0 0}.actions{display:flex;gap:8px}
     .icon-btn,.btn{border:0;border-radius:14px;background:var(--panel);color:var(--text);box-shadow:var(--shadow);padding:11px 14px}.icon-btn{width:44px;height:44px;padding:0;display:grid;place-items:center}.btn{font-weight:750}.btn.primary{background:linear-gradient(135deg,var(--primary),var(--primary2));color:white}.btn.soft{background:var(--panel2);box-shadow:none}.btn.danger{background:#fff0f1;color:#c63c48;box-shadow:none}.btn.good{background:#e8fff7;color:#0c8a63;box-shadow:none}
-    .nav{position:fixed;z-index:30;bottom:12px;left:50%;transform:translateX(-50%);width:min(760px,calc(100% - 24px));display:grid;grid-template-columns:repeat(7,1fr);gap:5px;padding:7px;background:rgba(255,255,255,.86);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.7);border-radius:22px;box-shadow:0 16px 50px rgba(20,22,60,.2)}
+    .nav{position:fixed;z-index:30;bottom:12px;left:50%;transform:translateX(-50%);width:min(760px,calc(100% - 24px));display:grid;grid-template-columns:repeat(6,1fr);gap:5px;padding:7px;background:rgba(255,255,255,.86);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.7);border-radius:22px;box-shadow:0 16px 50px rgba(20,22,60,.2)}
     [data-theme="dark"] .nav{background:rgba(24,26,34,.9);border-color:#30333e}.nav button{border:0;background:transparent;color:var(--muted);padding:8px 3px;border-radius:15px;font-size:.72rem}.nav button span{display:block;font-size:1.25rem;margin-bottom:2px}.nav button.active{background:var(--primary);color:#fff}
     .page{display:none}.page.active{display:block}.grid{display:grid;gap:16px}.grid.cols-4{grid-template-columns:repeat(4,1fr)}.grid.cols-3{grid-template-columns:repeat(3,1fr)}.grid.cols-2{grid-template-columns:repeat(2,1fr)}
     .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}.card.flat{box-shadow:none}.card h2,.card h3{margin:0 0 12px}.eyebrow{font-size:.78rem;color:var(--muted);font-weight:700}.big-number{font-size:1.75rem;font-weight:900;margin-top:5px}.muted{color:var(--muted)}
@@ -39,7 +39,7 @@
     .form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.field{display:grid;gap:7px}.field.full{grid-column:1/-1}.field label{font-size:.82rem;color:var(--muted);font-weight:700}.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:13px;padding:12px;outline:none}.field input:focus,.field select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(109,93,252,.12)}
     dialog{border:0;padding:0;background:transparent;width:min(600px,calc(100% - 24px));max-height:92vh}dialog::backdrop{background:rgba(10,11,18,.55);backdrop-filter:blur(4px)}.modal{background:var(--panel);color:var(--text);border-radius:24px;padding:20px;max-height:92vh;overflow:auto}.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}.modal-head h3{margin:0}.close{border:0;background:var(--panel2);color:var(--text);width:38px;height:38px;border-radius:12px}
     .timer-wrap{text-align:center}.timer-display{font-size:clamp(3.2rem,14vw,6.6rem);font-weight:900;letter-spacing:-3px;font-variant-numeric:tabular-nums;margin:18px 0 4px}.timer-mode{color:var(--muted);font-weight:750}.timer-controls{display:flex;justify-content:center;gap:10px;margin:18px 0;flex-wrap:wrap}.timer-controls .btn{min-width:105px}.rounds{display:flex;justify-content:center;gap:7px;margin:12px 0}.round{width:12px;height:12px;border-radius:50%;background:var(--line)}.round.done{background:var(--good)}.round.current{background:var(--primary);box-shadow:0 0 0 5px rgba(109,93,252,.14)}
-    .calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}.cal-head{text-align:center;font-size:.72rem;color:var(--muted);padding:5px}.day{border:1px solid var(--line);background:var(--panel2);min-height:66px;border-radius:12px;padding:7px;text-align:right;color:var(--text)}.day.out{opacity:.25}.day.selected{border-color:var(--primary);background:rgba(109,93,252,.12)}.day .num{font-weight:800}.day .hours{font-size:.72rem;color:var(--primary);margin-top:8px;font-weight:800}.calendar-nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.calendar-nav h3{margin:0;font-size:1rem}
+    .calendar{display:grid;grid-template-columns:repeat(6,1fr);gap:7px}.cal-head{text-align:center;font-size:.72rem;color:var(--muted);padding:5px}.day{border:1px solid var(--line);background:var(--panel2);min-height:66px;border-radius:12px;padding:7px;text-align:right;color:var(--text)}.day.out{opacity:.25}.day.selected{border-color:var(--primary);background:rgba(109,93,252,.12)}.day .num{font-weight:800}.day .hours{font-size:.72rem;color:var(--primary);margin-top:8px;font-weight:800}.calendar-nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.calendar-nav h3{margin:0;font-size:1rem}
     .holiday-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.holiday-day-list{display:grid;gap:8px;max-height:250px;overflow:auto;margin-top:12px}.holiday-day-row{display:flex;align-items:center;gap:8px;background:var(--panel2);padding:9px;border-radius:12px}.holiday-day-row input{width:90px;margin-inline-start:auto}
     .session-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}.session-row:last-child{border:0}.session-icon{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:var(--panel2)}.session-info{flex:1}.session-info strong{display:block}.session-info small{color:var(--muted)}
     .toast{position:fixed;top:18px;left:50%;transform:translate(-50%,-25px);opacity:0;z-index:100;background:#20212c;color:#fff;border-radius:14px;padding:12px 16px;transition:.25s;pointer-events:none;box-shadow:var(--shadow)}.toast.show{opacity:1;transform:translate(-50%,0)}
@@ -51,7 +51,7 @@
     .dayplan-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:16px}
     .dayplan-date{display:flex;align-items:center;gap:8px}.dayplan-date strong{min-width:160px;text-align:center}
     .dayplan-timeline{display:grid;gap:10px}.dayplan-item{display:grid;grid-template-columns:76px 1fr auto;gap:12px;align-items:center;padding:13px;border:1px solid var(--line);background:var(--panel);border-radius:17px}.dayplan-item.done{opacity:.58}.dayplan-item.done .dayplan-title{text-decoration:line-through}.dayplan-time{font-weight:900;font-variant-numeric:tabular-nums;color:var(--primary)}.dayplan-title{font-weight:850}.dayplan-sub{font-size:.78rem;color:var(--muted);margin-top:3px}.dayplan-actions{display:flex;align-items:center;gap:6px}.dayplan-check{width:24px;height:24px;accent-color:var(--primary)}.dayplan-learning{padding:14px;border-radius:16px;background:var(--panel2);border:1px solid var(--line);margin-bottom:16px}.dayplan-learning.good{border-color:#bdebdc;background:#effbf7}.template-row{display:flex;gap:8px;flex-wrap:wrap}.template-row select{flex:1;min-width:170px;border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:13px;padding:11px}
-    @media(max-width:560px){.nav{grid-template-columns:repeat(7,1fr);gap:2px}.nav button{font-size:.62rem;padding:7px 1px}.nav button span{font-size:1.08rem}.dayplan-item{grid-template-columns:62px 1fr;}.dayplan-actions{grid-column:2;justify-content:flex-end}.dayplan-date{width:100%;justify-content:space-between}.dayplan-date strong{min-width:0;flex:1}}
+    @media(max-width:560px){.nav{grid-template-columns:repeat(6,1fr);gap:2px}.nav button{font-size:.62rem;padding:7px 1px}.nav button span{font-size:1.08rem}.dayplan-item{grid-template-columns:62px 1fr;}.dayplan-actions{grid-column:2;justify-content:flex-end}.dayplan-date{width:100%;justify-content:space-between}.dayplan-date strong{min-width:0;flex:1}}
 
     .cloud-card{border:1px solid var(--line);background:var(--panel2);border-radius:18px;padding:14px}.cloud-head{display:flex;align-items:center;justify-content:space-between;gap:12px}.cloud-head strong{display:block;margin-bottom:3px}.cloud-card .timer-controls{justify-content:flex-start}.cloud-card .btn{box-shadow:none}.cloud-card input{background:var(--panel);}
     @media(max-width:850px){.grid.cols-4{grid-template-columns:repeat(2,1fr)}.grid.cols-3{grid-template-columns:1fr}.grid.cols-2{grid-template-columns:1fr}.holiday-summary{grid-template-columns:1fr 1fr 1fr}}
@@ -107,13 +107,32 @@ dialog[open]{position:fixed;inset:0;margin:auto}
       <div id="setupNotice" class="card" style="margin-bottom:16px;display:none"><div class="section-head"><div><h2>Semester einrichten</h2><div class="muted">Lege den Zeitraum fest und füge deine Fächer hinzu.</div></div><button class="btn primary" data-open="semesterDialog">Jetzt einrichten</button></div></div>
       <div class="dashboard-mode" id="dashboardMode"><button type="button" data-mode="holiday">Ferien</button><button type="button" data-mode="semester">Semester</button></div>
       <div class="dashboard-countdown" id="dashboardCountdown"><div class="count-number" id="countdownNumber">—</div><div><strong id="countdownTitle">Zeitraum einrichten</strong><div class="muted" id="countdownDate">Lege Semester- und Feriendaten fest.</div></div></div>
-      <div class="card hero" style="margin-bottom:16px"><div class="hero-row"><div><div style="opacity:.85;font-size:.86rem">Gesamtfortschritt</div><div class="big-number" id="heroStudied">0 Std.</div><div style="opacity:.85;margin:8px 0" id="heroRemaining">verbleibend 0 Std.</div><button class="btn" style="background:white;color:#5c4de0;box-shadow:none" data-nav="timer">Lernsession starten</button></div><div class="ring" id="overallRing"><strong id="overallPercent">0%</strong></div></div></div>
+      <div class="card hero" style="margin-bottom:16px"><div class="hero-row"><div><div style="opacity:.85;font-size:.86rem">Gesamtfortschritt</div><div class="big-number" id="heroStudied">0 Std.</div><div style="opacity:.85;margin:8px 0" id="heroRemaining">verbleibend 0 Std.</div><button class="btn" style="background:white;color:#5c4de0;box-shadow:none" data-open="manualSessionDialog">Lernzeit eintragen</button></div><div class="ring" id="overallRing"><strong id="overallPercent">0%</strong></div></div></div>
       <div class="grid cols-4" style="margin-bottom:16px">
         <div class="card"><div class="eyebrow" id="dailyNeedLabel">Täglich erforderlich</div><div class="big-number" id="dailyNeed">0:00</div><div class="muted" id="dailyNeedHint">Nach verbleibenden Tagen</div></div>
         <div class="card"><div class="eyebrow" id="weeklyNeedLabel">Wöchentlich erforderlich</div><div class="big-number" id="weeklyNeed">0:00</div><div class="muted" id="weeklyNeedHint">Um im Plan zu bleiben</div></div>
         <div class="card"><div class="eyebrow" id="todayStudiedLabel">Heute gelernt</div><div class="big-number" id="todayStudied">0:00</div><div class="muted" id="todayStatus">Starte deine erste Session</div></div>
         <div class="card"><div class="eyebrow">Heute geplant</div><div class="big-number" id="todayPlanned">0:00</div><div class="muted" id="todayPlannedStatus">Aus der Semesterplanung</div></div>
         <div class="card"><div class="eyebrow">Fächer und Credits</div><div class="big-number" id="creditsTotal">0 CP</div><div class="muted" id="subjectsCount">0 Fächer</div></div>
+      </div>
+      <div class="card" id="dailyStudyCard" style="margin-bottom:16px">
+        <div class="section-head"><div><h2 id="dailyStudyTitle">Heute</h2><div class="muted" id="dailyStudySource">Dein Lernplan für heute</div></div><span class="status" id="dailyStudyBadge">—</span></div>
+        <div class="grid cols-4" style="margin-top:12px">
+          <div><div class="eyebrow">Geplant</div><div class="big-number" id="dailyTrackPlanned">0:00</div></div>
+          <div><div class="eyebrow">Erledigt</div><div class="big-number" id="dailyTrackDone">0:00</div></div>
+          <div><div class="eyebrow">Noch offen</div><div class="big-number" id="dailyTrackOpen">0:00</div></div>
+          <div><div class="eyebrow">Erreicht</div><div class="big-number" id="dailyTrackPercent">0%</div></div>
+        </div>
+        <div class="progress" style="margin-top:12px"><i id="dailyTrackProgress"></i></div>
+        <div class="timer-controls" style="margin-top:14px">
+          <button class="btn primary" type="button" id="markTodayDone">✓ Als erledigt markieren</button>
+          <button class="btn soft" type="button" id="enterTodayHours">✏️ Stunden eintragen</button>
+        </div>
+      </div>
+      <div class="card" id="pastStudyDaysCard" style="margin-bottom:16px">
+        <div class="section-head"><div><h2>Vergangene Tage</h2><div class="muted">Geplant, erledigt und offen – damit du siehst, wo etwas fehlt.</div></div></div>
+        <div id="pastStudyDays"></div>
+        <div class="dashboard-status" id="pastStudyBacklog" style="margin-top:12px"></div>
       </div>
       <div class="card" id="planStatusCard" style="margin-bottom:16px"><div class="dashboard-status" id="planStatus"></div></div>
       <div class="card" id="semesterPlanHomeCard" style="margin-bottom:16px">
@@ -131,24 +150,6 @@ dialog[open]{position:fixed;inset:0;margin:auto}
       <div class="section-head"><div><h2>Lernfächer</h2><div class="muted">Jeder Credit = <span id="hoursPerCreditText">17</span> Stunden im Vorlesungszeitraum</div></div><button class="btn primary" data-open="subjectDialog">+ Fach hinzufügen</button></div>
       <div class="grid cols-4" style="margin-bottom:16px"><div class="card"><div class="eyebrow">Credits gesamt</div><div class="big-number" id="subCredits">0</div></div><div class="card"><div class="eyebrow">Gesamtplan</div><div class="big-number" id="subRequired">0 Std.</div></div><div class="card"><div class="eyebrow">Erledigt</div><div class="big-number" id="subStudied">0 Std.</div></div><div class="card"><div class="eyebrow">Verbleibend</div><div class="big-number" id="subRemaining">0 Std.</div></div></div>
       <div id="subjectsList" class="subject-list"></div>
-    </section>
-
-    <section class="page" data-page="timer">
-      <div class="grid cols-2">
-        <div class="card timer-wrap">
-          <div class="section-head"><h2>Lerntimer</h2><button type="button" class="mini-btn fullscreen-btn" id="timerFullscreen">⛶</button><span id="timerHolidayBadge" class="status good hidden">Im Ferienplan</span></div>
-          <div class="field"><label>Aktuelles Fach</label><select id="timerSubject"></select></div>
-          <div class="timer-display" id="timerDisplay">25:00</div><div class="timer-mode" id="timerMode">Lernzeit</div><div class="rounds" id="rounds"></div>
-          <div class="timer-controls"><button class="btn primary" id="timerStart">Starten</button><button class="btn soft" id="timerPause" disabled>Pausieren</button><button class="btn danger" id="timerStop" disabled>Beenden und speichern</button></div>
-          <div class="progress"><i id="timerProgress"></i></div>
-        </div>
-        <div class="card"><h2>Session-Einstellungen</h2><div class="form-grid">
-          <div class="field"><label>Lernminuten</label><input id="focusMinutes" type="number" min="1" max="240" value="25"></div>
-          <div class="field"><label>Pausenminuten</label><input id="breakMinutes" type="number" min="0" max="90" value="5"></div>
-          <div class="field"><label>Anzahl der Runden</label><input id="roundCount" type="number" min="1" max="12" value="4"></div>
-          <div class="field"><label>Modus</label><select id="timerPreset"><option value="custom">Benutzerdefiniert</option><option value="25,5,4">Pomodoro 25/5</option><option value="50,10,3">Tiefer Fokus 50/10</option><option value="90,20,2">Lange Session 90/20</option><option value="open">Offener Timer</option></select></div>
-        </div><div style="margin-top:16px;padding:14px;background:var(--panel2);border-radius:15px"><strong>Wie werden die Stunden berechnet?</strong><p class="muted" style="margin-bottom:0">Nur die tatsächliche Lernzeit wird dem Fach gutgeschrieben. Pausen zählen nicht. Jede Session innerhalb des eingetragenen Ferienzeitraums wird zusätzlich im Ferienfortschritt erfasst; die Kalendertage dienen nur der Planung.</p></div></div>
-      </div>
     </section>
 
     <section class="page" data-page="holiday">
@@ -187,7 +188,7 @@ dialog[open]{position:fixed;inset:0;margin:auto}
   </main>
 </div>
 
-<nav class="nav"><button class="active" data-nav="home"><span>🏠</span>Start</button><button data-nav="subjects"><span>📚</span>Fächer</button><button data-nav="dayplan"><span>🗓️</span>Tag</button><button data-nav="progress"><span>🎓</span>LP</button><button data-nav="timer"><span>⏱️</span>Timer</button><button data-nav="holiday"><span>🏖️</span>Ferien</button><button data-nav="history"><span>📊</span>Verlauf</button></nav>
+<nav class="nav"><button class="active" data-nav="home"><span>🏠</span>Start</button><button data-nav="subjects"><span>📚</span>Fächer</button><button data-nav="dayplan"><span>🗓️</span>Tag</button><button data-nav="progress"><span>🎓</span>LP</button><button data-nav="holiday"><span>🏖️</span>Ferien</button><button data-nav="history"><span>📊</span>Verlauf</button></nav>
 <div class="toast" id="toast"></div>
 
 <dialog id="semesterDialog"><form method="dialog" class="modal" id="semesterForm"><div class="modal-head"><h3>Semester einrichten</h3><button class="close" value="cancel">✕</button></div><div class="form-grid"><div class="field"><label>Semestername</label><input id="semesterName" required placeholder="z. B. Wintersemester 2026"></div><div class="field"><label>Stunden pro Credit</label><input id="hoursPerCredit" type="number" min="1" max="100" value="17" required></div><div class="field"><label>Beginn der Vorlesungszeit</label><input id="semesterStart" type="date" required></div><div class="field"><label>Ende der Vorlesungszeit</label><input id="semesterEnd" type="date" required></div></div><p class="muted">Die Berechnung gilt nur für die Vorlesungszeit, nicht für die Prüfungsphase.</p><div class="timer-controls"><button class="btn primary" value="default">Speichern</button><button class="btn soft" value="cancel">Abbrechen</button></div></form></dialog>
@@ -199,20 +200,32 @@ dialog[open]{position:fixed;inset:0;margin:auto}
 <dialog id="manualSessionDialog"><form method="dialog" class="modal" id="manualSessionForm"><div class="modal-head"><h3>Session manuell hinzufügen</h3><button class="close" value="cancel">✕</button></div><input id="manualSessionId" type="hidden"><div class="form-grid"><div class="field"><label>Fach</label><select id="manualSubject" required></select></div><div class="field"><label>Datum</label><input id="manualDate" type="date" required></div><div class="field"><label>Stunden</label><input id="manualHours" type="number" min="0" max="24" value="1"></div><div class="field"><label>Minuten</label><input id="manualMinutes" type="number" min="0" max="59" value="0"></div></div><div class="timer-controls"><button class="btn primary" value="default">Session speichern</button><button class="btn soft" value="cancel">Abbrechen</button></div></form></dialog>
 
 
+<dialog id="dailyStudyDialog"><form method="dialog" class="modal" id="dailyStudyForm">
+<div class="modal-head"><h3 id="dailyStudyDialogTitle">Lernzeit erfassen</h3><button class="close" value="cancel">✕</button></div>
+<input type="hidden" id="dailyStudyDate">
+<div class="card" style="margin-bottom:14px"><strong id="dailyStudyDateText">—</strong><div class="muted" id="dailyStudyPlanText">—</div></div>
+<div class="form-grid">
+  <div class="field full"><label>Fach</label><select id="dailyStudySubject" required></select></div>
+  <div class="field"><label>Stunden</label><input id="dailyStudyHours" type="number" min="0" max="24" value="0"></div>
+  <div class="field"><label>Minuten</label><input id="dailyStudyMinutes" type="number" min="0" max="59" value="0"></div>
+</div>
+<div class="timer-controls"><button class="btn primary" value="default">Speichern</button><button class="btn soft" value="cancel">Abbrechen</button></div>
+</form></dialog>
+
 <dialog id="lpDialog"><form method="dialog" class="modal" id="lpForm"><div class="modal-head"><h3 id="lpDialogTitle">Modul bearbeiten</h3><button class="close" value="cancel">✕</button></div><input type="hidden" id="lpId"><div class="form-grid"><div class="field full"><label>Modulname</label><input id="lpName" required></div><div class="field"><label>Leistungspunkte</label><input id="lpCredits" type="number" min="0" step="0.5" required></div><div class="field"><label>Ursprüngliches Semester</label><input id="lpOriginSemester" placeholder="z. B. 3"></div><div class="field"><label>Geplantes Semester</label><select id="lpPlanSemester"><option value="1">1. Semester</option><option value="2">2. Semester</option><option value="3">3. Semester</option><option value="Sommer">Sommer</option><option value="4">4. Semester</option><option value="5">5. Semester</option><option value="6">6. Semester</option><option value="7">7. Semester</option></select></div><div class="field"><label>Status</label><select id="lpStatus"><option value="open">Offen</option><option value="planned">Geplant</option><option value="active">In Bearbeitung</option><option value="exam">Prüfung abgelegt</option><option value="passed">Bestanden</option><option value="failed">Nicht bestanden / Wiederholung</option><option value="postponed">Verschoben</option></select></div><div class="field"><label>Prüfungsdatum (optional)</label><input id="lpExamDate" type="date"></div><div class="field full"><label><input id="lpUseInStudy" type="checkbox"> In den Lernplan übernehmen</label></div></div><div class="timer-controls"><button class="btn primary" value="default">Speichern</button><button class="btn soft" value="cancel">Abbrechen</button><button type="button" class="btn danger hidden" id="lpDelete">Löschen</button></div></form></dialog>
 
 <dialog id="dayPlanDialog"><form method="dialog" class="modal" id="dayPlanForm"><div class="modal-head"><h3 id="dayPlanDialogTitle">Aktivität hinzufügen</h3><button class="close" value="cancel">✕</button></div><input type="hidden" id="dayPlanItemId"><div class="form-grid"><div class="field"><label>Kategorie</label><select id="dayPlanType"><option value="study">📚 Lernen</option><option value="gym">🏋️ Gym</option><option value="reading">📖 Lesen</option><option value="uni">🎓 Uni</option><option value="work">💼 Arbeit</option><option value="break">☕ Pause</option><option value="other">✨ Sonstiges</option></select></div><div class="field"><label>Datum</label><input id="dayPlanItemDate" type="date" required></div><div class="field full"><label>Bezeichnung</label><input id="dayPlanTitle" placeholder="z. B. HM3 lernen" required></div><div class="field"><label>Von</label><input id="dayPlanStart" type="time" required></div><div class="field"><label>Bis</label><input id="dayPlanEnd" type="time" required></div><div class="field"><label>Wiederholen</label><select id="dayPlanRepeat"><option value="none">Nicht wiederholen</option><option value="daily">Täglich</option><option value="weekdays">Mo–Fr</option><option value="weekly">Wöchentlich</option></select></div><div class="field"><label>Wiederholen bis</label><input id="dayPlanRepeatUntil" type="date"></div></div><p class="muted" style="margin-top:12px">Der Tagesplan dient nur zur Organisation. Abhaken verändert keine Lernstunden und startet keinen Timer.</p><div class="timer-controls"><button class="btn primary" value="default">Speichern</button><button class="btn soft" value="cancel">Abbrechen</button><button type="button" class="btn danger hidden" id="deleteDayPlanItem">Löschen</button></div></form></dialog>
 
 <dialog id="settingsDialog"><form method="dialog" class="modal"><div class="modal-head"><h3>Einstellungen und Daten</h3><button class="close" value="cancel">✕</button></div>
 <div class="cloud-card"><div class="cloud-head"><div><strong>☁️ Konto & Cloud-Sync</strong><div class="muted" id="cloudStatus">Firebase wird geprüft…</div></div><span class="status warn" id="cloudBadge">Lokal</span></div><div id="cloudSignedOut"><div class="timer-controls" style="margin:12px 0 0"><button type="button" class="btn primary" id="cloudGoogleBtn">🔐 Mit Google anmelden</button></div><p class="muted" style="margin:10px 0 0">Deine Lernpläne und Sitzungen werden nach der Anmeldung automatisch mit deinem Google-Konto synchronisiert.</p></div><div id="cloudSignedIn" class="hidden"><div class="metrics" style="margin-top:12px"><span class="pill" id="cloudUserLabel">—</span><span class="pill" id="cloudSyncLabel">Noch nicht synchronisiert</span></div><div id="cloudDataSummary" class="muted" style="margin-top:10px;font-weight:700">Cloud-Inhalt wird geprüft…</div><div class="timer-controls" style="margin:12px 0 0"><button type="button" class="btn soft" id="cloudUploadBtn">⬆️ Dieses Gerät in Cloud</button><button type="button" class="btn soft" id="cloudDownloadBtn">⬇️ Cloud auf dieses Gerät</button><button type="button" class="btn danger" id="cloudLogoutBtn">Abmelden</button></div></div><p class="muted" id="cloudSetupHint" style="margin:10px 0 0"></p></div>
-<div class="grid" style="margin:14px 0"><label class="setting-row"><span>🔔 Benachrichtigungen</span><input type="checkbox" id="notifySetting"></label><label class="setting-row"><span>🔊 Ton</span><input type="checkbox" id="soundSetting" checked></label><label class="setting-row"><span>📳 Vibration</span><input type="checkbox" id="vibrateSetting" checked></label><label class="setting-row"><span>▶️ Nächste Phase automatisch</span><input type="checkbox" id="autoNextSetting" checked></label></div><div class="grid"><button type="button" class="btn soft" id="exportBtn">📤 Backup exportieren</button><label class="btn soft" style="text-align:center">📥 Backup importieren<input id="importInput" type="file" accept="application/json" hidden></label><button type="button" class="btn danger" id="resetBtn">🗑️ Alle Daten löschen</button></div><p class="muted">Ohne Anmeldung bleiben die Daten lokal. Mit aktivierter Cloud-Synchronisierung werden Änderungen zusätzlich in deinem Firebase-Konto gespeichert.</p></form></dialog>
+<div class="grid"><button type="button" class="btn soft" id="exportBtn">📤 Backup exportieren</button><label class="btn soft" style="text-align:center">📥 Backup importieren<input id="importInput" type="file" accept="application/json" hidden></label><button type="button" class="btn danger" id="resetBtn">🗑️ Alle Daten löschen</button></div><p class="muted">Ohne Anmeldung bleiben die Daten lokal. Mit aktivierter Cloud-Synchronisierung werden Änderungen zusätzlich in deinem Firebase-Konto gespeichert.</p></form></dialog>
 
 <script src="firebase-config.js"></script>
 <script>
 (()=>{
 'use strict';
 const KEY='wesstudy_v1';
-const defaultState={version:4.4,theme:'light',lang:'de',dashboardMode:'auto',semester:{name:'',start:'',end:'',hoursPerCredit:17},subjects:[],sessions:[],holiday:null,dailyPlan:{items:[],templates:[]},timerSettings:{sound:true,vibrate:true,notifications:false,autoNext:true},studyProgress:null,meta:{updatedAt:0}};
+const defaultState={version:4.5,theme:'light',lang:'de',dashboardMode:'auto',semester:{name:'',start:'',end:'',hoursPerCredit:17},subjects:[],sessions:[],holiday:null,dailyPlan:{items:[],templates:[]},timerSettings:{sound:true,vibrate:true,notifications:false,autoNext:true},studyProgress:null,meta:{updatedAt:0}};
 let state=load(); let timer={running:false,paused:false,mode:'focus',round:1,totalRounds:4,focusSec:1500,breakSec:300,remaining:1500,startedAt:null,accumulatedFocus:0,interval:null,open:false};
 let calDate=new Date(); let holidayDraft={days:{}}; let deferredPrompt=null;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
@@ -254,7 +267,7 @@ function holidayDoneToDate(){if(!state.holiday)return 0;const today=todayISO();r
 function holidayPlanPosition(){return holidayDoneToDate()-holidayPlannedToDate()}
 function totalPlanExpectedToDate(){const s=state.semester,today=todayISO(),holidayTarget=Math.min(totalRequired(),holidayPlannedMins());let expectedHoliday=0;if(state.holiday){expectedHoliday=today>=state.holiday.end?holidayTarget:Math.min(holidayTarget,holidayPlannedToDate())}if(!s.start||!s.end||today<s.start)return expectedHoliday;const totalDays=daysInclusive(s.start,s.end);if(!totalDays)return expectedHoliday;const elapsed=Math.min(totalDays,daysInclusive(s.start,today));const semesterTarget=Math.max(0,totalRequired()-holidayTarget);return holidayTarget+semesterTarget*(elapsed/totalDays)}
 function totalPlanPosition(){return totalStudied()-totalPlanExpectedToDate()}
-function renderAll(){applyTheme();renderSemester();renderSubjects();renderHome();renderHoliday();renderHistory();renderDailyPlan();populateSubjectSelects();renderTimerMeta()}
+function renderAll(){applyTheme();renderSemester();renderSubjects();renderHome();renderDailyStudyTracking();renderHoliday();renderHistory();renderDailyPlan();populateSubjectSelects();renderTimerMeta()}
 function applyTheme(){document.documentElement.dataset.theme=state.theme;$('#themeBtn').textContent=state.theme==='dark'?'☀️':'🌙'}
 function renderSemester(){const sem=state.semester;$('#hoursPerCreditText').textContent=sem.hoursPerCredit||17;$('#setupNotice').style.display=sem.start&&sem.end?'none':'block'}
 function subjectHTML(s,compact=false){const req=subjectRequired(s),done=studiedForSubject(s.id),rem=Math.max(0,req-done),p=req?clamp(done/req*100,0,100):0;return `<div class="subject"><div class="subject-head"><div class="subject-title"><span class="dot" style="background:${esc(s.color)}"></span><div><strong>${esc(s.name)}</strong><div class="muted" style="font-size:.78rem">${s.credits} CP · ${hoursText(req)}</div></div></div>${compact?'':`<div class="subject-actions"><button class="mini-btn" data-edit-subject="${s.id}">✏️</button><button class="mini-btn" data-delete-subject="${s.id}">🗑️</button></div>`}</div><div class="progress" style="margin-top:12px"><i style="width:${p}%"></i></div><div class="metrics"><span class="pill">Erledigt ${hoursText(done)}</span><span class="pill">Verbleibend ${hoursText(rem)}</span><span class="pill">${p.toFixed(0)}%</span></div></div>`}
@@ -327,6 +340,47 @@ $('#copyYesterdayPlan').onclick=()=>{const d=parseDate(dayPlanDate);d.setDate(d.
 $('#saveDayTemplate').onclick=()=>{const items=dayPlanItems();if(!items.length)return toast('Dieser Tag ist leer.');const name=prompt('Name der Vorlage, z. B. Uni-Tag');if(!name?.trim())return;dailyPlanState().templates.push({id:uid(),name:name.trim(),items:items.map(({type,title,start,end})=>({type,title,start,end}))});save();toast('Vorlage gespeichert')};
 $('#applyDayTemplate').onclick=()=>{const id=$('#dayTemplateSelect').value,t=dailyPlanState().templates.find(x=>x.id===id);if(!t)return toast('Wähle zuerst eine Vorlage.');const plan=dailyPlanState();t.items.forEach(x=>plan.items.push({...x,id:uid(),groupId:uid(),date:dayPlanDate,done:false}));save();toast('Vorlage angewendet')};
 
+
+/* ===== WesStudy v4.5: tägliche Lernkontrolle ===== */
+function plannedStudyMinsForDate(date){
+  if(state.holiday&&overlapDate(date,state.holiday.start,state.holiday.end)) return Number(state.holiday.days?.[date]||0)*60;
+  return Number(state.semesterPlan?.days?.[date]||0)*60;
+}
+function dailyStudySourceForDate(date){
+  if(state.holiday&&overlapDate(date,state.holiday.start,state.holiday.end)) return 'Ferienplan';
+  return 'Semesterplanung';
+}
+function openDailyStudyEntry(date=todayISO(),full=false){
+  const planned=plannedStudyMinsForDate(date),done=sessionsOn(date),remaining=Math.max(0,planned-done);
+  $('#dailyStudyDate').value=date;
+  $('#dailyStudyDateText').textContent=fmtDate(date);
+  $('#dailyStudyPlanText').textContent=`Laut ${dailyStudySourceForDate(date)}: ${minsText(planned)} geplant · ${minsText(done)} bereits erledigt`;
+  const sel=$('#dailyStudySubject');
+  sel.innerHTML=state.subjects.map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join('');
+  const mins=full?remaining:0;
+  $('#dailyStudyHours').value=Math.floor(mins/60);
+  $('#dailyStudyMinutes').value=mins%60;
+  $('#dailyStudyDialog').showModal();
+}
+function renderDailyStudyTracking(){
+  const today=todayISO(),planned=plannedStudyMinsForDate(today),done=sessionsOn(today),open=Math.max(0,planned-done),pct=planned?clamp(done/planned*100,0,100):(done?100:0);
+  $('#dailyStudyTitle').textContent=`Heute – ${fmtDate(today)}`;
+  $('#dailyStudySource').textContent=planned?`Aus dem ${dailyStudySourceForDate(today)}`:'Für heute ist keine Lernzeit geplant';
+  $('#dailyTrackPlanned').textContent=minsText(planned);$('#dailyTrackDone').textContent=minsText(done);$('#dailyTrackOpen').textContent=minsText(open);$('#dailyTrackPercent').textContent=`${Math.round(pct)}%`;$('#dailyTrackProgress').style.width=`${pct}%`;
+  const badge=$('#dailyStudyBadge');badge.className='status '+(planned&&done>=planned?'good':planned&&done?'warn':'');badge.textContent=planned?(done>=planned?'Erledigt':done?'Teilweise':'Offen'):'Nicht geplant';
+  $('#markTodayDone').disabled=!planned||done>=planned||!state.subjects.length;$('#enterTodayHours').disabled=!state.subjects.length;
+  const dates=new Set();
+  if(state.holiday?.days) Object.keys(state.holiday.days).forEach(d=>{if(d<today)dates.add(d)});
+  if(state.semesterPlan?.days) Object.keys(state.semesterPlan.days).forEach(d=>{if(d<today)dates.add(d)});
+  const rows=[...dates].sort().reverse().slice(0,10);
+  let backlog=0;
+  $('#pastStudyDays').innerHTML=rows.length?rows.map(d=>{const pl=plannedStudyMinsForDate(d),dn=sessionsOn(d),op=Math.max(0,pl-dn);backlog+=op;const status=pl===0?'Nicht geplant':dn>=pl?'✓ Erreicht':dn>0?`${minsText(op)} offen`:'Nicht geschafft';return `<div class="session-row" data-past-day="${d}" style="cursor:pointer"><div class="session-icon">${dn>=pl&&pl?'✅':dn?'🟠':'🔴'}</div><div class="session-info"><strong>${fmtDate(d)}</strong><small>Geplant ${minsText(pl)} · Erledigt ${minsText(dn)}</small></div><strong>${status}</strong></div>`}).join(''):'<div class="muted">Noch keine vergangenen Plantage.</div>';
+  $('#pastStudyBacklog').textContent=backlog?`Gesamtrückstand aus den angezeigten Tagen: ${minsText(backlog)}`:'Kein Rückstand in den angezeigten Tagen 🎉';
+}
+$('#markTodayDone').onclick=()=>openDailyStudyEntry(todayISO(),true);
+$('#enterTodayHours').onclick=()=>openDailyStudyEntry(todayISO(),false);
+$('#pastStudyDays').addEventListener('click',e=>{const row=e.target.closest('[data-past-day]');if(row)openDailyStudyEntry(row.dataset.pastDay,false)});
+$('#dailyStudyForm').addEventListener('submit',e=>{if(e.submitter?.value==='cancel')return;e.preventDefault();const minutes=Number($('#dailyStudyHours').value||0)*60+Number($('#dailyStudyMinutes').value||0),subjectId=$('#dailyStudySubject').value,date=$('#dailyStudyDate').value;if(!subjectId||minutes<=0)return toast('Wähle ein Fach und gib eine Lernzeit ein.');state.sessions.push({id:uid(),subjectId,date,minutes:Math.round(minutes),createdAt:new Date().toISOString(),source:'manual-daily'});save();$('#dailyStudyDialog').close();toast('Lernzeit wurde gespeichert')});
 function setupTimer(){if(timer.running)return;const subj=$('#timerSubject').value;if(!subj)return toast('Füge zuerst ein Fach hinzu und wähle es aus.');const preset=$('#timerPreset').value;timer.open=preset==='open';timer.focusSec=Math.max(60,Number($('#focusMinutes').value||25)*60);timer.breakSec=Math.max(0,Number($('#breakMinutes').value||5)*60);timer.totalRounds=Math.max(1,Number($('#roundCount').value||1));timer.round=1;timer.mode='focus';timer.remaining=timer.open?0:timer.focusSec;timer.accumulatedFocus=0;timer.startedAt=Date.now();timer.running=true;timer.paused=false;lockTimerSettings(true);$('#timerStart').textContent='Läuft';$('#timerStart').disabled=true;$('#timerPause').disabled=false;$('#timerStop').disabled=false;tick();timer.interval=setInterval(tick,1000);renderRounds()}
 function tick(){if(!timer.running||timer.paused)return;if(timer.open){const elapsed=Math.floor((Date.now()-timer.startedAt)/1000);timer.remaining=elapsed;$('#timerDisplay').textContent=formatSec(elapsed);$('#timerProgress').style.width='100%';return}timer.remaining--;if(timer.mode==='focus')timer.accumulatedFocus++;if(timer.remaining<=0)advanceTimer();renderTimerDisplay()}
 function advanceTimer(){beep();if(timer.mode==='focus'){if(timer.round>=timer.totalRounds){finishTimer(true);return}timer.mode='break';timer.remaining=timer.breakSec}else{timer.mode='focus';timer.round++;timer.remaining=timer.focusSec}renderRounds()}
