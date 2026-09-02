@@ -39,7 +39,7 @@
     .form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.field{display:grid;gap:7px}.field.full{grid-column:1/-1}.field label{font-size:.82rem;color:var(--muted);font-weight:700}.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:13px;padding:12px;outline:none}.field input:focus,.field select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(109,93,252,.12)}
     dialog{border:0;padding:0;background:transparent;width:min(600px,calc(100% - 24px));max-height:92vh}dialog::backdrop{background:rgba(10,11,18,.55);backdrop-filter:blur(4px)}.modal{background:var(--panel);color:var(--text);border-radius:24px;padding:20px;max-height:92vh;overflow:auto}.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}.modal-head h3{margin:0}.close{border:0;background:var(--panel2);color:var(--text);width:38px;height:38px;border-radius:12px}
     .timer-wrap{text-align:center}.timer-display{font-size:clamp(3.2rem,14vw,6.6rem);font-weight:900;letter-spacing:-3px;font-variant-numeric:tabular-nums;margin:18px 0 4px}.timer-mode{color:var(--muted);font-weight:750}.timer-controls{display:flex;justify-content:center;gap:10px;margin:18px 0;flex-wrap:wrap}.timer-controls .btn{min-width:105px}.rounds{display:flex;justify-content:center;gap:7px;margin:12px 0}.round{width:12px;height:12px;border-radius:50%;background:var(--line)}.round.done{background:var(--good)}.round.current{background:var(--primary);box-shadow:0 0 0 5px rgba(109,93,252,.14)}
-    .calendar{display:grid;grid-template-columns:repeat(6,1fr);gap:7px}.cal-head{text-align:center;font-size:.72rem;color:var(--muted);padding:5px}.day{border:1px solid var(--line);background:var(--panel2);min-height:66px;border-radius:12px;padding:7px;text-align:right;color:var(--text)}.day.out{opacity:.25}.day.selected{border-color:var(--primary);background:rgba(109,93,252,.12)}.day .num{font-weight:800}.day .hours{font-size:.72rem;color:var(--primary);margin-top:8px;font-weight:800}.calendar-nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.calendar-nav h3{margin:0;font-size:1rem}
+    .calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:7px}.cal-head{text-align:center;font-size:.72rem;color:var(--muted);padding:5px}.day{border:1px solid var(--line);background:var(--panel2);min-height:66px;border-radius:12px;padding:7px;text-align:right;color:var(--text)}.day.out{opacity:.25}.day.selected{border-color:var(--primary);background:rgba(109,93,252,.12)}.day .num{font-weight:800}.day .hours{font-size:.72rem;color:var(--primary);margin-top:8px;font-weight:800}.calendar-nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.calendar-nav h3{margin:0;font-size:1rem}
     .holiday-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.holiday-day-list{display:grid;gap:8px;max-height:250px;overflow:auto;margin-top:12px}.holiday-day-row{display:flex;align-items:center;gap:8px;background:var(--panel2);padding:9px;border-radius:12px}.holiday-day-row input{width:90px;margin-inline-start:auto}
     .session-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}.session-row:last-child{border:0}.session-icon{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:var(--panel2)}.session-info{flex:1}.session-info strong{display:block}.session-info small{color:var(--muted)}
     .toast{position:fixed;top:18px;left:50%;transform:translate(-50%,-25px);opacity:0;z-index:100;background:#20212c;color:#fff;border-radius:14px;padding:12px 16px;transition:.25s;pointer-events:none;box-shadow:var(--shadow)}.toast.show{opacity:1;transform:translate(-50%,0)}
@@ -92,6 +92,12 @@ dialog[open]{position:fixed;inset:0;margin:auto}
 .dashboard-status{margin-top:10px;font-weight:800}.dashboard-status.good{color:var(--good)}.dashboard-status.bad{color:var(--danger)}
 .semester-preview{margin-top:16px}.mode-only.hidden{display:none!important}
 @media(max-width:520px){.dashboard-mode{width:100%}.dashboard-mode button{flex:1;padding:10px 8px}.dashboard-countdown{align-items:flex-start}.dashboard-countdown .count-number{font-size:1.35rem;min-width:44px}}
+@media(max-width:560px){
+  .calendar{gap:5px}
+  .cal-head{font-size:.66rem;padding:4px 0}
+  .day{min-height:58px;padding:5px 4px;border-radius:10px}
+  .day .hours{font-size:.64rem;margin-top:5px}
+}
 </style>
 </head>
 <body>
@@ -367,14 +373,29 @@ function renderDailyStudyTracking(){
   $('#dailyStudyTitle').textContent=`Heute – ${fmtDate(today)}`;
   $('#dailyStudySource').textContent=planned?`Aus dem ${dailyStudySourceForDate(today)}`:'Für heute ist keine Lernzeit geplant';
   $('#dailyTrackPlanned').textContent=minsText(planned);$('#dailyTrackDone').textContent=minsText(done);$('#dailyTrackOpen').textContent=minsText(open);$('#dailyTrackPercent').textContent=`${Math.round(pct)}%`;$('#dailyTrackProgress').style.width=`${pct}%`;
-  const badge=$('#dailyStudyBadge');badge.className='status '+(planned&&done>=planned?'good':planned&&done?'warn':'');badge.textContent=planned?(done>=planned?'Erledigt':done?'Teilweise':'Offen'):'Nicht geplant';
+  const badge=$('#dailyStudyBadge');
+  badge.className='status '+(planned&&done>=planned?'good':planned&&done?'warn':(!planned&&done?'good':''));
+  badge.textContent=planned?(done>=planned?'Erledigt':done?'Teilweise':'Offen'):(done?'Zusätzlich gelernt':'Nicht geplant');
   $('#markTodayDone').disabled=!planned||done>=planned||!state.subjects.length;$('#enterTodayHours').disabled=!state.subjects.length;
   const dates=new Set();
   if(state.holiday?.days) Object.keys(state.holiday.days).forEach(d=>{if(d<today)dates.add(d)});
   if(state.semesterPlan?.days) Object.keys(state.semesterPlan.days).forEach(d=>{if(d<today)dates.add(d)});
+  // Lernverlauf (state.sessions) ist die einzige Quelle für "Erledigt".
+  // Dadurch erscheinen auch zusätzliche Lerntage ohne Ferien-/Semesterplan.
+  state.sessions.forEach(x=>{if(x?.date&&x.date<today&&Number(x.minutes||0)>0)dates.add(x.date)});
   const rows=[...dates].sort().reverse().slice(0,10);
   let backlog=0;
-  $('#pastStudyDays').innerHTML=rows.length?rows.map(d=>{const pl=plannedStudyMinsForDate(d),dn=sessionsOn(d),op=Math.max(0,pl-dn);backlog+=op;const status=pl===0?'Nicht geplant':dn>=pl?'✓ Erreicht':dn>0?`${minsText(op)} offen`:'Nicht geschafft';return `<div class="session-row" data-past-day="${d}" style="cursor:pointer"><div class="session-icon">${dn>=pl&&pl?'✅':dn?'🟠':'🔴'}</div><div class="session-info"><strong>${fmtDate(d)}</strong><small>Geplant ${minsText(pl)} · Erledigt ${minsText(dn)}</small></div><strong>${status}</strong></div>`}).join(''):'<div class="muted">Noch keine vergangenen Plantage.</div>';
+  $('#pastStudyDays').innerHTML=rows.length?rows.map(d=>{
+    const pl=plannedStudyMinsForDate(d),dn=sessionsOn(d),op=Math.max(0,pl-dn),extra=Math.max(0,dn-pl);
+    backlog+=op;
+    let status,icon;
+    if(pl===0&&dn>0){status=`+${minsText(dn)} zusätzlich`;icon='✅'}
+    else if(pl===0){status='Nicht geplant';icon='⚪'}
+    else if(dn>=pl){status=extra?`✓ Erreicht · +${minsText(extra)}`:'✓ Erreicht';icon='✅'}
+    else if(dn>0){status=`${minsText(op)} offen`;icon='🟠'}
+    else{status='Nicht geschafft';icon='🔴'}
+    return `<div class="session-row" data-past-day="${d}" style="cursor:pointer"><div class="session-icon">${icon}</div><div class="session-info"><strong>${fmtDate(d)}</strong><small>Geplant ${minsText(pl)} · Erledigt ${minsText(dn)}</small></div><strong>${status}</strong></div>`
+  }).join(''):'<div class="muted">Noch keine vergangenen Plan- oder Lerntage.</div>';
   $('#pastStudyBacklog').textContent=backlog?`Gesamtrückstand aus den angezeigten Tagen: ${minsText(backlog)}`:'Kein Rückstand in den angezeigten Tagen 🎉';
 }
 $('#markTodayDone').onclick=()=>openDailyStudyEntry(todayISO(),true);
