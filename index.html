@@ -98,6 +98,44 @@ dialog[open]{position:fixed;inset:0;margin:auto}
   .day{min-height:58px;padding:5px 4px;border-radius:10px}
   .day .hours{font-size:.64rem;margin-top:5px}
 }
+
+/* ===== v4.6 Wochenplan ===== */
+.plan-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+.plan-tabs button{border:0;border-radius:12px;padding:10px 14px;background:var(--panel2);font-weight:800;color:var(--muted);cursor:pointer}
+.plan-tabs button.active{background:var(--accent);color:#fff}
+.week-overview{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
+.week-day-card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:10px;min-width:0}
+.week-day-card.today{outline:2px solid var(--accent)}
+.week-day-card .wd-title{font-weight:900;margin-bottom:7px}
+.week-day-card .wd-target{font-weight:900;color:var(--accent);margin-bottom:7px}
+.week-mini{font-size:.74rem;color:var(--muted);padding:4px 0;border-top:1px solid var(--line)}
+.week-mini:first-of-type{border-top:0}
+.planner-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:12px 0}
+.planner-stat{background:var(--panel2);border-radius:14px;padding:11px}
+.planner-stat strong{display:block;font-size:1.15rem;margin-top:4px}
+.planner-group{margin:14px 0}
+.planner-group h3{font-size:.88rem;margin:0 0 8px;color:var(--muted)}
+.planner-item{display:grid;grid-template-columns:72px 1fr auto;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}
+.planner-item:last-child{border-bottom:0}
+.planner-time{font-weight:900;font-variant-numeric:tabular-nums}
+.planner-item-title{font-weight:850}
+.planner-item-sub{font-size:.78rem;color:var(--muted);margin-top:3px}
+.planner-actions{display:flex;gap:6px;align-items:center}
+.planner-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:999px;font-size:.72rem;font-weight:800;background:var(--panel2)}
+.planner-chip.study{background:#ecfdf5;color:#047857}
+.planner-chip.work{background:#eff6ff;color:#1d4ed8}
+.planner-chip.warn{background:#fff7ed;color:#c2410c}
+.planner-chip.conflict{background:#fef2f2;color:#b91c1c}
+.planner-alert{border:1px solid #fed7aa;background:#fff7ed;color:#9a3412;padding:11px 13px;border-radius:14px;margin:10px 0;font-weight:700}
+.planner-good{border:1px solid #bbf7d0;background:#f0fdf4;color:#047857;padding:11px 13px;border-radius:14px;margin:10px 0;font-weight:700}
+.rule-list{display:grid;gap:8px;margin-top:12px}
+.rule-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;background:var(--panel2);border-radius:14px;padding:11px}
+.rule-row small{display:block;color:var(--muted);margin-top:3px}
+.rule-actions{display:flex;gap:5px}
+.actual-input{width:62px!important;padding:6px!important;font-size:.78rem!important}
+@media(max-width:900px){.week-overview{grid-template-columns:repeat(2,minmax(0,1fr))}.planner-summary{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.week-overview{grid-template-columns:1fr}.planner-item{grid-template-columns:62px 1fr auto}.planner-summary{grid-template-columns:1fr 1fr}}
+
 </style>
 </head>
 <body>
@@ -169,7 +207,38 @@ dialog[open]{position:fixed;inset:0;margin:auto}
     </section>
 
     <section class="page" data-page="dayplan">
-      <div class="section-head"><div><h2>🗓️ Tagesplan</h2><div class="muted">Plane deinen ganzen Tag – Lernen, Gym, Lesen, Uni, Arbeit und mehr. Unabhängig vom Lerntimer.</div></div><button class="btn primary" id="addDayPlanItem">+ Aktivität</button></div>
+      <div class="section-head"><div><h2>🗓️ Tages- & Wochenplan</h2><div class="muted">Pflichttermine, flexible Lernzeit, Arbeit, Gym, Meal Prep, Kultur, Fahrt und Vorbereitung – ohne deine bestehende Stundenplanung zu verändern.</div></div><button class="btn primary" id="addDayPlanItem">+ Aktivität</button></div>
+      <div class="plan-tabs" id="planTabs"><button class="active" data-plan-tab="day">Heute / Tag</button><button data-plan-tab="week">Woche</button><button data-plan-tab="rules">Regeln & Zeiten</button></div>
+      <div id="smartDayPlanner">
+        <div class="card" style="margin-bottom:16px">
+          <div class="section-head"><div><h2 id="smartDayTitle">Heute</h2><div class="muted" id="smartDaySubtitle">Automatisch aus deinen Regeln und deiner Studienplanung berechnet.</div></div><button class="btn soft" id="plannerSettingsBtn">⚙️ Regeln bearbeiten</button></div>
+          <div class="planner-summary">
+            <div class="planner-stat"><div class="eyebrow">Studienziel</div><strong id="smartStudyTarget">0:00</strong></div>
+            <div class="planner-stat"><div class="eyebrow">In Bib nutzbar</div><strong id="smartBibStudy">0:00</strong></div>
+            <div class="planner-stat"><div class="eyebrow">Außerhalb Bib</div><strong id="smartOutsideStudy">0:00</strong></div>
+            <div class="planner-stat"><div class="eyebrow">Ist im Verlauf</div><strong id="smartStudyDone">0:00</strong></div>
+          </div>
+          <div id="smartDayMessages"></div>
+          <div id="smartDayItems"></div>
+          <div class="timer-controls" style="margin-top:14px">
+            <button class="btn soft" id="moveOpenTomorrow" type="button">Offen → morgen</button>
+            <button class="btn soft" id="autoDistributeOpen" type="button">Offen automatisch verteilen</button>
+          </div>
+        </div>
+      </div>
+      <div id="smartWeekPlanner" class="hidden">
+        <div class="card" style="margin-bottom:16px">
+          <div class="section-head"><div><h2>Wochenübersicht</h2><div class="muted" id="weekPlannerLabel"></div></div><button class="btn soft" id="weekTodayBtn">Diese Woche</button></div>
+          <div class="week-overview" id="weekOverview"></div>
+        </div>
+      </div>
+      <div id="smartRulesPlanner" class="hidden">
+        <div class="card" style="margin-bottom:16px">
+          <div class="section-head"><div><h2>Regeln & Standardzeiten</h2><div class="muted">Alles bleibt später editierbar. Änderungen berechnen Tag und Woche sofort neu.</div></div><button class="btn primary" id="addPlannerRule">+ Regel</button></div>
+          <div id="plannerGlobalSettings"></div>
+          <div class="rule-list" id="plannerRuleList"></div>
+        </div>
+      </div>
       <div class="card" style="margin-bottom:16px">
         <div class="dayplan-head"><div class="dayplan-date"><button class="mini-btn" id="dayPlanPrev">‹</button><strong id="dayPlanDateLabel">Heute</strong><button class="mini-btn" id="dayPlanNext">›</button></div><button class="btn soft" id="dayPlanToday">Heute</button></div>
         <div class="grid cols-4" style="margin-bottom:14px"><div class="card flat"><div class="eyebrow">Geplant</div><div class="big-number" id="dayPlanTotal">0:00</div></div><div class="card flat"><div class="eyebrow">Erledigt</div><div class="big-number" id="dayPlanDone">0:00</div></div><div class="card flat"><div class="eyebrow">Aktivitäten</div><div class="big-number" id="dayPlanCount">0</div></div><div class="card flat"><div class="eyebrow">Lernen eingeplant</div><div class="big-number" id="dayPlanStudy">0:00</div></div></div>
@@ -218,6 +287,48 @@ dialog[open]{position:fixed;inset:0;margin:auto}
 <div class="timer-controls"><button class="btn primary" value="default">Speichern</button><button class="btn soft" value="cancel">Abbrechen</button></div>
 </form></dialog>
 
+
+<dialog id="plannerRuleDialog"><form method="dialog" class="modal" id="plannerRuleForm">
+  <div class="modal-head"><h3 id="plannerRuleDialogTitle">Regel bearbeiten</h3><button class="close" value="cancel">✕</button></div>
+  <input type="hidden" id="plannerRuleId">
+  <div class="form-grid">
+    <div class="field"><label>Typ</label><select id="plannerRuleType"><option value="uni">Universität</option><option value="bib">Bib</option><option value="vmt">VMT</option><option value="lab">Labor</option><option value="gym">Gym</option><option value="mealprep">Meal Prep</option><option value="culture">Kultur</option><option value="studyWindow">Studienfenster</option><option value="other">Sonstiges</option></select></div>
+    <div class="field"><label>Name</label><input id="plannerRuleName" required></div>
+    <div class="field"><label>Wochentag</label><select id="plannerRuleWeekday"><option value="1">Montag</option><option value="2">Dienstag</option><option value="3">Mittwoch</option><option value="4">Donnerstag</option><option value="5">Freitag</option><option value="6">Samstag</option><option value="0">Sonntag</option></select></div>
+    <div class="field"><label>Start</label><input id="plannerRuleStart" type="time"></div>
+    <div class="field"><label>Ende</label><input id="plannerRuleEnd" type="time"></div>
+    <div class="field"><label>Wiederholung</label><select id="plannerRuleRepeat"><option value="weekly">Jede Woche</option><option value="biweekly">Alle 2 Wochen</option></select></div>
+    <div class="field"><label>Erste Woche / Anker (bei 2-wöchig)</label><input id="plannerRuleAnchor" type="date"></div>
+    <div class="field"><label>Nutzbare Lernzeit während Arbeit (Min.)</label><input id="plannerRuleStudyMin" type="number" min="0" max="600" step="15" value="0"></div>
+    <div class="field full"><label><input id="plannerRuleEnabled" type="checkbox" checked> Regel aktiv</label></div>
+  </div>
+  <div class="timer-controls"><button class="btn primary" value="default">Speichern</button><button class="btn soft" value="cancel">Abbrechen</button><button type="button" class="btn danger hidden" id="deletePlannerRule">Löschen</button></div>
+</form></dialog>
+
+<dialog id="plannerSettingsDialog"><form method="dialog" class="modal" id="plannerSettingsForm">
+  <div class="modal-head"><h3>Wochenplan – Einstellungen</h3><button class="close" value="cancel">✕</button></div>
+  <div class="form-grid">
+    <div class="field"><label>Semesterbeginn</label><input id="wpSemesterStart" type="date"></div>
+    <div class="field"><label>Semesterende</label><input id="wpSemesterEnd" type="date"></div>
+    <div class="field"><label>Vorlesungsfrei ab</label><input id="wpLectureFreeStart" type="date"></div>
+    <div class="field"><label>Vorlesungsfrei bis</label><input id="wpLectureFreeEnd" type="date"></div>
+    <div class="field"><label>Vorbereitung vor Abfahrt (Min.)</label><input id="wpPrepMin" type="number" min="0" value="40"></div>
+    <div class="field"><label>Haus → Uni (Min.)</label><input id="wpUniTravelMin" type="number" min="0" value="15"></div>
+    <div class="field"><label>Uni → Bib (Min.)</label><input id="wpBibTravelMin" type="number" min="0" value="20"></div>
+    <div class="field"><label>Haus ↔ VMT mit Buffer (Min.)</label><input id="wpVmtTravelMin" type="number" min="0" value="85"></div>
+    <div class="field"><label>VMT Arbeitsdauer (Min.)</label><input id="wpVmtDurationMin" type="number" min="60" value="540"></div>
+    <div class="field"><label>VMT: max. Studium an diesem Tag (Min.)</label><input id="wpVmtStudyCapMin" type="number" min="0" value="150"></div>
+    <div class="field"><label>Gym Standarddauer (Min.)</label><input id="wpGymMin" type="number" min="0" value="75"></div>
+    <div class="field"><label>Meal Prep Standarddauer (Min.)</label><input id="wpMealPrepMin" type="number" min="0" value="90"></div>
+    <div class="field"><label>Schlaf Minimum (Min.)</label><input id="wpSleepMin" type="number" min="0" value="360"></div>
+    <div class="field"><label>Schlaf bevorzugt (Min.)</label><input id="wpSleepPreferred" type="number" min="0" value="450"></div>
+    <div class="field"><label>Sonntag Schlafziel (Min.)</label><input id="wpSundaySleep" type="number" min="0" value="480"></div>
+    <div class="field"><label>Kultur pro Woche (Min.)</label><input id="wpCultureWeeklyMin" type="number" min="0" value="240"></div>
+    <div class="field full"><label><input id="wpNovemberAccounting" type="checkbox" checked> VMT-Termine im November 2026 nur als Abrechnung betrachten</label></div>
+  </div>
+  <p class="muted">Die vorhandenen Semester-/Ferienstunden werden nicht überschrieben. Der Wochenplan verschiebt Ziele nur flexibel in der Anzeige; die Gesamtsumme bleibt erhalten.</p>
+  <div class="timer-controls"><button class="btn primary" value="default">Speichern</button><button class="btn soft" value="cancel">Abbrechen</button></div>
+</form></dialog>
 <dialog id="lpDialog"><form method="dialog" class="modal" id="lpForm"><div class="modal-head"><h3 id="lpDialogTitle">Modul bearbeiten</h3><button class="close" value="cancel">✕</button></div><input type="hidden" id="lpId"><div class="form-grid"><div class="field full"><label>Modulname</label><input id="lpName" required></div><div class="field"><label>Leistungspunkte</label><input id="lpCredits" type="number" min="0" step="0.5" required></div><div class="field"><label>Ursprüngliches Semester</label><input id="lpOriginSemester" placeholder="z. B. 3"></div><div class="field"><label>Geplantes Semester</label><select id="lpPlanSemester"><option value="1">1. Semester</option><option value="2">2. Semester</option><option value="3">3. Semester</option><option value="Sommer">Sommer</option><option value="4">4. Semester</option><option value="5">5. Semester</option><option value="6">6. Semester</option><option value="7">7. Semester</option></select></div><div class="field"><label>Status</label><select id="lpStatus"><option value="open">Offen</option><option value="planned">Geplant</option><option value="active">In Bearbeitung</option><option value="exam">Prüfung abgelegt</option><option value="passed">Bestanden</option><option value="failed">Nicht bestanden / Wiederholung</option><option value="postponed">Verschoben</option></select></div><div class="field"><label>Prüfungsdatum (optional)</label><input id="lpExamDate" type="date"></div><div class="field full"><label><input id="lpUseInStudy" type="checkbox"> In den Lernplan übernehmen</label></div></div><div class="timer-controls"><button class="btn primary" value="default">Speichern</button><button class="btn soft" value="cancel">Abbrechen</button><button type="button" class="btn danger hidden" id="lpDelete">Löschen</button></div></form></dialog>
 
 <dialog id="dayPlanDialog"><form method="dialog" class="modal" id="dayPlanForm"><div class="modal-head"><h3 id="dayPlanDialogTitle">Aktivität hinzufügen</h3><button class="close" value="cancel">✕</button></div><input type="hidden" id="dayPlanItemId"><div class="form-grid"><div class="field"><label>Kategorie</label><select id="dayPlanType"><option value="study">📚 Lernen</option><option value="gym">🏋️ Gym</option><option value="reading">📖 Lesen</option><option value="uni">🎓 Uni</option><option value="work">💼 Arbeit</option><option value="break">☕ Pause</option><option value="other">✨ Sonstiges</option></select></div><div class="field"><label>Datum</label><input id="dayPlanItemDate" type="date" required></div><div class="field full"><label>Bezeichnung</label><input id="dayPlanTitle" placeholder="z. B. HM3 lernen" required></div><div class="field"><label>Von</label><input id="dayPlanStart" type="time" required></div><div class="field"><label>Bis</label><input id="dayPlanEnd" type="time" required></div><div class="field"><label>Wiederholen</label><select id="dayPlanRepeat"><option value="none">Nicht wiederholen</option><option value="daily">Täglich</option><option value="weekdays">Mo–Fr</option><option value="weekly">Wöchentlich</option></select></div><div class="field"><label>Wiederholen bis</label><input id="dayPlanRepeatUntil" type="date"></div></div><p class="muted" style="margin-top:12px">Der Tagesplan dient nur zur Organisation. Abhaken verändert keine Lernstunden und startet keinen Timer.</p><div class="timer-controls"><button class="btn primary" value="default">Speichern</button><button class="btn soft" value="cancel">Abbrechen</button><button type="button" class="btn danger hidden" id="deleteDayPlanItem">Löschen</button></div></form></dialog>
@@ -231,7 +342,7 @@ dialog[open]{position:fixed;inset:0;margin:auto}
 (()=>{
 'use strict';
 const KEY='wesstudy_v1';
-const defaultState={version:4.5,theme:'light',lang:'de',dashboardMode:'auto',semester:{name:'',start:'',end:'',hoursPerCredit:17},subjects:[],sessions:[],holiday:null,dailyPlan:{items:[],templates:[]},timerSettings:{sound:true,vibrate:true,notifications:false,autoNext:true},studyProgress:null,meta:{updatedAt:0}};
+const defaultState={version:4.6,theme:'light',lang:'de',dashboardMode:'auto',semester:{name:'',start:'',end:'',hoursPerCredit:17},subjects:[],sessions:[],holiday:null,dailyPlan:{items:[],templates:[]},timerSettings:{sound:true,vibrate:true,notifications:false,autoNext:true},studyProgress:null,meta:{updatedAt:0}};
 let state=load(); let timer={running:false,paused:false,mode:'focus',round:1,totalRounds:4,focusSec:1500,breakSec:300,remaining:1500,startedAt:null,accumulatedFocus:0,interval:null,open:false};
 let calDate=new Date(); let holidayDraft={days:{}}; let deferredPrompt=null;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
@@ -346,6 +457,387 @@ $('#copyYesterdayPlan').onclick=()=>{const d=parseDate(dayPlanDate);d.setDate(d.
 $('#saveDayTemplate').onclick=()=>{const items=dayPlanItems();if(!items.length)return toast('Dieser Tag ist leer.');const name=prompt('Name der Vorlage, z. B. Uni-Tag');if(!name?.trim())return;dailyPlanState().templates.push({id:uid(),name:name.trim(),items:items.map(({type,title,start,end})=>({type,title,start,end}))});save();toast('Vorlage gespeichert')};
 $('#applyDayTemplate').onclick=()=>{const id=$('#dayTemplateSelect').value,t=dailyPlanState().templates.find(x=>x.id===id);if(!t)return toast('Wähle zuerst eine Vorlage.');const plan=dailyPlanState();t.items.forEach(x=>plan.items.push({...x,id:uid(),groupId:uid(),date:dayPlanDate,done:false}));save();toast('Vorlage angewendet')};
 
+
+
+/* ===== WesStudy v4.6: Wochenplan + Verpflichtungen ===== */
+const plannerTypeMeta={
+  uni:['🎓','Universität'],bib:['📚','Bib'],vmt:['🏭','VMT'],lab:['🧪','Labor'],gym:['🏋️','Gym'],
+  mealprep:['🍳','Meal Prep'],culture:['📖','Kultur'],studyWindow:['📘','Studienfenster'],other:['✨','Sonstiges'],
+  travel:['🚆','Fahrt'],prep:['🎒','Vorbereitung']
+};
+const plannerPublicHolidays=new Set(['2026-10-03','2026-11-01','2026-12-25','2026-12-26','2027-01-01','2027-01-06']);
+function plannerDefaults(){
+  return {
+    semesterStart:'2026-09-28',semesterEnd:'2027-01-29',
+    lectureFreeStart:'2026-12-19',lectureFreeEnd:'2027-01-10',
+    prepMin:40,uniTravelMin:15,bibTravelMin:20,vmtTravelMin:85,vmtDurationMin:540,vmtStudyCapMin:150,
+    gymMin:75,mealPrepMin:90,sleepMin:360,sleepPreferred:450,sundaySleep:480,cultureWeeklyMin:240,
+    novemberVmtAccountingOnly:true,studyAdjustments:{},completions:{},exceptions:{},
+    rules:[
+      {id:'u-m1',type:'uni',name:'TM 3',weekday:1,start:'08:00',end:'09:30',repeat:'weekly',enabled:true,studyMin:0},
+      {id:'u-m2',type:'uni',name:'Robotik',weekday:1,start:'09:50',end:'11:20',repeat:'weekly',enabled:true,studyMin:0},
+      {id:'sw-m',type:'studyWindow',name:'Studium zwischen Uni',weekday:1,start:'11:30',end:'13:30',repeat:'weekly',enabled:true,studyMin:0},
+      {id:'u-m3',type:'uni',name:'Bionik',weekday:1,start:'14:00',end:'15:30',repeat:'weekly',enabled:true,studyMin:0},
+      {id:'b-m',type:'bib',name:'Bib',weekday:1,start:'16:00',end:'20:00',repeat:'weekly',enabled:true,studyMin:180},
+      {id:'g-m',type:'gym',name:'Gym',weekday:1,start:'20:30',end:'21:45',repeat:'weekly',enabled:true,studyMin:0},
+
+      {id:'mp-tu',type:'mealprep',name:'Meal Prep',weekday:2,start:'07:10',end:'08:30',repeat:'weekly',enabled:true,studyMin:0},
+      {id:'u-tu1',type:'uni',name:'HM 3',weekday:2,start:'09:50',end:'11:20',repeat:'weekly',enabled:true,studyMin:0},
+      {id:'sw-tu',type:'studyWindow',name:'Studium zwischen Uni',weekday:2,start:'11:30',end:'13:30',repeat:'weekly',enabled:true,studyMin:0},
+      {id:'u-tu2',type:'uni',name:'Fertigungstechnik',weekday:2,start:'14:00',end:'15:30',repeat:'weekly',enabled:true,studyMin:0},
+      {id:'b-tu',type:'bib',name:'Bib',weekday:2,start:'16:00',end:'20:00',repeat:'weekly',enabled:true,studyMin:180},
+
+      {id:'u-w1',type:'uni',name:'TM 3',weekday:3,start:'08:00',end:'09:30',repeat:'weekly',enabled:true,studyMin:0},
+      {id:'u-w2',type:'uni',name:'MicroComputer',weekday:3,start:'09:50',end:'11:20',repeat:'weekly',enabled:true,studyMin:0},
+      {id:'sw-w',type:'studyWindow',name:'Studium zwischen Uni',weekday:3,start:'11:30',end:'13:30',repeat:'weekly',enabled:true,studyMin:0},
+      {id:'lab-w',type:'lab',name:'Numerische Programmierung – Labor',weekday:3,start:'14:00',end:'17:10',repeat:'biweekly',anchor:'',enabled:true,studyMin:0},
+      {id:'b-w',type:'bib',name:'Bib',weekday:3,start:'16:00',end:'20:00',repeat:'weekly',enabled:true,studyMin:180},
+      {id:'g-w',type:'gym',name:'Gym',weekday:3,start:'20:30',end:'21:45',repeat:'weekly',enabled:true,studyMin:0},
+
+      {id:'u-th1',type:'uni',name:'TM Kinematik',weekday:4,start:'08:00',end:'09:30',repeat:'weekly',enabled:true,studyMin:0},
+      {id:'u-th2',type:'uni',name:'Höhere Mathematik 3',weekday:4,start:'09:50',end:'11:20',repeat:'weekly',enabled:true,studyMin:0},
+      {id:'u-th3',type:'uni',name:'Rapid Technologies',weekday:4,start:'11:30',end:'13:00',repeat:'weekly',enabled:true,studyMin:0},
+      {id:'sw-th',type:'studyWindow',name:'Studium vor Bib',weekday:4,start:'13:30',end:'15:30',repeat:'weekly',enabled:true,studyMin:0},
+      {id:'b-th',type:'bib',name:'Bib',weekday:4,start:'16:00',end:'20:00',repeat:'weekly',enabled:true,studyMin:180},
+
+      {id:'v-f',type:'vmt',name:'VMT',weekday:5,start:'',end:'',repeat:'weekly',enabled:false,studyMin:0},
+
+      {id:'b-sa',type:'bib',name:'Bib',weekday:6,start:'09:00',end:'13:00',repeat:'weekly',enabled:true,studyMin:180},
+      {id:'mp-sa',type:'mealprep',name:'Meal Prep',weekday:6,start:'14:00',end:'15:30',repeat:'weekly',enabled:true,studyMin:0},
+      {id:'sw-sa',type:'studyWindow',name:'Studium',weekday:6,start:'15:30',end:'17:30',repeat:'weekly',enabled:true,studyMin:0},
+      {id:'g-sa',type:'gym',name:'Gym',weekday:6,start:'18:00',end:'19:15',repeat:'weekly',enabled:true,studyMin:0},
+      {id:'c-sa',type:'culture',name:'Kultur',weekday:6,start:'19:30',end:'20:15',repeat:'weekly',enabled:true,studyMin:0},
+
+      {id:'sw-su1',type:'studyWindow',name:'Studium',weekday:0,start:'09:30',end:'12:30',repeat:'weekly',enabled:true,studyMin:0},
+      {id:'c-su',type:'culture',name:'Kulturprogramm',weekday:0,start:'13:30',end:'14:45',repeat:'weekly',enabled:true,studyMin:0},
+      {id:'g-su',type:'gym',name:'Gym',weekday:0,start:'15:30',end:'16:45',repeat:'weekly',enabled:true,studyMin:0},
+      {id:'sw-su2',type:'studyWindow',name:'Studium',weekday:0,start:'17:30',end:'20:30',repeat:'weekly',enabled:true,studyMin:0}
+    ]
+  };
+}
+function plannerState(){
+  if(!state.weeklyPlanner){
+    state.weeklyPlanner=plannerDefaults();
+  }else{
+    const d=plannerDefaults(),w=state.weeklyPlanner;
+    state.weeklyPlanner={...d,...w,
+      rules:Array.isArray(w.rules)?w.rules:d.rules,
+      studyAdjustments:{...(w.studyAdjustments||{})},
+      completions:{...(w.completions||{})},
+      exceptions:{...(w.exceptions||{})}
+    };
+  }
+  return state.weeklyPlanner;
+}
+function addMinsTime(t,mins){
+  if(!t)return '';
+  const base=timeToMins(t)+Number(mins||0),m=((base%1440)+1440)%1440;
+  return `${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`;
+}
+function subMinsTime(t,mins){return addMinsTime(t,-Number(mins||0))}
+function plannerWeekStart(date){
+  const d=parseDate(date),shift=(d.getDay()+6)%7;d.setDate(d.getDate()-shift);return localISO(d);
+}
+function plannerWeekDates(date){
+  const start=parseDate(plannerWeekStart(date));
+  return Array.from({length:7},(_,i)=>{const d=new Date(start);d.setDate(d.getDate()+i);return localISO(d)});
+}
+function isLectureFree(date){
+  const w=plannerState();
+  return overlapDate(date,w.lectureFreeStart,w.lectureFreeEnd)||plannerPublicHolidays.has(date);
+}
+function plannerRuleApplies(rule,date){
+  if(!rule.enabled||Number(rule.weekday)!==parseDate(date).getDay())return false;
+  const w=plannerState();
+  if(date<w.semesterStart||date>w.semesterEnd)return false;
+  if(w.exceptions?.[date]?.[rule.id]===false)return false;
+  if((rule.type==='uni'||rule.type==='lab')&&isLectureFree(date))return false;
+  if(rule.repeat==='biweekly'){
+    if(!rule.anchor)return false;
+    const diff=Math.round((parseDate(date)-parseDate(rule.anchor))/86400000);
+    if(diff<0||diff%14!==0)return false;
+  }
+  return true;
+}
+function basePlannerRulesForDate(date){
+  const w=plannerState();
+  let rules=w.rules.filter(r=>plannerRuleApplies(r,date)).map(r=>({...r,generated:true}));
+  const hasLab=rules.some(r=>r.type==='lab');
+  const actualVmt=rules.some(r=>r.type==='vmt'&&!(w.novemberVmtAccountingOnly&&date.startsWith('2026-11')));
+  if(hasLab)rules=rules.filter(r=>r.type!=='bib'&&!(r.type==='gym'&&Number(r.weekday)===3));
+  if(actualVmt)rules=rules.filter(r=>r.type!=='bib');
+  if(w.novemberVmtAccountingOnly&&date.startsWith('2026-11'))rules=rules.filter(r=>r.type!=='vmt');
+
+  // In Laborwochen: Dienstag statt Mittwoch Gym, wenn Dienstag noch kein Gym hat.
+  const d=parseDate(date);
+  if(d.getDay()===2){
+    const wed=new Date(d);wed.setDate(wed.getDate()+1);const wedISO=localISO(wed);
+    const labNextDay=w.rules.some(r=>r.type==='lab'&&plannerRuleApplies(r,wedISO));
+    if(labNextDay&&!rules.some(r=>r.type==='gym')){
+      const g=w.rules.find(r=>r.id==='g-w');
+      if(g)rules.push({...g,id:'auto-gym-tu-lab',weekday:2,start:g.start,end:g.end,name:'Gym (statt Mittwoch – Laborwoche)',generated:true,auto:true});
+    }
+  }
+  return rules;
+}
+function plannerActualVmt(date,rules=basePlannerRulesForDate(date)){
+  const w=plannerState();
+  return rules.find(r=>r.type==='vmt'&&!(w.novemberVmtAccountingOnly&&date.startsWith('2026-11')));
+}
+function plannerGeneratedItems(date){
+  const w=plannerState(),rules=basePlannerRulesForDate(date),items=[];
+  for(const r of rules){
+    let start=r.start||'',end=r.end||'';
+    if(r.type==='vmt'&&start)end=addMinsTime(start,w.vmtDurationMin);
+    items.push({...r,start,end,key:`rule:${r.id}:${date}`});
+  }
+  // Preparation + commute before first university block
+  const uni=items.filter(x=>x.type==='uni').sort((a,b)=>a.start.localeCompare(b.start));
+  if(uni.length){
+    const first=uni[0],depart=subMinsTime(first.start,w.uniTravelMin),prepStart=subMinsTime(depart,w.prepMin);
+    items.push({id:'auto-prep-uni',key:`auto:prep-uni:${date}`,type:'prep',name:'Vorbereitung + Frühstück',start:prepStart,end:depart,generated:true,auto:true});
+    items.push({id:'auto-travel-uni',key:`auto:travel-uni:${date}`,type:'travel',name:'Haus → Uni',start:depart,end:first.start,generated:true,auto:true});
+  }
+  // Uni -> Bib commute when both are actual.
+  const bib=items.find(x=>x.type==='bib'),lastUni=uni.slice().sort((a,b)=>b.end.localeCompare(a.end))[0];
+  if(bib&&lastUni&&lastUni.end<=bib.start){
+    const commuteStart=subMinsTime(bib.start,w.bibTravelMin);
+    items.push({id:'auto-travel-bib',key:`auto:travel-bib:${date}`,type:'travel',name:'Uni → Bib',start:commuteStart,end:bib.start,generated:true,auto:true});
+  }
+  // VMT preparation + buffered commute.
+  const vmt=plannerActualVmt(date,rules);
+  if(vmt?.start){
+    const depart=subMinsTime(vmt.start,w.vmtTravelMin),prepStart=subMinsTime(depart,w.prepMin),vmtEnd=addMinsTime(vmt.start,w.vmtDurationMin);
+    items.push({id:'auto-prep-vmt',key:`auto:prep-vmt:${date}`,type:'prep',name:'Vorbereitung für VMT',start:prepStart,end:depart,generated:true,auto:true});
+    items.push({id:'auto-travel-vmt',key:`auto:travel-vmt:${date}`,type:'travel',name:'Haus → VMT (mit Buffer)',start:depart,end:vmt.start,generated:true,auto:true});
+    items.push({id:'auto-travel-home',key:`auto:travel-home:${date}`,type:'travel',name:'VMT → Haus (mit Buffer)',start:vmtEnd,end:addMinsTime(vmtEnd,w.vmtTravelMin),generated:true,auto:true});
+  }
+  return items.sort((a,b)=>(a.start||'99:99').localeCompare(b.start||'99:99'));
+}
+function plannerCompletion(date,key){
+  return plannerState().completions?.[date]?.[key]||null;
+}
+function setPlannerCompletion(date,key,patch){
+  const w=plannerState();w.completions[date]=w.completions[date]||{};
+  w.completions[date][key]={...(w.completions[date][key]||{}),...patch};
+  save();
+}
+function baseStudyTargetForDate(date){
+  const w=plannerState(),adj=Number(w.studyAdjustments?.[date]||0);
+  return Math.max(0,studyPlanForDate(date)+adj);
+}
+function flexibleWeekTargets(date){
+  const w=plannerState(),dates=plannerWeekDates(date),targets=Object.fromEntries(dates.map(d=>[d,baseStudyTargetForDate(d)]));
+  let pool=0;
+  for(const d of dates){
+    const rules=basePlannerRulesForDate(d),vmt=plannerActualVmt(d,rules);
+    if(vmt&&targets[d]>w.vmtStudyCapMin){pool+=targets[d]-w.vmtStudyCapMin;targets[d]=w.vmtStudyCapMin}
+  }
+  if(pool>0){
+    const ranked=dates.filter(d=>!plannerActualVmt(d,basePlannerRulesForDate(d))).sort((a,b)=>{
+      const score=x=>{const wd=parseDate(x).getDay(),r=basePlannerRulesForDate(x);return (wd===0?100:wd===6?80:0)+(r.some(y=>y.type==='bib')?50:0)+(r.some(y=>y.type==='uni')?0:20)};
+      return score(b)-score(a);
+    });
+    for(const d of ranked){
+      if(pool<=0)break;
+      const wd=parseDate(d).getDay(),maxAdd=wd===0?180:wd===6?120:basePlannerRulesForDate(d).some(r=>r.type==='bib')?90:60;
+      const add=Math.min(pool,maxAdd);targets[d]+=add;pool-=add;
+    }
+    if(pool>0&&ranked.length)targets[ranked[0]]+=pool;
+  }
+  return targets;
+}
+function flexibleStudyTargetForDate(date){return flexibleWeekTargets(date)[date]??baseStudyTargetForDate(date)}
+function bibUsableStudy(date,target=flexibleStudyTargetForDate(date)){
+  const bib=basePlannerRulesForDate(date).find(r=>r.type==='bib');
+  return bib?Math.min(target,Number(bib.studyMin||0)):0;
+}
+function plannerManualItems(date){
+  return dayPlanItems(date).map(x=>({...x,name:x.title,key:`manual:${x.id}`,generated:false}));
+}
+function plannerAllItems(date){
+  return [...plannerGeneratedItems(date),...plannerManualItems(date)].sort((a,b)=>(a.start||'99:99').localeCompare(b.start||'99:99'));
+}
+function plannerConflicts(date){
+  const arr=plannerGeneratedItems(date).filter(x=>x.start&&x.end),out=[];
+  for(let i=0;i<arr.length;i++)for(let j=i+1;j<arr.length;j++){
+    const a=arr[i],b=arr[j];
+    if(timeToMins(a.start)<timeToMins(b.end)&&timeToMins(b.start)<timeToMins(a.end)){
+      if(['travel','prep','studyWindow'].includes(a.type)||['travel','prep','studyWindow'].includes(b.type))continue;
+      out.push(`${a.name} ↔ ${b.name}`);
+    }
+  }
+  return [...new Set(out)];
+}
+function plannerStudyWindows(date,target){
+  const rules=basePlannerRulesForDate(date),bib=rules.find(r=>r.type==='bib'),bibStudy=bib?Math.min(target,Number(bib.studyMin||0)):0;
+  let rest=Math.max(0,target-bibStudy),blocks=[];
+  for(const r of rules.filter(x=>x.type==='studyWindow').sort((a,b)=>a.start.localeCompare(b.start))){
+    if(rest<=0)break;const cap=dayPlanDuration(r),use=Math.min(rest,cap);
+    blocks.push({start:r.start,end:addMinsTime(r.start,use),minutes:use,label:r.name});rest-=use;
+  }
+  if(rest>0){
+    const vmt=plannerActualVmt(date,rules);
+    if(vmt){
+      const vEnd=addMinsTime(vmt.start,plannerState().vmtDurationMin),home=addMinsTime(vEnd,plannerState().vmtTravelMin);
+      blocks.push({start:addMinsTime(home,60),end:addMinsTime(addMinsTime(home,60),rest),minutes:rest,label:'Studium nach VMT (max. realistisch)'});
+    }else{
+      blocks.push({start:'flexibel',end:'',minutes:rest,label:'Flexibel einplanen'});
+    }
+  }
+  return {bibStudy,blocks,rest};
+}
+function renderSmartDayPlanner(){
+  if(!document.getElementById('smartDayItems'))return;
+  plannerState();
+  const date=dayPlanDate,d=parseDate(date),items=plannerAllItems(date),target=flexibleStudyTargetForDate(date),base=baseStudyTargetForDate(date),done=sessionsOn(date),bibStudy=bibUsableStudy(date,target),outside=Math.max(0,target-bibStudy),studyWindows=plannerStudyWindows(date,target),conflicts=plannerConflicts(date);
+  document.getElementById('smartDayTitle').textContent=(date===todayISO()?'Heute – ':'')+new Intl.DateTimeFormat('de-DE',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'}).format(d);
+  const lf=isLectureFree(date);document.getElementById('smartDaySubtitle').textContent=lf?'Vorlesungsfrei / Feiertag – Uni-Termine werden automatisch ausgeblendet.':'Automatisch aus deinen Wochenregeln berechnet.';
+  document.getElementById('smartStudyTarget').textContent=minsText(target);
+  document.getElementById('smartBibStudy').textContent=minsText(bibStudy);
+  document.getElementById('smartOutsideStudy').textContent=minsText(outside);
+  document.getElementById('smartStudyDone').textContent=minsText(done);
+  const msgs=[];
+  if(target!==base)msgs.push(`<div class="planner-alert">↔️ Flexibles Studienziel: ${minsText(base)} ursprünglich → ${minsText(target)} heute. Die Wochensumme bleibt gleich.</div>`);
+  const actualVmt=plannerActualVmt(date,basePlannerRulesForDate(date));
+  if(actualVmt)msgs.push(`<div class="planner-alert">🏭 VMT-Tag: 9 Std. Arbeit + Fahrt/Buffer. Studium wird auf max. ${minsText(plannerState().vmtStudyCapMin)} begrenzt; Überschuss wird auf leichtere Tage verteilt.</div>`);
+  if(date.startsWith('2026-11')&&plannerState().novemberVmtAccountingOnly)msgs.push(`<div class="planner-good">ℹ️ November 2026: VMT wird als Abrechnungstermin behandelt und blockiert den Tag nicht.</div>`);
+  if(conflicts.length)msgs.push(`<div class="planner-alert">⚠️ Konflikt erkannt: ${conflicts.map(esc).join(' · ')}</div>`);
+  if(target){msgs.push(`<div class="${done>=target?'planner-good':'planner-alert'}">📚 Studium: Soll ${minsText(target)} · Erledigt im Lernverlauf ${minsText(done)} · ${done>=target?`+${minsText(done-target)} über Soll`:`${minsText(target-done)} offen`}</div>`)}
+  document.getElementById('smartDayMessages').innerHTML=msgs.join('');
+  const grouped={pflicht:[],study:[],personal:[]};
+  items.forEach(x=>{
+    if(['uni','bib','vmt','lab'].includes(x.type))grouped.pflicht.push(x);
+    else if(x.type==='studyWindow'){} // display actual allocated study below instead
+    else grouped.personal.push(x);
+  });
+  if(bibStudy&&basePlannerRulesForDate(date).some(r=>r.type==='bib'))grouped.study.push({key:`bib-study:${date}`,type:'studyWindow',name:'Studium während Bib',start:basePlannerRulesForDate(date).find(r=>r.type==='bib').start,end:'',minutes:bibStudy,generated:true,virtual:true});
+  studyWindows.blocks.forEach((b,i)=>grouped.study.push({key:`study-block:${date}:${i}`,type:'studyWindow',name:b.label,start:b.start,end:b.end,minutes:b.minutes,generated:true,virtual:true}));
+  const renderItem=x=>{
+    const meta=plannerTypeMeta[x.type]||plannerTypeMeta.other,comp=plannerCompletion(date,x.key),manual=!x.generated;
+    const dur=x.minutes!=null?x.minutes:(x.start&&x.end?dayPlanDuration(x):0);
+    let extra='';
+    if(x.type==='bib')extra=`Arbeitszeit ${minsText(dayPlanDuration(x))} · nutzbare Lernzeit ca. ${minsText(Number(x.studyMin||0))}`;
+    else if(x.type==='vmt')extra=`Arbeitszeit ${minsText(plannerState().vmtDurationMin)} · Lernzeit während Arbeit 0:00`;
+    else extra=`${meta[1]}${dur?' · '+minsText(dur):''}`;
+    if(comp?.actualMins!=null)extra+=` · Ist ${minsText(comp.actualMins)}`;
+    return `<div class="planner-item ${comp?.done?'done':''}">
+      <div class="planner-time">${esc(x.start||'flexibel')}${x.end?`<div class="muted" style="font-size:.7rem">bis ${esc(x.end)}</div>`:''}</div>
+      <div><div class="planner-item-title">${meta[0]} ${esc(x.name||x.title||meta[1])}</div><div class="planner-item-sub">${extra}</div></div>
+      <div class="planner-actions">
+        ${x.virtual?'':`<input type="checkbox" data-planner-done="${esc(x.key)}" ${comp?.done?'checked':''} aria-label="Erledigt">`}
+        ${x.virtual?'':`<button class="mini-btn" data-planner-actual="${esc(x.key)}" title="Ist-Zeit">⏱</button>`}
+        ${manual?`<button class="mini-btn" data-dayplan-edit="${esc(x.id)}">✏️</button>`:x.id?.startsWith('auto-')||x.auto?'':`<button class="mini-btn" data-planner-edit-rule="${esc(x.id)}">✏️</button>`}
+      </div>
+    </div>`;
+  };
+  document.getElementById('smartDayItems').innerHTML=
+    `<div class="planner-group"><h3>Pflichttermine</h3>${grouped.pflicht.length?grouped.pflicht.map(renderItem).join(''):'<div class="muted">Keine Pflichttermine.</div>'}</div>`+
+    `<div class="planner-group"><h3>Studienziel – geplant</h3>${grouped.study.length?grouped.study.map(renderItem).join(''):'<div class="muted">Keine Studienzeit geplant.</div>'}</div>`+
+    `<div class="planner-group"><h3>Persönliche Termine</h3>${grouped.personal.length?grouped.personal.map(renderItem).join(''):'<div class="muted">Keine persönlichen Termine.</div>'}</div>`;
+}
+function renderWeekPlanner(){
+  if(!document.getElementById('weekOverview'))return;
+  const dates=plannerWeekDates(dayPlanDate),targets=flexibleWeekTargets(dayPlanDate);
+  document.getElementById('weekPlannerLabel').textContent=`${fmtDate(dates[0])} – ${fmtDate(dates[6])}`;
+  document.getElementById('weekOverview').innerHTML=dates.map(date=>{
+    const r=basePlannerRulesForDate(date),target=targets[date]||0,done=sessionsOn(date),wd=new Intl.DateTimeFormat('de-DE',{weekday:'short',day:'2-digit',month:'2-digit'}).format(parseDate(date));
+    const names=r.filter(x=>['uni','lab','bib','vmt','gym','mealprep','culture'].includes(x.type)).slice(0,6);
+    return `<div class="week-day-card ${date===todayISO()?'today':''}" data-week-date="${date}"><div class="wd-title">${wd}</div><div class="wd-target">📚 ${minsText(target)} Soll</div><div class="week-mini">Ist: ${minsText(done)}</div>${names.map(x=>`<div class="week-mini">${(plannerTypeMeta[x.type]||['•'])[0]} ${esc(x.name)} ${x.start?x.start:''}</div>`).join('')}<div class="week-mini"><strong>${done>=target&&target?'✅ Soll erreicht':target?minsText(Math.max(0,target-done))+' offen':'—'}</strong></div></div>`
+  }).join('');
+}
+function renderPlannerRules(){
+  const w=plannerState(),g=document.getElementById('plannerGlobalSettings');if(!g)return;
+  g.innerHTML=`<div class="metrics"><span class="pill">Semester ${fmtDate(w.semesterStart)} – ${fmtDate(w.semesterEnd)}</span><span class="pill">Vorlesungsfrei ${fmtDate(w.lectureFreeStart)} – ${fmtDate(w.lectureFreeEnd)}</span><span class="pill">VMT ${minsText(w.vmtDurationMin)} Arbeit</span><span class="pill">VMT-Fahrt ${minsText(w.vmtTravelMin)} je Weg</span><span class="pill">Vorbereitung ${minsText(w.prepMin)}</span><span class="pill">Sonntag Schlaf ${minsText(w.sundaySleep)}</span></div><button class="btn soft" id="openPlannerSettings" style="margin-top:12px">Globale Einstellungen bearbeiten</button>`;
+  document.getElementById('plannerRuleList').innerHTML=w.rules.slice().sort((a,b)=>Number(a.weekday)-Number(b.weekday)||(a.start||'99:99').localeCompare(b.start||'99:99')).map(r=>`<div class="rule-row"><div><strong>${(plannerTypeMeta[r.type]||['•'])[0]} ${esc(r.name)}</strong><small>${['So','Mo','Di','Mi','Do','Fr','Sa'][Number(r.weekday)]} · ${r.start||'Start offen'}${r.type==='vmt'&&r.start?` → ${addMinsTime(r.start,w.vmtDurationMin)}`:r.end?'–'+r.end:''} · ${r.repeat==='biweekly'?'alle 2 Wochen':'wöchentlich'}${r.type==='bib'?` · Lernzeit ${minsText(Number(r.studyMin||0))}`:''}${!r.enabled?' · deaktiviert':''}</small></div><div class="rule-actions"><button class="mini-btn" data-planner-edit-rule="${r.id}">✏️</button><button class="mini-btn" data-planner-toggle-rule="${r.id}">${r.enabled?'⏸':'▶️'}</button></div></div>`).join('');
+}
+function renderPlannerAll(){renderSmartDayPlanner();renderWeekPlanner();renderPlannerRules()}
+function plannerSwitchTab(tab){
+  document.querySelectorAll('[data-plan-tab]').forEach(b=>b.classList.toggle('active',b.dataset.planTab===tab));
+  document.getElementById('smartDayPlanner').classList.toggle('hidden',tab!=='day');
+  document.getElementById('smartWeekPlanner').classList.toggle('hidden',tab!=='week');
+  document.getElementById('smartRulesPlanner').classList.toggle('hidden',tab!=='rules');
+  if(tab==='week')renderWeekPlanner();if(tab==='rules')renderPlannerRules();if(tab==='day')renderSmartDayPlanner();
+}
+function openPlannerRule(id=''){
+  const w=plannerState(),r=id?w.rules.find(x=>x.id===id):null;
+  document.getElementById('plannerRuleId').value=r?.id||'';
+  document.getElementById('plannerRuleDialogTitle').textContent=r?'Regel bearbeiten':'Regel hinzufügen';
+  document.getElementById('plannerRuleType').value=r?.type||'other';
+  document.getElementById('plannerRuleName').value=r?.name||'';
+  document.getElementById('plannerRuleWeekday').value=String(r?.weekday??1);
+  document.getElementById('plannerRuleStart').value=r?.start||'';
+  document.getElementById('plannerRuleEnd').value=r?.end||'';
+  document.getElementById('plannerRuleRepeat').value=r?.repeat||'weekly';
+  document.getElementById('plannerRuleAnchor').value=r?.anchor||'';
+  document.getElementById('plannerRuleStudyMin').value=Number(r?.studyMin||0);
+  document.getElementById('plannerRuleEnabled').checked=r?.enabled!==false;
+  document.getElementById('deletePlannerRule').classList.toggle('hidden',!r);
+  document.getElementById('plannerRuleDialog').showModal();
+}
+function openPlannerSettings(){
+  const w=plannerState();
+  ['semesterStart','semesterEnd','lectureFreeStart','lectureFreeEnd','prepMin','uniTravelMin','bibTravelMin','vmtTravelMin','vmtDurationMin','vmtStudyCapMin','gymMin','mealPrepMin','sleepMin','sleepPreferred','sundaySleep','cultureWeeklyMin'].forEach(k=>{
+    const id='wp'+k[0].toUpperCase()+k.slice(1),el=document.getElementById(id);if(el)el.value=w[k]??'';
+  });
+  document.getElementById('wpNovemberAccounting').checked=!!w.novemberVmtAccountingOnly;
+  document.getElementById('plannerSettingsDialog').showModal();
+}
+function moveStudyOpen(date,mode='tomorrow'){
+  const w=plannerState(),target=flexibleStudyTargetForDate(date),done=sessionsOn(date),open=Math.max(0,target-done);
+  if(!open)return toast('Für diesen Tag ist keine Lernzeit offen.');
+  const currentAdj=Number(w.studyAdjustments[date]||0);
+  w.studyAdjustments[date]=currentAdj-open;
+  const candidates=[];
+  let d=parseDate(date);
+  for(let i=1;i<=7;i++){const x=new Date(d);x.setDate(x.getDate()+i);const iso=localISO(x);if(iso<=w.semesterEnd&&!plannerActualVmt(iso,basePlannerRulesForDate(iso)))candidates.push(iso)}
+  if(!candidates.length){w.studyAdjustments[date]=currentAdj;return toast('Kein geeigneter Folgetag gefunden.')}
+  if(mode==='tomorrow'){
+    w.studyAdjustments[candidates[0]]=Number(w.studyAdjustments[candidates[0]]||0)+open;
+  }else{
+    const ranked=candidates.sort((a,b)=>{const score=x=>(parseDate(x).getDay()===0?100:parseDate(x).getDay()===6?80:0)+(basePlannerRulesForDate(x).some(r=>r.type==='bib')?50:0);return score(b)-score(a)}).slice(0,3);
+    let rem=open;ranked.forEach((x,i)=>{const add=i===ranked.length-1?rem:Math.round(open/ranked.length);w.studyAdjustments[x]=Number(w.studyAdjustments[x]||0)+add;rem-=add});
+  }
+  save();toast(mode==='tomorrow'?`${minsText(open)} auf den nächsten geeigneten Tag verschoben`:`${minsText(open)} automatisch verteilt`);
+}
+document.getElementById('planTabs').addEventListener('click',e=>{const b=e.target.closest('[data-plan-tab]');if(b)plannerSwitchTab(b.dataset.planTab)});
+document.getElementById('plannerSettingsBtn').onclick=openPlannerSettings;
+document.getElementById('addPlannerRule').onclick=()=>openPlannerRule();
+document.getElementById('weekTodayBtn').onclick=()=>{dayPlanDate=todayISO();renderWeekPlanner()};
+document.getElementById('moveOpenTomorrow').onclick=()=>moveStudyOpen(dayPlanDate,'tomorrow');
+document.getElementById('autoDistributeOpen').onclick=()=>moveStudyOpen(dayPlanDate,'auto');
+document.getElementById('weekOverview').addEventListener('click',e=>{const c=e.target.closest('[data-week-date]');if(c){dayPlanDate=c.dataset.weekDate;plannerSwitchTab('day');renderDailyPlan()}});
+document.getElementById('smartDayItems').addEventListener('change',e=>{if(e.target.matches('[data-planner-done]'))setPlannerCompletion(dayPlanDate,e.target.dataset.plannerDone,{done:e.target.checked})});
+document.getElementById('smartDayItems').addEventListener('click',e=>{
+  const a=e.target.closest('[data-planner-actual]');if(a){const cur=plannerCompletion(dayPlanDate,a.dataset.plannerActual)?.actualMins||0,v=prompt('Tatsächliche Dauer in Minuten:',String(cur));if(v!==null&&Number(v)>=0)setPlannerCompletion(dayPlanDate,a.dataset.plannerActual,{actualMins:Number(v)})}
+  const ed=e.target.closest('[data-planner-edit-rule]');if(ed)openPlannerRule(ed.dataset.plannerEditRule);
+});
+document.getElementById('plannerRuleList').addEventListener('click',e=>{
+  const ed=e.target.closest('[data-planner-edit-rule]');if(ed)return openPlannerRule(ed.dataset.plannerEditRule);
+  const tg=e.target.closest('[data-planner-toggle-rule]');if(tg){const r=plannerState().rules.find(x=>x.id===tg.dataset.plannerToggleRule);if(r){r.enabled=!r.enabled;save()}}
+});
+document.addEventListener('click',e=>{if(e.target.id==='openPlannerSettings')openPlannerSettings()});
+document.getElementById('plannerRuleForm').addEventListener('submit',e=>{
+  if(e.submitter?.value==='cancel')return;e.preventDefault();
+  const id=document.getElementById('plannerRuleId').value||uid(),w=plannerState(),old=w.rules.find(x=>x.id===id);
+  const r={id,type:document.getElementById('plannerRuleType').value,name:document.getElementById('plannerRuleName').value.trim(),weekday:Number(document.getElementById('plannerRuleWeekday').value),start:document.getElementById('plannerRuleStart').value,end:document.getElementById('plannerRuleEnd').value,repeat:document.getElementById('plannerRuleRepeat').value,anchor:document.getElementById('plannerRuleAnchor').value,studyMin:Number(document.getElementById('plannerRuleStudyMin').value||0),enabled:document.getElementById('plannerRuleEnabled').checked};
+  if(r.type!=='vmt'&&r.start&&r.end&&timeToMins(r.end)<=timeToMins(r.start))return toast('Ende muss nach Start liegen.');
+  if(old)Object.assign(old,r);else w.rules.push(r);save();document.getElementById('plannerRuleDialog').close();toast('Regel gespeichert');
+});
+document.getElementById('deletePlannerRule').onclick=()=>{const id=document.getElementById('plannerRuleId').value;if(id&&confirm('Diese Regel löschen?')){plannerState().rules=plannerState().rules.filter(x=>x.id!==id);save();document.getElementById('plannerRuleDialog').close()}};
+document.getElementById('plannerSettingsForm').addEventListener('submit',e=>{
+  if(e.submitter?.value==='cancel')return;e.preventDefault();const w=plannerState();
+  const map={wpSemesterStart:'semesterStart',wpSemesterEnd:'semesterEnd',wpLectureFreeStart:'lectureFreeStart',wpLectureFreeEnd:'lectureFreeEnd'};
+  Object.entries(map).forEach(([id,k])=>w[k]=document.getElementById(id).value);
+  const nums={wpPrepMin:'prepMin',wpUniTravelMin:'uniTravelMin',wpBibTravelMin:'bibTravelMin',wpVmtTravelMin:'vmtTravelMin',wpVmtDurationMin:'vmtDurationMin',wpVmtStudyCapMin:'vmtStudyCapMin',wpGymMin:'gymMin',wpMealPrepMin:'mealPrepMin',wpSleepMin:'sleepMin',wpSleepPreferred:'sleepPreferred',wpSundaySleep:'sundaySleep',wpCultureWeeklyMin:'cultureWeeklyMin'};
+  Object.entries(nums).forEach(([id,k])=>w[k]=Number(document.getElementById(id).value||0));
+  w.novemberVmtAccountingOnly=document.getElementById('wpNovemberAccounting').checked;save();document.getElementById('plannerSettingsDialog').close();toast('Wochenplan-Einstellungen gespeichert');
+});
+
+// Existing Tagesplan rendering stays, but smart planner is recalculated whenever the date changes.
+const renderDailyPlanV44=renderDailyPlan;
+renderDailyPlan=function(){renderDailyPlanV44();renderPlannerAll()};
+plannerState();
 
 /* ===== WesStudy v4.5: tägliche Lernkontrolle ===== */
 function plannedStudyMinsForDate(date){
@@ -619,12 +1111,12 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-open="subj
 
 window.WesStudyCloudBridge={
   getState:()=>structuredClone(state),
-  hasMeaningfulLocalData:()=>Boolean(state.subjects?.length||state.sessions?.length||state.holiday||state.dailyPlan?.items?.length||state.studyProgress?.modules?.length||state.semester?.start||state.semesterPlan?.days&&Object.keys(state.semesterPlan.days).length),
+  hasMeaningfulLocalData:()=>Boolean(state.subjects?.length||state.sessions?.length||state.holiday||state.dailyPlan?.items?.length||state.studyProgress?.modules?.length||state.semester?.start||state.semesterPlan?.days&&Object.keys(state.semesterPlan.days).length||state.weeklyPlanner?.rules?.length),
   applyCloudState:(incoming)=>{state={...structuredClone(defaultState),...(incoming||{}),semester:{...defaultState.semester,...((incoming||{}).semester||{})},dailyPlan:{...defaultState.dailyPlan,...((incoming||{}).dailyPlan||{}),items:Array.isArray((incoming||{}).dailyPlan?.items)?(incoming||{}).dailyPlan.items:[],templates:Array.isArray((incoming||{}).dailyPlan?.templates)?(incoming||{}).dailyPlan.templates:[]},timerSettings:{...defaultState.timerSettings,...((incoming||{}).timerSettings||{})},meta:{...defaultState.meta,...((incoming||{}).meta||{})}};localStorage.setItem(KEY,JSON.stringify(state));renderAll();},
   forceLocalSave:()=>{persistLocal(false);renderAll();},
   toast
 };
-renderAll();resetTimer();
+renderAll();
 })();
 </script>
 <script type="module" src="cloud-sync.js"></script>
