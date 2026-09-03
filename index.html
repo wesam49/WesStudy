@@ -136,6 +136,17 @@ dialog[open]{position:fixed;inset:0;margin:auto}
 @media(max-width:900px){.week-overview{grid-template-columns:repeat(2,minmax(0,1fr))}.planner-summary{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:560px){.week-overview{grid-template-columns:1fr}.planner-item{grid-template-columns:62px 1fr auto}.planner-summary{grid-template-columns:1fr 1fr}}
 
+
+/* ===== v4.7 synchronized planner ===== */
+.smart-nav{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.smart-nav-main{display:flex;align-items:center;gap:8px;min-width:0}
+.smart-nav .date-button{font-weight:900;min-width:180px;text-align:center}
+.smart-date-input{width:auto!important;min-width:145px!important;padding:8px 10px!important}
+.legacy-dayplan{display:none!important}
+.week-pattern-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;margin-top:10px}
+.week-pattern-grid .field{min-width:0}
+.week-pattern-grid input{padding:8px!important}
+@media(max-width:760px){.week-pattern-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.smart-nav{align-items:stretch}.smart-nav-main{justify-content:space-between}.smart-nav .date-button{min-width:0;flex:1}}
 </style>
 </head>
 <body>
@@ -210,6 +221,14 @@ dialog[open]{position:fixed;inset:0;margin:auto}
       <div class="section-head"><div><h2>🗓️ Tages- & Wochenplan</h2><div class="muted">Pflichttermine, flexible Lernzeit, Arbeit, Gym, Meal Prep, Kultur, Fahrt und Vorbereitung – ohne deine bestehende Stundenplanung zu verändern.</div></div><button class="btn primary" id="addDayPlanItem">+ Aktivität</button></div>
       <div class="plan-tabs" id="planTabs"><button class="active" data-plan-tab="day">Heute / Tag</button><button data-plan-tab="week">Woche</button><button data-plan-tab="rules">Regeln & Zeiten</button></div>
       <div id="smartDayPlanner">
+        <div class="smart-nav card">
+          <div class="smart-nav-main">
+            <button class="mini-btn" id="smartDayPrev" type="button">‹</button>
+            <button class="btn soft date-button" id="smartDayToday" type="button">Heute</button>
+            <button class="mini-btn" id="smartDayNext" type="button">›</button>
+          </div>
+          <input class="smart-date-input" id="smartDayDatePicker" type="date" aria-label="Tag auswählen">
+        </div>
         <div class="card" style="margin-bottom:16px">
           <div class="section-head"><div><h2 id="smartDayTitle">Heute</h2><div class="muted" id="smartDaySubtitle">Automatisch aus deinen Regeln und deiner Studienplanung berechnet.</div></div><button class="btn soft" id="plannerSettingsBtn">⚙️ Regeln bearbeiten</button></div>
           <div class="planner-summary">
@@ -228,7 +247,15 @@ dialog[open]{position:fixed;inset:0;margin:auto}
       </div>
       <div id="smartWeekPlanner" class="hidden">
         <div class="card" style="margin-bottom:16px">
-          <div class="section-head"><div><h2>Wochenübersicht</h2><div class="muted" id="weekPlannerLabel"></div></div><button class="btn soft" id="weekTodayBtn">Diese Woche</button></div>
+          <div class="smart-nav">
+            <div class="smart-nav-main">
+              <button class="mini-btn" id="smartWeekPrev" type="button">‹</button>
+              <button class="btn soft date-button" id="weekTodayBtn" type="button">Diese Woche</button>
+              <button class="mini-btn" id="smartWeekNext" type="button">›</button>
+            </div>
+            <input class="smart-date-input" id="smartWeekDatePicker" type="date" aria-label="Woche auswählen">
+          </div>
+          <div class="section-head"><div><h2>Wochenübersicht</h2><div class="muted" id="weekPlannerLabel"></div></div></div>
           <div class="week-overview" id="weekOverview"></div>
         </div>
       </div>
@@ -239,6 +266,7 @@ dialog[open]{position:fixed;inset:0;margin:auto}
           <div class="rule-list" id="plannerRuleList"></div>
         </div>
       </div>
+      <div class="legacy-dayplan" aria-hidden="true">
       <div class="card" style="margin-bottom:16px">
         <div class="dayplan-head"><div class="dayplan-date"><button class="mini-btn" id="dayPlanPrev">‹</button><strong id="dayPlanDateLabel">Heute</strong><button class="mini-btn" id="dayPlanNext">›</button></div><button class="btn soft" id="dayPlanToday">Heute</button></div>
         <div class="grid cols-4" style="margin-bottom:14px"><div class="card flat"><div class="eyebrow">Geplant</div><div class="big-number" id="dayPlanTotal">0:00</div></div><div class="card flat"><div class="eyebrow">Erledigt</div><div class="big-number" id="dayPlanDone">0:00</div></div><div class="card flat"><div class="eyebrow">Aktivitäten</div><div class="big-number" id="dayPlanCount">0</div></div><div class="card flat"><div class="eyebrow">Lernen eingeplant</div><div class="big-number" id="dayPlanStudy">0:00</div></div></div>
@@ -246,6 +274,7 @@ dialog[open]{position:fixed;inset:0;margin:auto}
         <div class="template-row"><button class="btn soft" id="copyYesterdayPlan">Gestern kopieren</button><button class="btn soft" id="saveDayTemplate">Als Vorlage speichern</button><select id="dayTemplateSelect"><option value="">Vorlage wählen…</option></select><button class="btn soft" id="applyDayTemplate">Vorlage anwenden</button></div>
       </div>
       <div id="dayPlanTimeline" class="dayplan-timeline"></div>
+      </div>
     </section>
 
     <section class="page" data-page="progress">
@@ -324,6 +353,19 @@ dialog[open]{position:fixed;inset:0;margin:auto}
     <div class="field"><label>Schlaf bevorzugt (Min.)</label><input id="wpSleepPreferred" type="number" min="0" value="450"></div>
     <div class="field"><label>Sonntag Schlafziel (Min.)</label><input id="wpSundaySleep" type="number" min="0" value="480"></div>
     <div class="field"><label>Kultur pro Woche (Min.)</label><input id="wpCultureWeeklyMin" type="number" min="0" value="240"></div>
+    <div class="field full">
+      <label>Studienziel pro Wochentag (Std.)</label>
+      <div class="week-pattern-grid">
+        <div class="field"><label>Mo</label><input id="wpStudyMon" type="number" min="0" max="16" step="0.25" value="5"></div>
+        <div class="field"><label>Di</label><input id="wpStudyTue" type="number" min="0" max="16" step="0.25" value="5"></div>
+        <div class="field"><label>Mi</label><input id="wpStudyWed" type="number" min="0" max="16" step="0.25" value="5"></div>
+        <div class="field"><label>Do</label><input id="wpStudyThu" type="number" min="0" max="16" step="0.25" value="5"></div>
+        <div class="field"><label>Fr</label><input id="wpStudyFri" type="number" min="0" max="16" step="0.25" value="3"></div>
+        <div class="field"><label>Sa</label><input id="wpStudySat" type="number" min="0" max="16" step="0.25" value="5"></div>
+        <div class="field"><label>So</label><input id="wpStudySun" type="number" min="0" max="16" step="0.25" value="6"></div>
+      </div>
+      <div class="muted" style="margin-top:7px">Standardmuster: 5 / 5 / 5 / 5 / 3 / 5 / 6 Std. Der Semesterplan wird auf dieses Muster verteilt, aber seine Gesamtsumme bleibt unverändert.</div>
+    </div>
     <div class="field full"><label><input id="wpNovemberAccounting" type="checkbox" checked> VMT-Termine im November 2026 nur als Abrechnung betrachten</label></div>
   </div>
   <p class="muted">Die vorhandenen Semester-/Ferienstunden werden nicht überschrieben. Der Wochenplan verschiebt Ziele nur flexibel in der Anzeige; die Gesamtsumme bleibt erhalten.</p>
@@ -342,7 +384,7 @@ dialog[open]{position:fixed;inset:0;margin:auto}
 (()=>{
 'use strict';
 const KEY='wesstudy_v1';
-const defaultState={version:4.6,theme:'light',lang:'de',dashboardMode:'auto',semester:{name:'',start:'',end:'',hoursPerCredit:17},subjects:[],sessions:[],holiday:null,dailyPlan:{items:[],templates:[]},timerSettings:{sound:true,vibrate:true,notifications:false,autoNext:true},studyProgress:null,meta:{updatedAt:0}};
+const defaultState={version:4.7,theme:'light',lang:'de',dashboardMode:'auto',semester:{name:'',start:'',end:'',hoursPerCredit:17},subjects:[],sessions:[],holiday:null,dailyPlan:{items:[],templates:[]},timerSettings:{sound:true,vibrate:true,notifications:false,autoNext:true},studyProgress:null,meta:{updatedAt:0}};
 let state=load(); let timer={running:false,paused:false,mode:'focus',round:1,totalRounds:4,focusSec:1500,breakSec:300,remaining:1500,startedAt:null,accumulatedFocus:0,interval:null,open:false};
 let calDate=new Date(); let holidayDraft={days:{}}; let deferredPrompt=null;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
@@ -473,6 +515,7 @@ function plannerDefaults(){
     prepMin:40,uniTravelMin:15,bibTravelMin:20,vmtTravelMin:85,vmtDurationMin:540,vmtStudyCapMin:150,
     gymMin:75,mealPrepMin:90,sleepMin:360,sleepPreferred:450,sundaySleep:480,cultureWeeklyMin:240,
     novemberVmtAccountingOnly:true,studyAdjustments:{},completions:{},exceptions:{},
+    studyHoursByWeekday:{0:6,1:5,2:5,3:5,4:5,5:3,6:5},semesterPlanSyncedV47:false,
     rules:[
       {id:'u-m1',type:'uni',name:'TM 3',weekday:1,start:'08:00',end:'09:30',repeat:'weekly',enabled:true,studyMin:0},
       {id:'u-m2',type:'uni',name:'Robotik',weekday:1,start:'09:50',end:'11:20',repeat:'weekly',enabled:true,studyMin:0},
@@ -524,11 +567,81 @@ function plannerState(){
       rules:Array.isArray(w.rules)?w.rules:d.rules,
       studyAdjustments:{...(w.studyAdjustments||{})},
       completions:{...(w.completions||{})},
-      exceptions:{...(w.exceptions||{})}
+      exceptions:{...(w.exceptions||{})},
+      studyHoursByWeekday:{...d.studyHoursByWeekday,...(w.studyHoursByWeekday||{})}
     };
   }
   return state.weeklyPlanner;
 }
+
+function plannerSemesterDates(){
+  const w=plannerState(),start=state.semester?.start||w.semesterStart,end=state.semester?.end||w.semesterEnd;
+  if(!start||!end||end<start)return [];
+  const out=[];let d=parseDate(start),last=parseDate(end);
+  while(d<=last){out.push(localISO(d));d=new Date(d.getTime()+86400000)}
+  return out;
+}
+function currentSemesterPlanMinutes(){
+  return Object.values(state.semesterPlan?.days||{}).reduce((sum,h)=>sum+Math.round(Number(h||0)*60),0);
+}
+function syncSemesterPlanFromWeeklyPattern(force=false){
+  const w=plannerState();
+  if(w.semesterPlanSyncedV47&&!force)return false;
+  const dates=plannerSemesterDates();if(!dates.length)return false;
+
+  // Preserve exactly the total that is already in Semesterplanung.
+  // If it is empty, fall back to the app's current semester requirement.
+  let target=currentSemesterPlanMinutes();
+  if(target<=0){
+    try{target=Math.max(0,totalRequired()-Math.min(totalRequired(),holidayPlannedMins()))}catch(_){target=0}
+  }
+  if(target<=0)return false;
+
+  const mins={};
+  dates.forEach(d=>{mins[d]=Math.round(Number(w.studyHoursByWeekday?.[parseDate(d).getDay()]||0)*60/15)*15});
+  let total=Object.values(mins).reduce((a,b)=>a+b,0),diff=target-total;
+
+  // Keep the user's weekly pattern as intact as possible.
+  // When the semester total is slightly lower, absorb reductions on Fridays first (VMT-heavy),
+  // then Saturdays/Sundays, in 15-minute steps. If more hours are needed, prefer Sunday,
+  // Saturday and Bib-friendly weekdays.
+  const reduceOrder=[
+    ...dates.filter(d=>parseDate(d).getDay()===5),
+    ...dates.filter(d=>parseDate(d).getDay()===6),
+    ...dates.filter(d=>parseDate(d).getDay()===0),
+    ...dates.filter(d=>[1,2,3,4].includes(parseDate(d).getDay()))
+  ];
+  const addOrder=[
+    ...dates.filter(d=>parseDate(d).getDay()===0),
+    ...dates.filter(d=>parseDate(d).getDay()===6),
+    ...dates.filter(d=>[1,2,3,4].includes(parseDate(d).getDay())),
+    ...dates.filter(d=>parseDate(d).getDay()===5)
+  ];
+  if(diff<0){
+    let need=-diff,idx=0,guard=0;
+    while(need>=15&&reduceOrder.length&&guard<20000){
+      const d=reduceOrder[idx%reduceOrder.length];
+      if(mins[d]>=15){mins[d]-=15;need-=15}
+      idx++;guard++;
+    }
+    if(need>0){
+      const d=reduceOrder.find(x=>mins[x]>=need);
+      if(d){mins[d]-=need;need=0}
+    }
+  }else if(diff>0){
+    let need=diff,idx=0;
+    while(need>=15&&addOrder.length){
+      const d=addOrder[idx%addOrder.length];mins[d]+=15;need-=15;idx++;
+    }
+    if(need>0&&addOrder.length)mins[addOrder[0]]+=need;
+  }
+
+  state.semesterPlan=state.semesterPlan||{days:{}};
+  state.semesterPlan.days=Object.fromEntries(dates.map(d=>[d,Math.round(mins[d])/60]));
+  w.semesterPlanSyncedV47=true;
+  return true;
+}
+
 function addMinsTime(t,mins){
   if(!t)return '';
   const base=timeToMins(t)+Number(mins||0),m=((base%1440)+1440)%1440;
@@ -692,6 +805,8 @@ function renderSmartDayPlanner(){
   plannerState();
   const date=dayPlanDate,d=parseDate(date),items=plannerAllItems(date),target=flexibleStudyTargetForDate(date),base=baseStudyTargetForDate(date),done=sessionsOn(date),bibStudy=bibUsableStudy(date,target),outside=Math.max(0,target-bibStudy),studyWindows=plannerStudyWindows(date,target),conflicts=plannerConflicts(date);
   document.getElementById('smartDayTitle').textContent=(date===todayISO()?'Heute – ':'')+new Intl.DateTimeFormat('de-DE',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'}).format(d);
+  const dayPicker=document.getElementById('smartDayDatePicker');if(dayPicker)dayPicker.value=date;
+  const dayBtn=document.getElementById('smartDayToday');if(dayBtn)dayBtn.textContent=date===todayISO()?'Heute':fmtDate(date);
   const lf=isLectureFree(date);document.getElementById('smartDaySubtitle').textContent=lf?'Vorlesungsfrei / Feiertag – Uni-Termine werden automatisch ausgeblendet.':'Automatisch aus deinen Wochenregeln berechnet.';
   document.getElementById('smartStudyTarget').textContent=minsText(target);
   document.getElementById('smartBibStudy').textContent=minsText(bibStudy);
@@ -740,6 +855,7 @@ function renderWeekPlanner(){
   if(!document.getElementById('weekOverview'))return;
   const dates=plannerWeekDates(dayPlanDate),targets=flexibleWeekTargets(dayPlanDate);
   document.getElementById('weekPlannerLabel').textContent=`${fmtDate(dates[0])} – ${fmtDate(dates[6])}`;
+  const weekPicker=document.getElementById('smartWeekDatePicker');if(weekPicker)weekPicker.value=dayPlanDate;
   document.getElementById('weekOverview').innerHTML=dates.map(date=>{
     const r=basePlannerRulesForDate(date),target=targets[date]||0,done=sessionsOn(date),wd=new Intl.DateTimeFormat('de-DE',{weekday:'short',day:'2-digit',month:'2-digit'}).format(parseDate(date));
     const names=r.filter(x=>['uni','lab','bib','vmt','gym','mealprep','culture'].includes(x.type)).slice(0,6);
@@ -748,7 +864,7 @@ function renderWeekPlanner(){
 }
 function renderPlannerRules(){
   const w=plannerState(),g=document.getElementById('plannerGlobalSettings');if(!g)return;
-  g.innerHTML=`<div class="metrics"><span class="pill">Semester ${fmtDate(w.semesterStart)} – ${fmtDate(w.semesterEnd)}</span><span class="pill">Vorlesungsfrei ${fmtDate(w.lectureFreeStart)} – ${fmtDate(w.lectureFreeEnd)}</span><span class="pill">VMT ${minsText(w.vmtDurationMin)} Arbeit</span><span class="pill">VMT-Fahrt ${minsText(w.vmtTravelMin)} je Weg</span><span class="pill">Vorbereitung ${minsText(w.prepMin)}</span><span class="pill">Sonntag Schlaf ${minsText(w.sundaySleep)}</span></div><button class="btn soft" id="openPlannerSettings" style="margin-top:12px">Globale Einstellungen bearbeiten</button>`;
+  g.innerHTML=`<div class="metrics"><span class="pill">Semester ${fmtDate(w.semesterStart)} – ${fmtDate(w.semesterEnd)}</span><span class="pill">Vorlesungsfrei ${fmtDate(w.lectureFreeStart)} – ${fmtDate(w.lectureFreeEnd)}</span><span class="pill">Studium Mo–So: ${[1,2,3,4,5,6,0].map(x=>Number(w.studyHoursByWeekday?.[x]||0)).join(' / ')} Std.</span><span class="pill">VMT ${minsText(w.vmtDurationMin)} Arbeit</span><span class="pill">VMT-Fahrt ${minsText(w.vmtTravelMin)} je Weg</span><span class="pill">Vorbereitung ${minsText(w.prepMin)}</span><span class="pill">Sonntag Schlaf ${minsText(w.sundaySleep)}</span></div><button class="btn soft" id="openPlannerSettings" style="margin-top:12px">Globale Einstellungen bearbeiten</button>`;
   document.getElementById('plannerRuleList').innerHTML=w.rules.slice().sort((a,b)=>Number(a.weekday)-Number(b.weekday)||(a.start||'99:99').localeCompare(b.start||'99:99')).map(r=>`<div class="rule-row"><div><strong>${(plannerTypeMeta[r.type]||['•'])[0]} ${esc(r.name)}</strong><small>${['So','Mo','Di','Mi','Do','Fr','Sa'][Number(r.weekday)]} · ${r.start||'Start offen'}${r.type==='vmt'&&r.start?` → ${addMinsTime(r.start,w.vmtDurationMin)}`:r.end?'–'+r.end:''} · ${r.repeat==='biweekly'?'alle 2 Wochen':'wöchentlich'}${r.type==='bib'?` · Lernzeit ${minsText(Number(r.studyMin||0))}`:''}${!r.enabled?' · deaktiviert':''}</small></div><div class="rule-actions"><button class="mini-btn" data-planner-edit-rule="${r.id}">✏️</button><button class="mini-btn" data-planner-toggle-rule="${r.id}">${r.enabled?'⏸':'▶️'}</button></div></div>`).join('');
 }
 function renderPlannerAll(){renderSmartDayPlanner();renderWeekPlanner();renderPlannerRules()}
@@ -781,6 +897,8 @@ function openPlannerSettings(){
     const id='wp'+k[0].toUpperCase()+k.slice(1),el=document.getElementById(id);if(el)el.value=w[k]??'';
   });
   document.getElementById('wpNovemberAccounting').checked=!!w.novemberVmtAccountingOnly;
+  const studyIds={1:'wpStudyMon',2:'wpStudyTue',3:'wpStudyWed',4:'wpStudyThu',5:'wpStudyFri',6:'wpStudySat',0:'wpStudySun'};
+  Object.entries(studyIds).forEach(([wd,id])=>document.getElementById(id).value=Number(w.studyHoursByWeekday?.[wd]??0));
   document.getElementById('plannerSettingsDialog').showModal();
 }
 function moveStudyOpen(date,mode='tomorrow'){
@@ -800,6 +918,21 @@ function moveStudyOpen(date,mode='tomorrow'){
   }
   save();toast(mode==='tomorrow'?`${minsText(open)} auf den nächsten geeigneten Tag verschoben`:`${minsText(open)} automatisch verteilt`);
 }
+
+function smartChangeDay(delta){
+  const d=parseDate(dayPlanDate);d.setDate(d.getDate()+delta);dayPlanDate=localISO(d);renderDailyPlan();
+}
+function smartChangeWeek(delta){
+  const d=parseDate(dayPlanDate);d.setDate(d.getDate()+delta*7);dayPlanDate=localISO(d);renderWeekPlanner();
+}
+document.getElementById('smartDayPrev').onclick=()=>smartChangeDay(-1);
+document.getElementById('smartDayNext').onclick=()=>smartChangeDay(1);
+document.getElementById('smartDayToday').onclick=()=>{dayPlanDate=todayISO();renderDailyPlan()};
+document.getElementById('smartDayDatePicker').addEventListener('change',e=>{if(e.target.value){dayPlanDate=e.target.value;renderDailyPlan()}});
+document.getElementById('smartWeekPrev').onclick=()=>smartChangeWeek(-1);
+document.getElementById('smartWeekNext').onclick=()=>smartChangeWeek(1);
+document.getElementById('smartWeekDatePicker').addEventListener('change',e=>{if(e.target.value){dayPlanDate=e.target.value;renderWeekPlanner()}});
+
 document.getElementById('planTabs').addEventListener('click',e=>{const b=e.target.closest('[data-plan-tab]');if(b)plannerSwitchTab(b.dataset.planTab)});
 document.getElementById('plannerSettingsBtn').onclick=openPlannerSettings;
 document.getElementById('addPlannerRule').onclick=()=>openPlannerRule();
@@ -831,13 +964,18 @@ document.getElementById('plannerSettingsForm').addEventListener('submit',e=>{
   Object.entries(map).forEach(([id,k])=>w[k]=document.getElementById(id).value);
   const nums={wpPrepMin:'prepMin',wpUniTravelMin:'uniTravelMin',wpBibTravelMin:'bibTravelMin',wpVmtTravelMin:'vmtTravelMin',wpVmtDurationMin:'vmtDurationMin',wpVmtStudyCapMin:'vmtStudyCapMin',wpGymMin:'gymMin',wpMealPrepMin:'mealPrepMin',wpSleepMin:'sleepMin',wpSleepPreferred:'sleepPreferred',wpSundaySleep:'sundaySleep',wpCultureWeeklyMin:'cultureWeeklyMin'};
   Object.entries(nums).forEach(([id,k])=>w[k]=Number(document.getElementById(id).value||0));
-  w.novemberVmtAccountingOnly=document.getElementById('wpNovemberAccounting').checked;save();document.getElementById('plannerSettingsDialog').close();toast('Wochenplan-Einstellungen gespeichert');
+  w.novemberVmtAccountingOnly=document.getElementById('wpNovemberAccounting').checked;
+  const studyIds={1:'wpStudyMon',2:'wpStudyTue',3:'wpStudyWed',4:'wpStudyThu',5:'wpStudyFri',6:'wpStudySat',0:'wpStudySun'};
+  Object.entries(studyIds).forEach(([wd,id])=>w.studyHoursByWeekday[wd]=Number(document.getElementById(id).value||0));
+  syncSemesterPlanFromWeeklyPattern(true);
+  save();document.getElementById('plannerSettingsDialog').close();toast('Wochenplan und Semesterplanung wurden synchronisiert');
 });
 
 // Existing Tagesplan rendering stays, but smart planner is recalculated whenever the date changes.
 const renderDailyPlanV44=renderDailyPlan;
-renderDailyPlan=function(){renderDailyPlanV44();renderPlannerAll()};
+renderDailyPlan=function(){renderPlannerAll()};
 plannerState();
+if(syncSemesterPlanFromWeeklyPattern(false)){persistLocal(true)}
 
 /* ===== WesStudy v4.5: tägliche Lernkontrolle ===== */
 function plannedStudyMinsForDate(date){
@@ -1044,7 +1182,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-open="subj
           <div class="field"><label>Standardstunden pro Tag</label><input id="defaultSemesterHours" type="number" min="0.25" max="24" step="0.25" value="4"></div>
           <div class="field"><label>Wochentag automatisch planen</label><select id="semesterWeekday"><option value="1">Montag</option><option value="2">Dienstag</option><option value="3">Mittwoch</option><option value="4">Donnerstag</option><option value="5">Freitag</option><option value="6">Samstag</option><option value="0">Sonntag</option></select></div>
         </div>
-        <div class="timer-controls" style="margin-top:12px"><button type="button" class="btn soft" id="applySemesterWeekday">Auf alle anwenden</button><button type="button" class="btn soft" id="clearSemesterPlan">Plan leeren</button></div>
+        <div class="timer-controls" style="margin-top:12px"><button type="button" class="btn soft" id="syncSemesterFromWeek">Mit Wochenplan synchronisieren</button><button type="button" class="btn soft" id="applySemesterWeekday">Auf alle anwenden</button><button type="button" class="btn soft" id="clearSemesterPlan">Plan leeren</button></div>
         <p class="muted" style="margin-top:10px">Beispiel: 4 Std. + Sonntag → trägt 4 Std. an jedem Sonntag zwischen Semesterbeginn und Semesterende ein. Du kannst danach einzelne Tage ändern oder löschen.</p>
         <div style="margin-top:16px"><div class="calendar-nav"><button type="button" class="mini-btn" id="semCalPrev">‹</button><h3 id="semCalTitle"></h3><button type="button" class="mini-btn" id="semCalNext">›</button></div><div class="calendar" id="semesterCalendar"></div><div class="holiday-day-list" id="selectedSemesterDays"></div></div>
         <div class="timer-controls"><button class="btn primary" value="default">Semesterplan speichern</button><button class="btn soft" value="cancel">Abbrechen</button></div>
@@ -1098,6 +1236,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-open="subj
   document.getElementById('openSemesterPlanHome').onclick=document.getElementById('openSemesterPlan').onclick;
   document.getElementById('semCalPrev').onclick=()=>{semesterCalDate=new Date(semesterCalDate.getFullYear(),semesterCalDate.getMonth()-1,1);renderSemesterCalendar()};
   document.getElementById('semCalNext').onclick=()=>{semesterCalDate=new Date(semesterCalDate.getFullYear(),semesterCalDate.getMonth()+1,1);renderSemesterCalendar()};
+  document.getElementById('syncSemesterFromWeek').onclick=()=>{syncSemesterPlanFromWeeklyPattern(true);semesterDraft={days:{...(state.semesterPlan?.days||{})}};renderSemesterCalendar();renderSelectedSemesterDays();save();toast('Semesterplanung wurde aus dem Wochenplan synchronisiert – Gesamtsumme unverändert')};
   document.getElementById('applySemesterWeekday').onclick=applyWeekday;
   document.getElementById('clearSemesterPlan').onclick=()=>{if(confirm('Alle geplanten Semestertage löschen?')){semesterDraft.days={};renderSemesterCalendar();renderSelectedSemesterDays()}};
   document.getElementById('semesterCalendar').addEventListener('click',e=>{const b=e.target.closest('[data-sem-cal-date]');if(!b||b.disabled)return;const d=b.dataset.semCalDate;if(semesterDraft.days[d]!=null)delete semesterDraft.days[d];else semesterDraft.days[d]=Number(document.getElementById('defaultSemesterHours').value||4);renderSemesterCalendar();renderSelectedSemesterDays()});
