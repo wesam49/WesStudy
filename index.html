@@ -218,7 +218,7 @@ dialog[open]{position:fixed;inset:0;margin:auto}
     </section>
 
     <section class="page" data-page="dayplan">
-      <div class="section-head"><div><h2>🗓️ Tages- & Wochenplan</h2><div class="muted">Pflichttermine, flexible Lernzeit, Arbeit, Gym, Meal Prep, Kultur, Fahrt und Vorbereitung – ohne deine bestehende Stundenplanung zu verändern.</div></div><button class="btn primary" id="addDayPlanItem">+ Aktivität</button></div>
+      <div class="section-head"><div><h2>🗓️ Tages- & Wochenplan</h2><div class="muted">Du trägst deinen Plan selbst ein. Lernen bleibt automatisch mit der Semesterplanung verbunden.</div></div><button class="btn primary" id="addDayPlanItem">+ Aktivität</button></div>
       <div class="plan-tabs" id="planTabs"><button class="active" data-plan-tab="day">Heute / Tag</button><button data-plan-tab="week">Woche</button><button data-plan-tab="rules">Regeln & Zeiten</button></div>
       <div id="smartDayPlanner">
         <div class="smart-nav card">
@@ -240,8 +240,10 @@ dialog[open]{position:fixed;inset:0;margin:auto}
           <div id="smartDayMessages"></div>
           <div id="smartDayItems"></div>
           <div class="timer-controls" style="margin-top:14px">
-            <button class="btn primary" id="addPlannerItem" type="button">+ Termin / Aktivität</button>
+            <button class="btn primary" id="addManualActivity" type="button">+ Aktivität / Termin</button>
             <button class="btn soft" id="addLearningBlock" type="button">+ Lernen</button>
+            <button class="btn soft hidden" id="moveOpenTomorrow" type="button">Offen → morgen</button>
+            <button class="btn soft hidden" id="autoDistributeOpen" type="button">Offen automatisch verteilen</button>
           </div>
         </div>
       </div>
@@ -367,7 +369,7 @@ dialog[open]{position:fixed;inset:0;margin:auto}
 </form></dialog>
 <dialog id="lpDialog"><form method="dialog" class="modal" id="lpForm"><div class="modal-head"><h3 id="lpDialogTitle">Modul bearbeiten</h3><button class="close" value="cancel">✕</button></div><input type="hidden" id="lpId"><div class="form-grid"><div class="field full"><label>Modulname</label><input id="lpName" required></div><div class="field"><label>Leistungspunkte</label><input id="lpCredits" type="number" min="0" step="0.5" required></div><div class="field"><label>Ursprüngliches Semester</label><input id="lpOriginSemester" placeholder="z. B. 3"></div><div class="field"><label>Geplantes Semester</label><select id="lpPlanSemester"><option value="1">1. Semester</option><option value="2">2. Semester</option><option value="3">3. Semester</option><option value="Sommer">Sommer</option><option value="4">4. Semester</option><option value="5">5. Semester</option><option value="6">6. Semester</option><option value="7">7. Semester</option></select></div><div class="field"><label>Status</label><select id="lpStatus"><option value="open">Offen</option><option value="planned">Geplant</option><option value="active">In Bearbeitung</option><option value="exam">Prüfung abgelegt</option><option value="passed">Bestanden</option><option value="failed">Nicht bestanden / Wiederholung</option><option value="postponed">Verschoben</option></select></div><div class="field"><label>Prüfungsdatum (optional)</label><input id="lpExamDate" type="date"></div><div class="field full"><label><input id="lpUseInStudy" type="checkbox"> In den Lernplan übernehmen</label></div></div><div class="timer-controls"><button class="btn primary" value="default">Speichern</button><button class="btn soft" value="cancel">Abbrechen</button><button type="button" class="btn danger hidden" id="lpDelete">Löschen</button></div></form></dialog>
 
-<dialog id="dayPlanDialog"><form method="dialog" class="modal" id="dayPlanForm"><div class="modal-head"><h3 id="dayPlanDialogTitle">Aktivität hinzufügen</h3><button class="close" value="cancel">✕</button></div><input type="hidden" id="dayPlanItemId"><div class="form-grid"><div class="field"><label>Kategorie</label><select id="dayPlanType"><option value="study">📚 Lernen</option><option value="gym">🏋️ Gym</option><option value="reading">📖 Lesen</option><option value="uni">🎓 Uni</option><option value="work">💼 Arbeit</option><option value="break">☕ Pause</option><option value="other">✨ Sonstiges</option></select></div><div class="field"><label>Datum</label><input id="dayPlanItemDate" type="date" required></div><div class="field full"><label>Bezeichnung</label><input id="dayPlanTitle" placeholder="z. B. HM3 lernen" required></div><div class="field"><label>Von</label><input id="dayPlanStart" type="time" required></div><div class="field"><label>Bis</label><input id="dayPlanEnd" type="time" required></div><div class="field"><label>Wiederholen</label><select id="dayPlanRepeat"><option value="none">Nicht wiederholen</option><option value="daily">Täglich</option><option value="weekdays">Mo–Fr</option><option value="weekly">Wöchentlich</option></select></div><div class="field"><label>Wiederholen bis</label><input id="dayPlanRepeatUntil" type="date"></div></div><p class="muted" style="margin-top:12px">Der Tagesplan dient nur zur Organisation. Abhaken verändert keine Lernstunden und startet keinen Timer.</p><div class="timer-controls"><button class="btn primary" value="default">Speichern</button><button class="btn soft" value="cancel">Abbrechen</button><button type="button" class="btn danger hidden" id="deleteDayPlanItem">Löschen</button></div></form></dialog>
+<dialog id="dayPlanDialog"><form method="dialog" class="modal" id="dayPlanForm"><div class="modal-head"><h3 id="dayPlanDialogTitle">Aktivität hinzufügen</h3><button class="close" value="cancel">✕</button></div><input type="hidden" id="dayPlanItemId"><div class="form-grid"><div class="field"><label>Kategorie</label><select id="dayPlanType"><option value="study">📚 Lernen</option><option value="uni">🎓 Uni</option><option value="work">💼 Arbeit / VMT / Bib</option><option value="gym">🏋️ Gym</option><option value="reading">📖 Lesen / Kultur</option><option value="break">☕ Pause</option><option value="other">✨ Termin / Sonstiges</option></select></div><div class="field"><label>Datum</label><input id="dayPlanItemDate" type="date" required></div><div class="field full"><label>Bezeichnung</label><input id="dayPlanTitle" placeholder="z. B. HM3 lernen" required></div><div class="field"><label>Von</label><input id="dayPlanStart" type="time" required></div><div class="field"><label>Bis</label><input id="dayPlanEnd" type="time" required></div><div class="field"><label>Wiederholen</label><select id="dayPlanRepeat"><option value="none">Nicht wiederholen</option><option value="daily">Täglich</option><option value="weekdays">Mo–Fr</option><option value="weekly">Wöchentlich</option></select></div><div class="field"><label>Wiederholen bis</label><input id="dayPlanRepeatUntil" type="date"></div></div><p class="muted" style="margin-top:12px">Lernen wird automatisch mit der Semesterplanung synchronisiert. Andere Aktivitäten bleiben reine Planung und werden nicht automatisch verschoben.</p><div class="timer-controls"><button class="btn primary" value="default">Speichern</button><button class="btn soft" value="cancel">Abbrechen</button><button type="button" class="btn danger hidden" id="deleteDayPlanItem">Löschen</button></div></form></dialog>
 
 <dialog id="settingsDialog"><form method="dialog" class="modal"><div class="modal-head"><h3>Einstellungen und Daten</h3><button class="close" value="cancel">✕</button></div>
 <div class="cloud-card"><div class="cloud-head"><div><strong>☁️ Konto & Cloud-Sync</strong><div class="muted" id="cloudStatus">Firebase wird geprüft…</div></div><span class="status warn" id="cloudBadge">Lokal</span></div><div id="cloudSignedOut"><div class="timer-controls" style="margin:12px 0 0"><button type="button" class="btn primary" id="cloudGoogleBtn">🔐 Mit Google anmelden</button></div><p class="muted" style="margin:10px 0 0">Deine Lernpläne und Sitzungen werden nach der Anmeldung automatisch mit deinem Google-Konto synchronisiert.</p></div><div id="cloudSignedIn" class="hidden"><div class="metrics" style="margin-top:12px"><span class="pill" id="cloudUserLabel">—</span><span class="pill" id="cloudSyncLabel">Noch nicht synchronisiert</span></div><div id="cloudDataSummary" class="muted" style="margin-top:10px;font-weight:700">Cloud-Inhalt wird geprüft…</div><div class="timer-controls" style="margin:12px 0 0"><button type="button" class="btn soft" id="cloudUploadBtn">⬆️ Dieses Gerät in Cloud</button><button type="button" class="btn soft" id="cloudDownloadBtn">⬇️ Cloud auf dieses Gerät</button><button type="button" class="btn danger" id="cloudLogoutBtn">Abmelden</button></div></div><p class="muted" id="cloudSetupHint" style="margin:10px 0 0"></p></div>
@@ -378,7 +380,7 @@ dialog[open]{position:fixed;inset:0;margin:auto}
 (()=>{
 'use strict';
 const KEY='wesstudy_v1';
-const defaultState={version:5.0,theme:'light',lang:'de',dashboardMode:'auto',semester:{name:'',start:'',end:'',hoursPerCredit:17},subjects:[],sessions:[],holiday:null,dailyPlan:{items:[],templates:[]},timerSettings:{sound:true,vibrate:true,notifications:false,autoNext:true},studyProgress:null,meta:{updatedAt:0}};
+const defaultState={version:5.01,theme:'light',lang:'de',dashboardMode:'auto',semester:{name:'',start:'',end:'',hoursPerCredit:17},subjects:[],sessions:[],holiday:null,dailyPlan:{items:[],templates:[]},timerSettings:{sound:true,vibrate:true,notifications:false,autoNext:true},studyProgress:null,meta:{updatedAt:0}};
 let state=load(); let timer={running:false,paused:false,mode:'focus',round:1,totalRounds:4,focusSec:1500,breakSec:300,remaining:1500,startedAt:null,accumulatedFocus:0,interval:null,open:false};
 let calDate=new Date(); let holidayDraft={days:{}}; let deferredPrompt=null;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
@@ -487,8 +489,36 @@ function renderDayTemplates(){const sel=$('#dayTemplateSelect');if(!sel)return;c
 $('#addDayPlanItem').onclick=()=>openDayPlanItem();$('#dayPlanPrev').onclick=()=>changeDayPlanDate(-1);$('#dayPlanNext').onclick=()=>changeDayPlanDate(1);$('#dayPlanToday').onclick=()=>{dayPlanDate=todayISO();renderDailyPlan()};
 $('#dayPlanTimeline').addEventListener('click',e=>{if(e.target.id==='dayPlanEmptyAdd')return openDayPlanItem();const ed=e.target.closest('[data-dayplan-edit]');if(ed)openDayPlanItem(ed.dataset.dayplanEdit)});
 $('#dayPlanTimeline').addEventListener('change',e=>{if(!e.target.matches('[data-dayplan-done]'))return;const x=dailyPlanState().items.find(i=>i.id===e.target.dataset.dayplanDone);if(x){x.done=e.target.checked;save()}});
-$('#dayPlanForm').addEventListener('submit',e=>{if(e.submitter?.value==='cancel')return;e.preventDefault();const start=$('#dayPlanStart').value,end=$('#dayPlanEnd').value;if(timeToMins(end)<=timeToMins(start))return toast('Die Endzeit muss nach der Startzeit liegen.');const id=$('#dayPlanItemId').value,type=$('#dayPlanType').value,title=$('#dayPlanTitle').value.trim(),date=$('#dayPlanItemDate').value,mode=$('#dayPlanRepeat').value,until=$('#dayPlanRepeatUntil').value;if(!title||!date)return;const plan=dailyPlanState();if(id){const x=plan.items.find(i=>i.id===id);if(x)Object.assign(x,{type,title,date,start,end})}else{const group=uid();repeatDates(date,mode,until).forEach(d=>plan.items.push({id:uid(),groupId:group,date:d,type,title,start,end,done:false}))}dayPlanDate=date;save();$('#dayPlanDialog').close();toast(id?'Aktivität aktualisiert':'Aktivität geplant')});
-$('#deleteDayPlanItem').onclick=()=>{const id=$('#dayPlanItemId').value;if(!id)return;if(confirm('Diese Aktivität löschen?')){dailyPlanState().items=dailyPlanState().items.filter(x=>x.id!==id);save();$('#dayPlanDialog').close();toast('Aktivität gelöscht')}};
+$('#dayPlanForm').addEventListener('submit',e=>{
+  if(e.submitter?.value==='cancel')return;e.preventDefault();
+  const start=$('#dayPlanStart').value,end=$('#dayPlanEnd').value;
+  if(timeToMins(end)<=timeToMins(start))return toast('Die Endzeit muss nach der Startzeit liegen.');
+  const id=$('#dayPlanItemId').value,type=$('#dayPlanType').value,title=$('#dayPlanTitle').value.trim(),date=$('#dayPlanItemDate').value,mode=$('#dayPlanRepeat').value,until=$('#dayPlanRepeatUntil').value;
+  if(!title||!date)return;
+  const plan=dailyPlanState(),affected=new Set();
+  if(id){
+    const x=plan.items.find(i=>i.id===id);
+    if(x){affected.add(x.date);Object.assign(x,{type,title,date,start,end});affected.add(date)}
+  }else{
+    const group=uid();
+    repeatDates(date,mode,until).forEach(d=>{plan.items.push({id:uid(),groupId:group,date:d,type,title,start,end,done:false});affected.add(d)});
+  }
+  affected.forEach(syncManualLearningToSemester);
+  dayPlanDate=date;save();$('#dayPlanDialog').close();toast(id?'Aktivität aktualisiert':'Aktivität geplant');
+});
+$('#deleteDayPlanItem').onclick=()=>{
+  const id=$('#dayPlanItemId').value;if(!id)return;
+  const plan=dailyPlanState(),x=plan.items.find(i=>i.id===id);if(!x)return;
+  const sameGroup=plan.items.filter(i=>i.groupId&&i.groupId===x.groupId);
+  let deleteSeries=false;
+  if(sameGroup.length>1){const a=prompt('Löschen:\n1 = Nur diesen Termin\n2 = Ganze Serie','1');if(a===null)return;deleteSeries=String(a).trim()==='2'}
+  else if(!confirm('Diese Aktivität löschen?'))return;
+  const affected=new Set();
+  if(deleteSeries){sameGroup.forEach(i=>affected.add(i.date));plan.items=plan.items.filter(i=>i.groupId!==x.groupId)}
+  else{affected.add(x.date);plan.items=plan.items.filter(i=>i.id!==id)}
+  affected.forEach(syncManualLearningToSemester);
+  save();$('#dayPlanDialog').close();toast(deleteSeries?'Serie gelöscht':'Aktivität gelöscht');
+};
 $('#copyYesterdayPlan').onclick=()=>{const d=parseDate(dayPlanDate);d.setDate(d.getDate()-1);const src=dayPlanItems(localISO(d));if(!src.length)return toast('Gestern gibt es keinen Tagesplan.');const plan=dailyPlanState();src.forEach(x=>plan.items.push({...x,id:uid(),groupId:uid(),date:dayPlanDate,done:false}));save();toast('Plan von gestern kopiert')};
 $('#saveDayTemplate').onclick=()=>{const items=dayPlanItems();if(!items.length)return toast('Dieser Tag ist leer.');const name=prompt('Name der Vorlage, z. B. Uni-Tag');if(!name?.trim())return;dailyPlanState().templates.push({id:uid(),name:name.trim(),items:items.map(({type,title,start,end})=>({type,title,start,end}))});save();toast('Vorlage gespeichert')};
 $('#applyDayTemplate').onclick=()=>{const id=$('#dayTemplateSelect').value,t=dailyPlanState().templates.find(x=>x.id===id);if(!t)return toast('Wähle zuerst eine Vorlage.');const plan=dailyPlanState();t.items.forEach(x=>plan.items.push({...x,id:uid(),groupId:uid(),date:dayPlanDate,done:false}));save();toast('Vorlage angewendet')};
@@ -510,7 +540,7 @@ function plannerDefaults(){
     gymMin:75,mealPrepMin:90,sleepMin:360,sleepPreferred:450,sundaySleep:480,cultureWeeklyMin:240,
     freeDayStudyMaxMin:360,labDayStudyMaxMin:300,saturdayStudyMaxMin:330,sundayStudyMaxMin:360,
     freeWakeTime:'08:00',sundayWakeTime:'08:30',
-    novemberVmtAccountingOnly:true,manualMode:true,manualItems:[],studyAdjustments:{},completions:{},exceptions:{},dayOverrides:{},
+    novemberVmtAccountingOnly:true,manualMode:true,studyAdjustments:{},completions:{},exceptions:{},dayOverrides:{},
     semesterPlanTotalMins:0,smartPlanRevision:'',scheduleRevision:'',
     rules:[
       {id:'u-m1',type:'uni',name:'TM Kinematik',weekday:1,start:'08:00',end:'09:30',repeat:'weekly',enabled:true,studyMin:0},
@@ -565,8 +595,7 @@ function plannerState(){
       studyAdjustments:{...(w.studyAdjustments||{})},
       completions:{...(w.completions||{})},
       exceptions:{...(w.exceptions||{})},
-      dayOverrides:{...(w.dayOverrides||{})},
-      manualItems:Array.isArray(w.manualItems)?w.manualItems:[]
+      dayOverrides:{...(w.dayOverrides||{})}
     };
   }
   const w=state.weeklyPlanner;
@@ -851,65 +880,31 @@ function bibUsableStudy(date,target=flexibleStudyTargetForDate(date)){
   const bib=basePlannerRulesForDate(date).find(r=>r.type==='bib');
   return bib?Math.min(target,Number(bib.studyMin||0)):0;
 }
-function simpleManualItems(){const w=plannerState();w.manualItems=w.manualItems||[];return w.manualItems}
-function simpleManualMatches(item,date){
-  if(item.deleted||(item.exceptions||[]).includes(date))return false;
-  if(item.repeat==='none')return item.date===date;
-  if(item.startDate&&date<item.startDate)return false;
-  if(item.endDate&&date>item.endDate)return false;
-  if(item.repeat==='daily')return true;
-  if(item.repeat==='weekly')return Number(item.weekday)===parseDate(date).getDay();
-  return false;
+function manualLearningMinutesForDate(date){
+  return dayPlanItems(date).filter(x=>x.type==='study').reduce((sum,x)=>sum+dayPlanDuration(x),0);
 }
-function simpleManualForDate(date){return simpleManualItems().filter(x=>simpleManualMatches(x,date)).map(x=>({...x,manualSimple:true,generated:false,key:`simple:${x.id}:${date}`}))}
-function simpleType(v){return ({'1':'learning','2':'uni','3':'bib','4':'gym','5':'mealprep','6':'culture','7':'travel','8':'vmt','9':'other'})[String(v).trim()]||'other'}
-function simpleTypeName(t){return ({learning:'Lernen',uni:'Uni',bib:'Bib',gym:'Gym',mealprep:'Meal Prep',culture:'Kultur',travel:'Fahrt',vmt:'VMT',other:'Termin'})[t]||'Termin'}
-function simpleRepeat(date){
-  const r=prompt('Wiederholung:\\n1 = Nur dieser Tag\\n2 = Täglich\\n3 = Jede Woche','1'); if(r===null)return null;
-  if(String(r).trim()==='2')return {repeat:'daily',startDate:date};
-  if(String(r).trim()==='3')return {repeat:'weekly',weekday:parseDate(date).getDay(),startDate:date};
-  return {repeat:'none',date};
+function syncManualLearningToSemester(date){
+  if(!date)return;
+  state.semesterPlan=state.semesterPlan||{days:{}};
+  state.semesterPlan.days=state.semesterPlan.days||{};
+  const mins=manualLearningMinutesForDate(date);
+  if(mins>0)state.semesterPlan.days[date]=mins/60;
+  else delete state.semesterPlan.days[date];
 }
-function simpleLearningMinutes(date){return simpleManualForDate(date).filter(x=>x.type==='learning').reduce((a,x)=>a+Math.max(0,timeToMins(x.end)-timeToMins(x.start)),0)}
-function syncSimpleLearning(date){state.semesterPlan=state.semesterPlan||{days:{}};const m=simpleLearningMinutes(date);if(m>0)state.semesterPlan.days[date]=m/60;else delete state.semesterPlan.days[date]}
-function simpleOverlap(date,item,ignoreId=''){
-  const all=simpleManualForDate(date).filter(x=>x.id!==ignoreId&&x.start&&x.end);
-  return all.find(x=>timeToMins(item.start)<timeToMins(x.end)&&timeToMins(item.end)>timeToMins(x.start));
-}
-function addSimpleLearningQuick(date){
-  const start=prompt('Lernen – Von (HH:MM):','');if(start===null)return;const end=prompt('Lernen – Bis (HH:MM):','');if(end===null)return;
-  if(!/^\d{2}:\d{2}$/.test(start)||!/^\d{2}:\d{2}$/.test(end)||timeToMins(end)<=timeToMins(start))return toast('Bitte gültige Zeiten eingeben.');
-  const repeat=simpleRepeat(date);if(!repeat)return;const item={id:'sp'+Date.now()+Math.random().toString(36).slice(2,6),type:'learning',name:'Lernen',start,end,...repeat};
-  const ov=simpleOverlap(date,item);if(ov&&!confirm(`Überschneidung mit „${ov.name}“ (${ov.start}–${ov.end}). Trotzdem speichern?`))return;
-  simpleManualItems().push(item);syncSimpleLearning(date);save();toast('Lernblock gespeichert.');
-}
-function addSimplePlannerItem(date){
-  const c=prompt('Was möchtest du eintragen?\\n1 = Lernen\\n2 = Uni\\n3 = Bib\\n4 = Gym\\n5 = Meal Prep\\n6 = Kultur\\n7 = Fahrt\\n8 = VMT\\n9 = Termin / Sonstiges','9');if(c===null)return;
-  const type=simpleType(c),name=prompt('Name:',simpleTypeName(type));if(name===null)return;
-  const start=prompt('Von (HH:MM):','');if(start===null)return; const end=prompt('Bis (HH:MM):','');if(end===null)return;
-  if(!/^\\d{2}:\\d{2}$/.test(start)||!/^\\d{2}:\\d{2}$/.test(end)||timeToMins(end)<=timeToMins(start))return toast('Bitte gültige Zeiten eingeben.');
-  const repeat=simpleRepeat(date);if(!repeat)return;
-  const item={id:'sp'+Date.now()+Math.random().toString(36).slice(2,6),type,name:name||simpleTypeName(type),start,end,...repeat};
-  const ov=simpleOverlap(date,item);if(ov&&!confirm(`Überschneidung mit „${ov.name}“ (${ov.start}–${ov.end}). Trotzdem speichern?`))return;
-  simpleManualItems().push(item);if(type==='learning')syncSimpleLearning(date);save();toast('Eintrag gespeichert.');
-}
-function editSimplePlannerItem(date,id){
-  const item=simpleManualItems().find(x=>x.id===id);if(!item)return;
-  const a=prompt(`„${item.name}“ ${item.start}–${item.end}\\n1 = Bearbeiten\\n2 = Nur diesen Tag löschen\\n3 = Ganze Regel löschen`,'1');if(a===null)return;
-  if(String(a).trim()==='2'){if(item.repeat==='none')item.deleted=true;else{item.exceptions=item.exceptions||[];if(!item.exceptions.includes(date))item.exceptions.push(date)}if(item.type==='learning')syncSimpleLearning(date);save();toast('Für diesen Tag gelöscht.');return}
-  if(String(a).trim()==='3'){item.deleted=true;if(item.type==='learning')syncSimpleLearning(date);save();toast('Regel gelöscht.');return}
-  const name=prompt('Name:',item.name);if(name===null)return;const start=prompt('Von (HH:MM):',item.start);if(start===null)return;const end=prompt('Bis (HH:MM):',item.end);if(end===null)return;
-  if(!/^\\d{2}:\\d{2}$/.test(start)||!/^\\d{2}:\\d{2}$/.test(end)||timeToMins(end)<=timeToMins(start))return toast('Bitte gültige Zeiten eingeben.');
-  item.name=name||item.name;item.start=start;item.end=end;if(item.type==='learning')syncSimpleLearning(date);save();toast('Eintrag gespeichert.');
+function manualLearningConflict(date){
+  const arr=dayPlanItems(date).filter(x=>x.type==='study'&&x.start&&x.end).sort((a,b)=>a.start.localeCompare(b.start));
+  for(let i=0;i<arr.length;i++)for(let j=i+1;j<arr.length;j++){
+    if(timeToMins(arr[j].start)>=timeToMins(arr[i].end))break;
+    if(timeToMins(arr[i].start)<timeToMins(arr[j].end)&&timeToMins(arr[i].end)>timeToMins(arr[j].start))return [arr[i],arr[j]];
+  }
+  return null;
 }
 function plannerManualItems(date){
   return dayPlanItems(date).map(x=>({...x,name:x.title,key:`manual:${x.id}`,generated:false}));
 }
 function plannerAllItems(date){
-  const w=plannerState();
-  const manual=[...simpleManualForDate(date),...plannerManualItems(date)];
-  if(w.manualMode)return manual.sort((a,b)=>(a.start||'99:99').localeCompare(b.start||'99:99'));
-  return [...plannerGeneratedItems(date),...manual].sort((a,b)=>(a.start||'99:99').localeCompare(b.start||'99:99'));
+  if(plannerState().manualMode)return plannerManualItems(date).sort((a,b)=>(a.start||'99:99').localeCompare(b.start||'99:99'));
+  return [...plannerGeneratedItems(date),...plannerManualItems(date)].sort((a,b)=>(a.start||'99:99').localeCompare(b.start||'99:99'));
 }
 function plannerConflicts(date){
   const arr=plannerGeneratedItems(date).filter(x=>x.start&&x.end),out=[];
@@ -945,14 +940,6 @@ function plannerFreeGaps(date){
 }
 function minsToClock(m){m=((m%1440)+1440)%1440;return `${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`}
 function plannerStudyWindows(date,target){
-  if(plannerState().manualMode){
-    const learn=simpleManualForDate(date).filter(x=>x.type==='learning');
-    const bib=simpleManualForDate(date).filter(x=>x.type==='bib');
-    const bibBlocks=[],blocks=[];
-    learn.forEach(x=>{const mins=timeToMins(x.end)-timeToMins(x.start);const inBib=bib.some(b=>timeToMins(x.start)>=timeToMins(b.start)&&timeToMins(x.end)<=timeToMins(b.end));(inBib?bibBlocks:blocks).push({start:x.start,end:x.end,minutes:mins,source:inBib?'bib':'outside'});});
-    const total=learn.reduce((a,x)=>a+timeToMins(x.end)-timeToMins(x.start),0);
-    return {bibStudy:bibBlocks.reduce((a,b)=>a+b.minutes,0),bibBlocks,blocks,unplanned:Math.max(0,target-total),manual:true};
-  }
   const override=plannerState().dayOverrides?.[date];
   if(Array.isArray(override?.learningBlocks)){
     const all=override.learningBlocks.map(b=>({...b})),bibBlocks=all.filter(b=>b.source==='bib'),blocks=all.filter(b=>b.source!=='bib');
@@ -1004,39 +991,34 @@ function renderSmartDayPlanner(){
   plannerState();
   const date=dayPlanDate,d=parseDate(date),baseItems=plannerAllItems(date),target=flexibleStudyTargetForDate(date),base=baseStudyTargetForDate(date),done=sessionsOn(date),studyWindows=plannerStudyWindows(date,target),bibStudy=studyWindows.bibStudy,outside=Math.max(0,target-bibStudy),conflicts=plannerConflicts(date);
 
-  // Every Lernen block is real planned Lernzeit. It counts toward the Tagesziel,
-  // regardless of whether it happens inside Bib or outside.
+  // Im manuellen Modus kommen Lernblöcke ausschließlich aus deinen eigenen Einträgen.
   const learningItems=[];
   if(!plannerState().manualMode){
     studyWindows.bibBlocks.forEach((b,i)=>learningItems.push({key:`bib-study:${date}:${i}`,type:'studyWindow',name:'Lernen (in der Bib)',start:b.start,end:b.end,minutes:b.minutes,generated:true,virtual:true,learning:true,source:'bib'}));
     studyWindows.blocks.forEach((b,i)=>learningItems.push({key:`study-block:${date}:${i}`,type:'studyWindow',name:'Lernen',start:b.start,end:b.end,minutes:b.minutes,generated:true,virtual:true,learning:true,source:'outside'}));
-  }else{
-    simpleManualForDate(date).filter(x=>x.type==='learning').forEach(x=>{x.learning=true});
   }
-  const plannedLearning=plannerState().manualMode?simpleLearningMinutes(date):learningItems.reduce((sum,x)=>sum+Number(x.minutes||0),0);
+  const plannedLearning=plannerState().manualMode?manualLearningMinutesForDate(date):learningItems.reduce((sum,x)=>sum+Number(x.minutes||0),0);
   const notPlanned=Math.max(0,target-plannedLearning);
   const notLearned=Math.max(0,target-done);
 
   document.getElementById('smartDayTitle').textContent=(date===todayISO()?'Heute – ':'')+new Intl.DateTimeFormat('de-DE',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'}).format(d);
   const dayPicker=document.getElementById('smartDayDatePicker');if(dayPicker)dayPicker.value=date;
   const dayBtn=document.getElementById('smartDayToday');if(dayBtn)dayBtn.textContent=date===todayISO()?'Heute':fmtDate(date);
-  const lf=isLectureFree(date);document.getElementById('smartDaySubtitle').textContent=plannerState().manualMode?'Manueller Plan: Du entscheidest, was eingetragen, wiederholt, geändert oder gelöscht wird.':(lf?'Vorlesungsfrei / Feiertag – Uni-Termine werden automatisch ausgeblendet.':'Automatisch aus deinen Wochenregeln berechnet.');
+  const lf=isLectureFree(date);document.getElementById('smartDaySubtitle').textContent=plannerState().manualMode?'Manueller Plan: Du bestimmst alle Termine und Wiederholungen selbst. Lernen bleibt mit der Semesterplanung verbunden.':(lf?'Vorlesungsfrei / Feiertag – Uni-Termine werden automatisch ausgeblendet.':'Automatisch aus deinen Wochenregeln berechnet.');
   document.getElementById('smartStudyTarget').textContent=minsText(target);
   document.getElementById('smartBibStudy').textContent=minsText(bibStudy);
   document.getElementById('smartOutsideStudy').textContent=minsText(outside);
   document.getElementById('smartStudyDone').textContent=minsText(done);
 
   const msgs=[];
-  if(target!==base)msgs.push(`<div class="planner-alert">↔️ Flexibles Lernziel: ${minsText(base)} ursprünglich → ${minsText(target)} heute. Die Wochensumme bleibt gleich.</div>`);
-  const actualVmt=plannerActualVmt(date,basePlannerRulesForDate(date));
-  if(actualVmt)msgs.push(`<div class="planner-alert">🏭 VMT-Tag: 9 Std. Arbeit + Fahrt/Buffer. Lernen wird auf max. ${minsText(plannerState().vmtStudyCapMin)} begrenzt; Überschuss wird auf leichtere Tage verteilt.</div>`);
-  if(date.startsWith('2026-11')&&plannerState().novemberVmtAccountingOnly)msgs.push(`<div class="planner-good">ℹ️ November 2026: VMT wird als Abrechnungstermin behandelt und blockiert den Tag nicht.</div>`);
-  if(conflicts.length)msgs.push(`<div class="planner-alert">⚠️ Konflikt erkannt: ${conflicts.map(esc).join(' · ')}</div>`);
-  const nLearn=normalizeLearningBlocks(currentLearningBlocksForDate(date));
-  if(nLearn.conflicts.length){
-    const [i,j]=nLearn.conflicts[0],a=nLearn.list[i],b=nLearn.list[j];
-    msgs.push(`<div class="planner-alert">⚠️ Lernkonflikt: ${esc(a.start)}–${esc(a.end)} überschneidet sich mit ${esc(b.start)}–${esc(b.end)}. Bitte einen Lernblock ändern oder löschen.</div>`);
+  if(!plannerState().manualMode){
+    if(target!==base)msgs.push(`<div class="planner-alert">↔️ Flexibles Lernziel: ${minsText(base)} ursprünglich → ${minsText(target)} heute. Die Wochensumme bleibt gleich.</div>`);
+    const actualVmt=plannerActualVmt(date,basePlannerRulesForDate(date));
+    if(actualVmt)msgs.push(`<div class="planner-alert">🏭 VMT-Tag: 9 Std. Arbeit + Fahrt/Buffer.</div>`);
+    if(conflicts.length)msgs.push(`<div class="planner-alert">⚠️ Konflikt erkannt: ${conflicts.map(esc).join(' · ')}</div>`);
   }
+  const manualConflict=manualLearningConflict(date);
+  if(manualConflict)msgs.push(`<div class="planner-alert">⚠️ Lernkonflikt: ${esc(manualConflict[0].start)}–${esc(manualConflict[0].end)} überschneidet sich mit ${esc(manualConflict[1].start)}–${esc(manualConflict[1].end)}. Bitte einen Eintrag bearbeiten oder löschen.</div>`);
   if(target){
     msgs.push(`<div class="${notPlanned===0?'planner-good':'planner-alert'}">📘 Lernplanung: Soll ${minsText(target)} · als Lernen eingeplant ${minsText(plannedLearning)} · ${notPlanned===0?'vollständig eingeplant ✅':`${minsText(notPlanned)} noch nicht eingeplant`}</div>`);
     msgs.push(`<div class="${done>=target?'planner-good':'planner-alert'}">✅ Lernverlauf: erledigt ${minsText(done)} · ${done>=target?`${minsText(done-target)} über Soll`:`noch nicht gelernt ${minsText(notLearned)}`}</div>`);
@@ -1054,8 +1036,8 @@ function renderSmartDayPlanner(){
   });
 
   const renderItem=x=>{
-    if(x.manualSimple&&x.type==='learning'){x.learning=true;x.virtual=false;x.source='outside'}
-    const meta=plannerTypeMeta[x.type]||plannerTypeMeta.other,comp=plannerCompletion(date,x.key),manual=!x.generated;
+    if(plannerState().manualMode&&x.type==='study'){x.learning=true;x.minutes=dayPlanDuration(x);}
+    const meta=(x.type==='study'?plannerTypeMeta.studyWindow:plannerTypeMeta[x.type])||plannerTypeMeta.other,comp=plannerCompletion(date,x.key),manual=!x.generated;
     const dur=x.minutes!=null?x.minutes:(x.start&&x.end?dayPlanDuration(x):0);
     let extra='';
     if(x.learning){
@@ -1080,10 +1062,10 @@ function renderSmartDayPlanner(){
       <div class="planner-actions">
         ${x.virtual?'':`<input type="checkbox" data-planner-done="${esc(x.key)}" ${comp?.done?'checked':''} aria-label="Erledigt">`}
         ${x.virtual?'':`<button class="mini-btn" data-planner-actual="${esc(x.key)}" title="Ist-Zeit">⏱</button>`}
-        ${x.learning&&!x.manualSimple?`<button class="mini-btn" data-day-learning-edit="${esc(x.key)}" title="Lernblock für diesen Tag ändern">✏️</button>`:''}
-        ${x.learning&&!x.manualSimple?`<button class="mini-btn" data-day-learning-delete="${esc(x.key)}" title="Lernblock löschen">🗑️</button>`:''}
+        ${x.learning&&!manual?`<button class="mini-btn" data-day-learning-edit="${esc(x.key)}" title="Lernblock für diesen Tag ändern">✏️</button>`:''}
+        ${x.learning&&!manual?`<button class="mini-btn" data-day-learning-delete="${esc(x.key)}" title="Lernblock löschen">🗑️</button>`:''}
         ${x.type==='wake'?`<button class="mini-btn" data-day-wake-edit="${esc(date)}" title="Aufstehzeit ändern">✏️</button>`:''}
-        ${x.manualSimple?`<button class="mini-btn" data-simple-edit="${esc(x.id)}" title="Bearbeiten / löschen">✏️</button>`:manual?`<button class="mini-btn" data-dayplan-edit="${esc(x.id)}">✏️</button>`:x.id?.startsWith('auto-')||x.auto||x.virtual?'':`<button class="mini-btn" data-planner-edit-rule="${esc(x.id)}">✏️</button>`}
+        ${manual?`<button class="mini-btn" data-dayplan-edit="${esc(x.id)}">✏️</button>`:x.id?.startsWith('auto-')||x.auto||x.virtual?'':`<button class="mini-btn" data-planner-edit-rule="${esc(x.id)}">✏️</button>`}
       </div>
     </div>`;
   };
@@ -1346,6 +1328,11 @@ function editLearningBlockFromTag(date,key){
     }
   }
 }
+function openManualActivityForTag(date,type='other'){
+  dayPlanDate=date;openDayPlanItem();
+  $('#dayPlanType').value=type;
+  if(type==='study'&&!$('#dayPlanTitle').value)$('#dayPlanTitle').value='Lernen';
+}
 function smartChangeDay(delta){
   const d=parseDate(dayPlanDate);d.setDate(d.getDate()+delta);dayPlanDate=localISO(d);renderDailyPlan();
 }
@@ -1363,11 +1350,9 @@ document.getElementById('smartDayItems').addEventListener('click',e=>{
   if(learn){editLearningBlockFromTag(dayPlanDate,learn.dataset.dayLearningEdit);return}
   const del=e.target.closest('[data-day-learning-delete]');
   if(del){deleteLearningBlockFromTag(dayPlanDate,del.dataset.dayLearningDelete);return}
-  const se=e.target.closest('[data-simple-edit]');
-  if(se){editSimplePlannerItem(dayPlanDate,se.dataset.simpleEdit);return}
 });
-document.getElementById('addLearningBlock').addEventListener('click',()=>{if(plannerState().manualMode){const old=prompt; addSimpleLearningQuick(dayPlanDate)}else addLearningBlockFromTag(dayPlanDate)});
-document.getElementById('addPlannerItem').addEventListener('click',()=>addSimplePlannerItem(dayPlanDate));
+document.getElementById('addLearningBlock').addEventListener('click',()=>openManualActivityForTag(dayPlanDate,'study'));
+document.getElementById('addManualActivity').addEventListener('click',()=>openManualActivityForTag(dayPlanDate,'other'));
 
 
 document.getElementById('smartWeekPrev').onclick=()=>smartChangeWeek(-1);
@@ -1389,9 +1374,10 @@ document.getElementById('editSmartStudyTarget').onclick=()=>{
   state.semesterPlan=state.semesterPlan||{days:{}};
   if(mins>0)state.semesterPlan.days[date]=mins/60;else delete state.semesterPlan.days[date];
   const dayO=plannerDayOverride(date);
-  dayO.learningBlocks=null;dayO.shiftEvents=[];
+  if(!plannerState().manualMode)dayO.learningBlocks=null;
+  dayO.shiftEvents=[];
   plannerState().studyAdjustments[date]=0;
-  save();toast('Lernziel in Tag und Semesterplanung aktualisiert');
+  save();toast(plannerState().manualMode?'Semester-Lernziel aktualisiert. Deine Lernblöcke bleiben unverändert.':'Lernziel in Tag und Semesterplanung aktualisiert');
 };
 
 document.getElementById('moveOpenTomorrow').onclick=()=>moveStudyOpen(dayPlanDate,'tomorrow');
