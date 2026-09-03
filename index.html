@@ -378,7 +378,7 @@ dialog[open]{position:fixed;inset:0;margin:auto}
 (()=>{
 'use strict';
 const KEY='wesstudy_v1';
-const defaultState={version:4.8,theme:'light',lang:'de',dashboardMode:'auto',semester:{name:'',start:'',end:'',hoursPerCredit:17},subjects:[],sessions:[],holiday:null,dailyPlan:{items:[],templates:[]},timerSettings:{sound:true,vibrate:true,notifications:false,autoNext:true},studyProgress:null,meta:{updatedAt:0}};
+const defaultState={version:4.9,theme:'light',lang:'de',dashboardMode:'auto',semester:{name:'',start:'',end:'',hoursPerCredit:17},subjects:[],sessions:[],holiday:null,dailyPlan:{items:[],templates:[]},timerSettings:{sound:true,vibrate:true,notifications:false,autoNext:true},studyProgress:null,meta:{updatedAt:0}};
 let state=load(); let timer={running:false,paused:false,mode:'focus',round:1,totalRounds:4,focusSec:1500,breakSec:300,remaining:1500,startedAt:null,accumulatedFocus:0,interval:null,open:false};
 let calDate=new Date(); let holidayDraft={days:{}}; let deferredPrompt=null;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
@@ -510,7 +510,7 @@ function plannerDefaults(){
     gymMin:75,mealPrepMin:90,sleepMin:360,sleepPreferred:450,sundaySleep:480,cultureWeeklyMin:240,
     freeDayStudyMaxMin:360,labDayStudyMaxMin:300,saturdayStudyMaxMin:330,sundayStudyMaxMin:360,
     freeWakeTime:'08:00',sundayWakeTime:'08:30',
-    novemberVmtAccountingOnly:true,studyAdjustments:{},completions:{},exceptions:{},
+    novemberVmtAccountingOnly:true,studyAdjustments:{},completions:{},exceptions:{},dayOverrides:{},
     semesterPlanTotalMins:0,smartPlanRevision:'',scheduleRevision:'',
     rules:[
       {id:'u-m1',type:'uni',name:'TM Kinematik',weekday:1,start:'08:00',end:'09:30',repeat:'weekly',enabled:true,studyMin:0},
@@ -564,7 +564,8 @@ function plannerState(){
       rules:Array.isArray(w.rules)?w.rules:d.rules,
       studyAdjustments:{...(w.studyAdjustments||{})},
       completions:{...(w.completions||{})},
-      exceptions:{...(w.exceptions||{})}
+      exceptions:{...(w.exceptions||{})},
+      dayOverrides:{...(w.dayOverrides||{})}
     };
   }
   const w=state.weeklyPlanner;
@@ -730,9 +731,63 @@ function plannerActualVmt(date,rules=basePlannerRulesForDate(date)){
   const w=plannerState();
   return rules.find(r=>r.type==='vmt'&&!(w.novemberVmtAccountingOnly&&date.startsWith('2026-11')));
 }
+
+function plannerDayOverride(date){
+  const w=plannerState();w.dayOverrides=w.dayOverrides||{};
+  return w.dayOverrides[date]||(w.dayOverrides[date]={shiftEvents:[],learningBlocks:null,wakeTime:'',wakeShiftMins:0});
+}
+function clockDiff(newTime,oldTime){
+  if(!newTime||!oldTime)return 0;
+  let d=timeToMins(newTime)-timeToMins(oldTime);
+  if(d>720)d-=1440;if(d<-720)d+=1440;return d;
+}
+function shiftClock(time,delta){
+  if(!time||time==='flexibel')return time;
+  return minsToClock(timeToMins(time)+Number(delta||0));
+}
+function plannerFlexibleType(type){return ['studyWindow','gym','mealprep','culture','other'].includes(type)}
+function plannerFixedType(type){return ['uni','lab','vmt','bib','travel','prep'].includes(type)}
+function dayShiftForItem(date,item){
+  const o=plannerState().dayOverrides?.[date];if(!o)return 0;
+  let delta=Number(o.wakeShiftMins||0),st=timeToMins(item.start||'00:00');
+  (o.shiftEvents||[]).forEach(ev=>{if(st>=Number(ev.afterMin||0))delta+=Number(ev.delta||0)});
+  return delta;
+}
+function applyDayFlexibleShift(date,item){
+  if(!plannerFlexibleType(item.type)||!item.start)return item;
+  const delta=dayShiftForItem(date,item);if(!delta)return item;
+  const dur=item.end?Math.max(0,timeToMins(item.end)-timeToMins(item.start)):Number(item.minutes||0);
+  const start=shiftClock(item.start,delta);
+  return {...item,start,end:item.end?addMinsTime(start,dur):item.end,_dayShifted:true};
+}
+function findNextFreeStart(desired,duration,fixed){
+  let start=desired,guard=0;
+  while(guard++<50){
+    const hit=fixed.find(f=>start<f.end&&start+duration>f.start);
+    if(!hit)return start;
+    start=hit.end;
+  }
+  return start;
+}
+function reflowFlexibleTimeline(date,timeline){
+  const fixed=timeline.filter(x=>plannerFixedType(x.type)&&x.start&&x.end)
+    .map(x=>({start:timeToMins(x.start),end:timeToMins(x.end),name:x.name||x.type}))
+    .sort((a,b)=>a.start-b.start);
+  let lastFlexEnd=0;
+  return timeline.map(x=>{
+    if(!plannerFlexibleType(x.type)||!x.start||!x.end)return x;
+    const dur=Math.max(0,timeToMins(x.end)-timeToMins(x.start));
+    const desired=Math.max(timeToMins(x.start),lastFlexEnd);
+    const actual=findNextFreeStart(desired,dur,fixed);
+    if(actual+dur>23*60+45)return {...x,_overflow:true};
+    lastFlexEnd=actual+dur;
+    return actual!==timeToMins(x.start)?{...x,start:minsToClock(actual),end:minsToClock(actual+dur),_reflowed:true}:x;
+  });
+}
 function plannerGeneratedItems(date){
   const w=plannerState(),rules=basePlannerRulesForDate(date),items=[];
-  for(const r of rules){
+  for(const r0 of rules){
+    const r=applyDayFlexibleShift(date,{...r0});
     let start=r.start||'',end=r.end||'';
     if(r.type==='vmt'&&start)end=addMinsTime(start,w.vmtDurationMin);
     items.push({...r,start,end,key:`rule:${r.id}:${date}`});
@@ -759,21 +814,20 @@ function plannerGeneratedItems(date){
     items.push({id:'auto-travel-home',key:`auto:travel-home:${date}`,type:'travel',name:'VMT → Haus (mit Buffer)',start:vmtEnd,end:addMinsTime(vmtEnd,w.vmtTravelMin),generated:true,auto:true});
   }
 
-  // Sleep / wake are real parts of the day plan.
-  const timed=items.filter(x=>x.start&&x.start!=='flexibel');
-  let wake='';
-  const prep=timed.filter(x=>x.type==='prep').sort((a,b)=>a.start.localeCompare(b.start))[0];
-  if(prep)wake=prep.start;
-  else{
-    const first=timed.sort((a,b)=>a.start.localeCompare(b.start))[0];
-    if(first)wake=subMinsTime(first.start,45);
-    else wake=parseDate(date).getDay()===0?(w.sundayWakeTime||'08:30'):(w.freeWakeTime||'08:00');
+  const timed=items.filter(x=>x.start&&x.start!=='flexibel'),override=plannerState().dayOverrides?.[date]||{};
+  let wake=override.wakeTime||'';
+  if(!wake){
+    const prep=timed.filter(x=>x.type==='prep').sort((a,b)=>a.start.localeCompare(b.start))[0];
+    if(prep)wake=prep.start;
+    else{
+      const first=timed.sort((a,b)=>a.start.localeCompare(b.start))[0];
+      if(first)wake=subMinsTime(first.start,45);
+      else wake=parseDate(date).getDay()===0?(w.sundayWakeTime||'08:30'):(w.freeWakeTime||'08:00');
+    }
   }
-  const sleepGoal=parseDate(date).getDay()===0?Number(w.sundaySleep||480):Number(w.sleepPreferred||450);
-  const bed=subMinsTime(wake,sleepGoal);
+  const sleepGoal=parseDate(date).getDay()===0?Number(w.sundaySleep||480):Number(w.sleepPreferred||450),bed=subMinsTime(wake,sleepGoal);
   items.push({id:'auto-sleep',key:`auto:sleep:${date}`,type:'sleep',name:'Schlaf',start:bed,end:wake,generated:true,auto:true,_sort:'00:00',previousEvening:true,minutes:sleepGoal});
   items.push({id:'auto-wake',key:`auto:wake:${date}`,type:'wake',name:'Aufstehen',start:wake,end:'',generated:true,auto:true,_sort:wake,minutes:0});
-
   return items.sort((a,b)=>(a._sort||a.start||'99:99').localeCompare(b._sort||b.start||'99:99'));
 }
 function plannerCompletion(date,key){
@@ -836,6 +890,12 @@ function plannerFreeGaps(date){
 }
 function minsToClock(m){m=((m%1440)+1440)%1440;return `${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`}
 function plannerStudyWindows(date,target){
+  const override=plannerState().dayOverrides?.[date];
+  if(Array.isArray(override?.learningBlocks)&&override.learningBlocks.length){
+    const all=override.learningBlocks.map(b=>({...b})),bibBlocks=all.filter(b=>b.source==='bib'),blocks=all.filter(b=>b.source!=='bib');
+    const bibStudy=bibBlocks.reduce((a,b)=>a+Number(b.minutes||0),0),total=all.reduce((a,b)=>a+Number(b.minutes||0),0);
+    return {bibStudy,bibBlocks,blocks,unplanned:Math.max(0,target-total),custom:true};
+  }
   const rules=basePlannerRulesForDate(date),bib=rules.find(r=>r.type==='bib');
   let remaining=Math.max(0,target),blocks=[],bibBlocks=[],bibStudy=0;
 
@@ -920,8 +980,9 @@ function renderSmartDayPlanner(){
 
   // One chronological timeline: preparation, travel, university, Lernen, Bib,
   // personal appointments etc. are no longer separated into groups.
-  const timeline=[...baseItems.filter(x=>x.type!=='studyWindow'),...learningItems];
-  const priority={prep:1,travel:2,uni:3,lab:3,studyWindow:4,bib:5,vmt:5,mealprep:6,gym:6,culture:6,other:7};
+  let timeline=[...baseItems.filter(x=>x.type!=='studyWindow'),...learningItems];
+  timeline=reflowFlexibleTimeline(date,timeline);
+  const priority={sleep:0,wake:1,prep:2,travel:3,uni:4,lab:4,studyWindow:5,bib:6,vmt:6,mealprep:7,gym:7,culture:7,other:8};
   timeline.sort((a,b)=>{
     const ta=a._sort||(a.start==='flexibel'||!a.start?'99:99':a.start),tb=b._sort||(b.start==='flexibel'||!b.start?'99:99':b.start);
     return ta.localeCompare(tb)||(priority[a.type]||9)-(priority[b.type]||9)||(a.end||'').localeCompare(b.end||'');
@@ -944,6 +1005,8 @@ function renderSmartDayPlanner(){
     }else{
       extra=`${meta[1]}${dur?' · '+minsText(dur):''}`;
     }
+    if(x._reflowed)extra+=` · automatisch verschoben`;
+    if(x._overflow)extra+=` · ⚠️ passt heute nicht mehr sinnvoll`;
     if(comp?.actualMins!=null)extra+=` · Ist ${minsText(comp.actualMins)}`;
     return `<div class="planner-item ${comp?.done?'done':''} ${x.learning?'planner-learning-item':''}">
       <div class="planner-time">${esc(x.start||'flexibel')}${x.end?`<div class="muted" style="font-size:.7rem">bis ${esc(x.end)}</div>`:''}</div>
@@ -951,6 +1014,8 @@ function renderSmartDayPlanner(){
       <div class="planner-actions">
         ${x.virtual?'':`<input type="checkbox" data-planner-done="${esc(x.key)}" ${comp?.done?'checked':''} aria-label="Erledigt">`}
         ${x.virtual?'':`<button class="mini-btn" data-planner-actual="${esc(x.key)}" title="Ist-Zeit">⏱</button>`}
+        ${x.learning?`<button class="mini-btn" data-day-learning-edit="${esc(x.key)}" title="Lernblock für diesen Tag ändern">✏️</button>`:''}
+        ${x.type==='wake'?`<button class="mini-btn" data-day-wake-edit="${esc(date)}" title="Aufstehzeit ändern">✏️</button>`:''}
         ${manual?`<button class="mini-btn" data-dayplan-edit="${esc(x.id)}">✏️</button>`:x.id?.startsWith('auto-')||x.auto||x.virtual?'':`<button class="mini-btn" data-planner-edit-rule="${esc(x.id)}">✏️</button>`}
       </div>
     </div>`;
@@ -1051,6 +1116,66 @@ function moveStudyOpen(date,mode='tomorrow'){
   if(remaining>0)toast(`${minsText(moved)} automatisch sinnvoll eingeplant. ${minsText(remaining)} konnten nicht sinnvoll eingeplant werden.`);
   else toast(`${minsText(moved)} automatisch auf passende Tage verteilt und in den Tagesplänen eingeplant.`);
 }
+
+function currentLearningBlocksForDate(date){
+  const target=baseStudyTargetForDate(date),sw=plannerStudyWindows(date,target),arr=[];
+  sw.bibBlocks.forEach((b,i)=>arr.push({...b,source:'bib',renderKey:`bib-study:${date}:${i}`}));
+  sw.blocks.forEach((b,i)=>arr.push({...b,source:'outside',renderKey:`study-block:${date}:${i}`}));
+  return arr.sort((a,b)=>a.start.localeCompare(b.start));
+}
+function editWakeFromTag(date){
+  const current=plannerGeneratedItems(date).find(x=>x.type==='wake')?.start||'08:00';
+  const raw=prompt(`Neue Aufstehzeit für ${fmtDate(date)} (HH:MM):`,current);
+  if(raw===null)return;
+  if(!/^\d{2}:\d{2}$/.test(raw)||timeToMins(raw)>=1440)return toast('Bitte eine gültige Uhrzeit eingeben, z. B. 10:00.');
+  const wd=parseDate(date).getDay(),weekdayName=['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'][wd];
+  const scope=prompt(`Wie soll die Änderung gelten?\n1 = Nur ${fmtDate(date)}\n2 = Alle zukünftigen ${weekdayName}e`, '1');
+  if(scope===null)return;
+  const delta=clockDiff(raw,current);
+  if(String(scope).trim()==='2'){
+    const w=plannerState();
+    if(wd===0)w.sundayWakeTime=raw;
+    w.rules.forEach(r=>{
+      if(Number(r.weekday)===wd&&plannerFlexibleType(r.type)&&r.start){
+        const dur=r.end?dayPlanDuration(r):0;
+        r.start=shiftClock(r.start,delta);
+        if(r.end)r.end=addMinsTime(r.start,dur);
+      }
+    });
+    save();toast(`Alle zukünftigen ${weekdayName}e wurden um ${delta>=0?'+':''}${delta} Min. verschoben.`);
+  }else{
+    const o=plannerDayOverride(date);
+    o.wakeTime=raw;
+    o.wakeShiftMins=Number(o.wakeShiftMins||0)+delta;
+    save();toast(`Nur ${fmtDate(date)} wurde um ${delta>=0?'+':''}${delta} Min. verschoben.`);
+  }
+}
+function editLearningBlockFromTag(date,key){
+  const rendered=currentLearningBlocksForDate(date),chosen=rendered.find(x=>x.renderKey===key);
+  if(!chosen)return toast('Lernblock konnte nicht gefunden werden.');
+  const raw=prompt(`Neue Dauer für Lernen ab ${chosen.start} in Stunden:`,String(Number(chosen.minutes||0)/60));
+  if(raw===null)return;
+  const hours=Number(String(raw).replace(',','.'));
+  if(!Number.isFinite(hours)||hours<=0)return toast('Bitte eine gültige Lernzeit eingeben.');
+  const newMin=Math.max(15,Math.round(hours*60/15)*15),oldMin=Number(chosen.minutes||0),delta=newMin-oldMin;
+  const currentTarget=baseStudyTargetForDate(date),newTarget=currentTarget+delta,cap=plannerDayStudyCapacity(date);
+  if(newTarget>cap)return toast(`Die Änderung passt nicht: Tageskapazität ${minsText(cap)}, neues Lernziel wäre ${minsText(newTarget)}.`);
+  const pos=rendered.findIndex(x=>x.renderKey===key),o=plannerDayOverride(date);
+  const all=rendered.map(x=>({start:x.start,end:x.end,minutes:Number(x.minutes||0),label:x.source==='bib'?'Lernen (in der Bib)':'Lernen',source:x.source}));
+  const oldEnd=timeToMins(all[pos].end);
+  all[pos].minutes=newMin;
+  all[pos].end=addMinsTime(all[pos].start,newMin);
+  for(let i=pos+1;i<all.length;i++){
+    all[i].start=shiftClock(all[i].start,delta);
+    all[i].end=shiftClock(all[i].end,delta);
+  }
+  o.learningBlocks=all;
+  o.shiftEvents=o.shiftEvents||[];
+  o.shiftEvents.push({afterMin:oldEnd,delta});
+  setSemesterTargetMins(date,newTarget);
+  save();
+  toast(`Lernblock geändert. Nachfolgende flexible Termine wurden um ${delta>=0?'+':''}${delta} Min. verschoben.`);
+}
 function smartChangeDay(delta){
   const d=parseDate(dayPlanDate);d.setDate(d.getDate()+delta);dayPlanDate=localISO(d);renderDailyPlan();
 }
@@ -1061,6 +1186,13 @@ document.getElementById('smartDayPrev').onclick=()=>smartChangeDay(-1);
 document.getElementById('smartDayNext').onclick=()=>smartChangeDay(1);
 document.getElementById('smartDayToday').onclick=()=>{dayPlanDate=todayISO();renderDailyPlan()};
 document.getElementById('smartDayDatePicker').addEventListener('change',e=>{if(e.target.value){dayPlanDate=e.target.value;renderDailyPlan()}});
+document.getElementById('smartDayItems').addEventListener('click',e=>{
+  const wake=e.target.closest('[data-day-wake-edit]');
+  if(wake){editWakeFromTag(wake.dataset.dayWakeEdit);return}
+  const learn=e.target.closest('[data-day-learning-edit]');
+  if(learn){editLearningBlockFromTag(dayPlanDate,learn.dataset.dayLearningEdit);return}
+});
+
 document.getElementById('smartWeekPrev').onclick=()=>smartChangeWeek(-1);
 document.getElementById('smartWeekNext').onclick=()=>smartChangeWeek(1);
 document.getElementById('smartWeekDatePicker').addEventListener('change',e=>{if(e.target.value){dayPlanDate=e.target.value;renderWeekPlanner()}});
@@ -1079,6 +1211,8 @@ document.getElementById('editSmartStudyTarget').onclick=()=>{
   if(mins>cap)return toast(`Für ${fmtDate(date)} können höchstens ${minsText(cap)} sinnvoll eingeplant werden. Bitte wähle einen anderen Tag für den Rest.`);
   state.semesterPlan=state.semesterPlan||{days:{}};
   if(mins>0)state.semesterPlan.days[date]=mins/60;else delete state.semesterPlan.days[date];
+  const dayO=plannerDayOverride(date);
+  dayO.learningBlocks=null;dayO.shiftEvents=[];
   plannerState().studyAdjustments[date]=0;
   save();toast('Lernziel in Tag und Semesterplanung aktualisiert');
 };
@@ -1105,7 +1239,7 @@ document.getElementById('plannerRuleForm').addEventListener('submit',e=>{
 });
 document.getElementById('deletePlannerRule').onclick=()=>{const id=document.getElementById('plannerRuleId').value;if(id&&confirm('Diese Regel löschen?')){plannerState().rules=plannerState().rules.filter(x=>x.id!==id);save();document.getElementById('plannerRuleDialog').close()}};
 document.getElementById('plannerSettingsForm').addEventListener('submit',e=>{
-  if(e.submitter?.value==='cancel')return;e.preventDefault();const w=plannerState();
+  if(e.submitter?.value==='cancel')return;e.preventDefault();const w=plannerState();const oldSundayWake=w.sundayWakeTime||'08:30';
   const map={wpSemesterStart:'semesterStart',wpSemesterEnd:'semesterEnd',wpLectureFreeStart:'lectureFreeStart',wpLectureFreeEnd:'lectureFreeEnd'};
   Object.entries(map).forEach(([id,k])=>w[k]=document.getElementById(id).value);
   const nums={wpPrepMin:'prepMin',wpUniTravelMin:'uniTravelMin',wpBibTravelMin:'bibTravelMin',wpVmtTravelMin:'vmtTravelMin',wpVmtDurationMin:'vmtDurationMin',wpVmtStudyCapMin:'vmtStudyCapMin',wpGymMin:'gymMin',wpMealPrepMin:'mealPrepMin',wpSleepMin:'sleepMin',wpSleepPreferred:'sleepPreferred',wpSundaySleep:'sundaySleep',wpCultureWeeklyMin:'cultureWeeklyMin'};
@@ -1113,6 +1247,16 @@ document.getElementById('plannerSettingsForm').addEventListener('submit',e=>{
   w.novemberVmtAccountingOnly=document.getElementById('wpNovemberAccounting').checked;
   ['freeDayStudyMaxMin','labDayStudyMaxMin','saturdayStudyMaxMin','sundayStudyMaxMin'].forEach(k=>{const id='wp'+k[0].toUpperCase()+k.slice(1);w[k]=Number(document.getElementById(id).value||0)});
   ['freeWakeTime','sundayWakeTime'].forEach(k=>{const id='wp'+k[0].toUpperCase()+k.slice(1);w[k]=document.getElementById(id).value||w[k]});
+  const sundayDelta=clockDiff(w.sundayWakeTime||oldSundayWake,oldSundayWake);
+  if(sundayDelta){
+    w.rules.forEach(r=>{
+      if(Number(r.weekday)===0&&plannerFlexibleType(r.type)&&r.start){
+        const dur=r.end?dayPlanDuration(r):0;
+        r.start=shiftClock(r.start,sundayDelta);
+        if(r.end)r.end=addMinsTime(r.start,dur);
+      }
+    });
+  }
   w.smartPlanRevision='';
   syncSemesterPlanFromWeeklyPattern(true);
   save();document.getElementById('plannerSettingsDialog').close();toast('Wochenplan und Semesterplanung wurden synchronisiert');
@@ -1332,10 +1476,17 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-open="subj
         <div class="timer-controls" style="margin-top:12px"><button type="button" class="btn soft" id="syncSemesterFromWeek">Mit Wochenplan synchronisieren</button><button type="button" class="btn soft" id="applySemesterWeekday">Auf alle anwenden</button><button type="button" class="btn soft" id="clearSemesterPlan">Plan leeren</button></div>
         <p class="muted" style="margin-top:10px">Beispiel: 4 Std. + Sonntag → trägt 4 Std. an jedem Sonntag zwischen Semesterbeginn und Semesterende ein. Du kannst danach einzelne Tage ändern oder löschen.</p>
         <div style="margin-top:16px"><div class="calendar-nav"><button type="button" class="mini-btn" id="semCalPrev">‹</button><h3 id="semCalTitle"></h3><button type="button" class="mini-btn" id="semCalNext">›</button></div><div class="calendar" id="semesterCalendar"></div><div class="holiday-day-list" id="selectedSemesterDays"></div></div>
+        <div id="semesterPlanError" class="planner-alert hidden" style="margin-top:14px;border-left:4px solid currentColor"></div>
         <div class="timer-controls"><button class="btn primary" value="default">Semesterplan speichern</button><button class="btn soft" value="cancel">Abbrechen</button></div>
       </form></dialog>`);
   }
 
+  function setSemesterPlanError(msg=''){
+    const el=document.getElementById('semesterPlanError');if(!el)return;
+    el.textContent=msg;
+    el.classList.toggle('hidden',!msg);
+    if(msg)el.scrollIntoView({behavior:'smooth',block:'center'});
+  }
   function semesterTargetMins(){return Math.max(0,totalRequired()-Math.min(totalRequired(),holidayPlannedMins()))}
   function semesterPlannedMins(days=state.semesterPlan?.days||{}){return Object.values(days).reduce((a,h)=>a+Number(h||0)*60,0)}
   function semesterAllDates(){
@@ -1359,6 +1510,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-open="subj
     if(hm) hm.innerHTML=`<span class="pill">Semesterbedarf ${hoursText(st.target)}</span><span class="pill">Verplant ${hoursText(st.planned)}</span><span class="pill">Noch offen ${hoursText(st.unplanned)}</span><span class="pill">Rest Ø ${minsText(st.avg)}/Tag</span>`;
   }
   function prepareSemesterPlanDialog(){
+    setSemesterPlanError('');
     semesterDraft={days:{...(state.semesterPlan?.days||{})}};semesterCalDate=parseDate(state.semester.start)||new Date();renderSemesterCalendar();renderSelectedSemesterDays();
   }
   function renderSemesterCalendar(){
@@ -1386,7 +1538,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-open="subj
       if(use>0)semesterDraft.days[iso]=use/60;
     });
     renderSemesterCalendar();renderSelectedSemesterDays();
-    if(limited)toast(`${limited} Tage wurden auf ihre sinnvoll verfügbare Lernzeit begrenzt.`);
+    if(limited){setSemesterPlanError(`⚠️ ${limited} Tage hatten nicht genug freie Zeit. Sie wurden automatisch auf ihre sinnvoll verfügbare Lernkapazität begrenzt.`);toast(`${limited} Tage wurden begrenzt – Details im Semesterplan.`)}else{setSemesterPlanError('');}
   }
   document.getElementById('openSemesterPlan').onclick=()=>{if(!state.semester.start||!state.semester.end)return toast('Lege zuerst den Semesterzeitraum fest.');prepareSemesterPlanDialog();document.getElementById('semesterPlanDialog').showModal()};
   document.getElementById('openSemesterPlanHome').onclick=document.getElementById('openSemesterPlan').onclick;
@@ -1395,10 +1547,10 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-open="subj
   document.getElementById('syncSemesterFromWeek').onclick=()=>{syncSemesterPlanFromWeeklyPattern(true);semesterDraft={days:{...(state.semesterPlan?.days||{})}};renderSemesterCalendar();renderSelectedSemesterDays();save();toast('Semesterplanung wurde intelligent aus dem Gesamtbedarf und den verfügbaren Zeitfenstern verteilt')};
   document.getElementById('applySemesterWeekday').onclick=applyWeekday;
   document.getElementById('clearSemesterPlan').onclick=()=>{if(confirm('Alle geplanten Semestertage löschen?')){semesterDraft.days={};renderSemesterCalendar();renderSelectedSemesterDays()}};
-  document.getElementById('semesterCalendar').addEventListener('click',e=>{const b=e.target.closest('[data-sem-cal-date]');if(!b||b.disabled)return;const d=b.dataset.semCalDate;if(semesterDraft.days[d]!=null)delete semesterDraft.days[d];else{const req=Number(document.getElementById('defaultSemesterHours').value||4)*60,cap=plannerDayStudyCapacity(d);if(req>cap)toast(`Für ${fmtDate(d)} passen höchstens ${minsText(cap)} sinnvoll in den Tagesplan.`);semesterDraft.days[d]=Math.min(req,cap)/60}renderSemesterCalendar();renderSelectedSemesterDays()});
-  document.getElementById('selectedSemesterDays').addEventListener('change',e=>{if(!e.target.matches('[data-semester-hours]'))return;const d=e.target.dataset.semesterHours,req=Math.round(Number(e.target.value||0)*60/15)*15,cap=plannerDayStudyCapacity(d);if(req>cap){toast(`Für ${fmtDate(d)} können nur ${minsText(cap)} sinnvoll eingeplant werden. Bitte verteile den Rest auf einen anderen Tag.`);e.target.value=Number(semesterDraft.days[d]||0);return}if(req>0)semesterDraft.days[d]=req/60;else delete semesterDraft.days[d];renderSemesterCalendar();renderSelectedSemesterDays()});
+  document.getElementById('semesterCalendar').addEventListener('click',e=>{const b=e.target.closest('[data-sem-cal-date]');if(!b||b.disabled)return;const d=b.dataset.semCalDate;if(semesterDraft.days[d]!=null)delete semesterDraft.days[d];else{const req=Number(document.getElementById('defaultSemesterHours').value||4)*60,cap=plannerDayStudyCapacity(d);if(req>cap){setSemesterPlanError(`⚠️ ${fmtDate(d)}: Gewünscht ${minsText(req)}, aber nur ${minsText(cap)} passen sinnvoll in den Tagesplan. Der Tag wurde auf ${minsText(cap)} begrenzt.`);toast('Semesterplanung: Stunden mussten begrenzt werden.')}semesterDraft.days[d]=Math.min(req,cap)/60}renderSemesterCalendar();renderSelectedSemesterDays()});
+  document.getElementById('selectedSemesterDays').addEventListener('change',e=>{if(!e.target.matches('[data-semester-hours]'))return;const d=e.target.dataset.semesterHours,req=Math.round(Number(e.target.value||0)*60/15)*15,cap=plannerDayStudyCapacity(d);if(req>cap){setSemesterPlanError(`❌ ${fmtDate(d)} kann nicht auf ${minsText(req)} gesetzt werden. Im Tagesplan sind nur ${minsText(cap)} sinnvoll verfügbar. ${minsText(req-cap)} passen nicht hinein. Bitte reduziere die Lernzeit oder verteile den Rest auf einen anderen Tag.`);toast('Änderung nicht übernommen – Grund steht unten im Semesterplan.');e.target.value=Number(semesterDraft.days[d]||0);return}else{setSemesterPlanError('');}if(req>0)semesterDraft.days[d]=req/60;else delete semesterDraft.days[d];renderSemesterCalendar();renderSelectedSemesterDays()});
   document.getElementById('selectedSemesterDays').addEventListener('click',e=>{const b=e.target.closest('[data-remove-semester-day]');if(!b)return;delete semesterDraft.days[b.dataset.removeSemesterDay];renderSemesterCalendar();renderSelectedSemesterDays()});
-  document.getElementById('semesterPlanForm').addEventListener('submit',e=>{if(e.submitter?.value==='cancel')return;e.preventDefault();const entries=Object.entries(semesterDraft.days).filter(([d])=>overlapDate(d,state.semester.start,state.semester.end));const bad=entries.find(([d,h])=>Number(h||0)*60>plannerDayStudyCapacity(d)+1);if(bad)return toast(`Für ${fmtDate(bad[0])} ist ${bad[1]} Std. zu viel für den Tagesplan. Bitte wähle einen anderen Tag für den Rest.`);state.semesterPlan={days:Object.fromEntries(entries)};plannerState().smartPlanRevision='manual';save();document.getElementById('semesterPlanDialog').close();toast('Semesterplanung gespeichert – Tag wurde automatisch synchronisiert')});
+  document.getElementById('semesterPlanForm').addEventListener('submit',e=>{if(e.submitter?.value==='cancel')return;e.preventDefault();const entries=Object.entries(semesterDraft.days).filter(([d])=>overlapDate(d,state.semester.start,state.semester.end));const bad=entries.find(([d,h])=>Number(h||0)*60>plannerDayStudyCapacity(d)+1);if(bad){const req=Number(bad[1]||0)*60,cap=plannerDayStudyCapacity(bad[0]);setSemesterPlanError(`❌ Plan konnte nicht gespeichert werden. ${fmtDate(bad[0])}: Gewünscht ${minsText(req)}, verfügbar ${minsText(cap)}. ${minsText(Math.max(0,req-cap))} können an diesem Tag nicht sinnvoll eingeplant werden. Bitte reduziere die Stunden oder wähle einen anderen Tag.`);return toast('Plan nicht gespeichert – bitte Hinweis im Semesterplan prüfen.')}setSemesterPlanError('');state.semesterPlan={days:Object.fromEntries(entries)};const wp=plannerState();wp.smartPlanRevision='manual';Object.keys(wp.dayOverrides||{}).forEach(d=>{if(state.semesterPlan.days[d]!=null&&wp.dayOverrides[d])wp.dayOverrides[d].learningBlocks=null});save();document.getElementById('semesterPlanDialog').close();toast('Semesterplanung gespeichert – Tag wurde automatisch synchronisiert')});
 
   const prevRenderAll=renderAll;renderAll=function(){prevRenderAll();renderSemesterPlanCard()};
   renderSemesterPlanCard();
