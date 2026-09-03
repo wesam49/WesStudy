@@ -321,7 +321,7 @@ dialog[open]{position:fixed;inset:0;margin:auto}
   <div class="modal-head"><h3 id="plannerRuleDialogTitle">Regel bearbeiten</h3><button class="close" value="cancel">✕</button></div>
   <input type="hidden" id="plannerRuleId">
   <div class="form-grid">
-    <div class="field"><label>Typ</label><select id="plannerRuleType"><option value="uni">Universität</option><option value="bib">Bib</option><option value="vmt">VMT</option><option value="lab">Labor</option><option value="gym">Gym</option><option value="mealprep">Meal Prep</option><option value="culture">Kultur</option><option value="studyWindow">Studienfenster</option><option value="other">Sonstiges</option></select></div>
+    <div class="field"><label>Typ</label><select id="plannerRuleType"><option value="uni">Universität</option><option value="bib">Bib</option><option value="vmt">VMT</option><option value="lab">Labor</option><option value="gym">Gym</option><option value="mealprep">Meal Prep</option><option value="culture">Kultur</option><option value="studyWindow">Lernen</option><option value="other">Sonstiges</option></select></div>
     <div class="field"><label>Name</label><input id="plannerRuleName" required></div>
     <div class="field"><label>Wochentag</label><select id="plannerRuleWeekday"><option value="1">Montag</option><option value="2">Dienstag</option><option value="3">Mittwoch</option><option value="4">Donnerstag</option><option value="5">Freitag</option><option value="6">Samstag</option><option value="0">Sonntag</option></select></div>
     <div class="field"><label>Start</label><input id="plannerRuleStart" type="time"></div>
@@ -384,7 +384,7 @@ dialog[open]{position:fixed;inset:0;margin:auto}
 (()=>{
 'use strict';
 const KEY='wesstudy_v1';
-const defaultState={version:4.7,theme:'light',lang:'de',dashboardMode:'auto',semester:{name:'',start:'',end:'',hoursPerCredit:17},subjects:[],sessions:[],holiday:null,dailyPlan:{items:[],templates:[]},timerSettings:{sound:true,vibrate:true,notifications:false,autoNext:true},studyProgress:null,meta:{updatedAt:0}};
+const defaultState={version:4.71,theme:'light',lang:'de',dashboardMode:'auto',semester:{name:'',start:'',end:'',hoursPerCredit:17},subjects:[],sessions:[],holiday:null,dailyPlan:{items:[],templates:[]},timerSettings:{sound:true,vibrate:true,notifications:false,autoNext:true},studyProgress:null,meta:{updatedAt:0}};
 let state=load(); let timer={running:false,paused:false,mode:'focus',round:1,totalRounds:4,focusSec:1500,breakSec:300,remaining:1500,startedAt:null,accumulatedFocus:0,interval:null,open:false};
 let calDate=new Date(); let holidayDraft={days:{}}; let deferredPrompt=null;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
@@ -504,7 +504,7 @@ $('#applyDayTemplate').onclick=()=>{const id=$('#dayTemplateSelect').value,t=dai
 /* ===== WesStudy v4.6: Wochenplan + Verpflichtungen ===== */
 const plannerTypeMeta={
   uni:['🎓','Universität'],bib:['📚','Bib'],vmt:['🏭','VMT'],lab:['🧪','Labor'],gym:['🏋️','Gym'],
-  mealprep:['🍳','Meal Prep'],culture:['📖','Kultur'],studyWindow:['📘','Studienfenster'],other:['✨','Sonstiges'],
+  mealprep:['🍳','Meal Prep'],culture:['📖','Kultur'],studyWindow:['📘','Lernen'],other:['✨','Sonstiges'],
   travel:['🚆','Fahrt'],prep:['🎒','Vorbereitung']
 };
 const plannerPublicHolidays=new Set(['2026-10-03','2026-11-01','2026-12-25','2026-12-26','2027-01-01','2027-01-06']);
@@ -519,20 +519,20 @@ function plannerDefaults(){
     rules:[
       {id:'u-m1',type:'uni',name:'TM 3',weekday:1,start:'08:00',end:'09:30',repeat:'weekly',enabled:true,studyMin:0},
       {id:'u-m2',type:'uni',name:'Robotik',weekday:1,start:'09:50',end:'11:20',repeat:'weekly',enabled:true,studyMin:0},
-      {id:'sw-m',type:'studyWindow',name:'Studium zwischen Uni',weekday:1,start:'11:30',end:'13:30',repeat:'weekly',enabled:true,studyMin:0},
+      {id:'sw-m',type:'studyWindow',name:'Lernen',weekday:1,start:'11:30',end:'13:30',repeat:'weekly',enabled:true,studyMin:0},
       {id:'u-m3',type:'uni',name:'Bionik',weekday:1,start:'14:00',end:'15:30',repeat:'weekly',enabled:true,studyMin:0},
       {id:'b-m',type:'bib',name:'Bib',weekday:1,start:'16:00',end:'20:00',repeat:'weekly',enabled:true,studyMin:180},
       {id:'g-m',type:'gym',name:'Gym',weekday:1,start:'20:30',end:'21:45',repeat:'weekly',enabled:true,studyMin:0},
 
       {id:'mp-tu',type:'mealprep',name:'Meal Prep',weekday:2,start:'07:10',end:'08:30',repeat:'weekly',enabled:true,studyMin:0},
       {id:'u-tu1',type:'uni',name:'HM 3',weekday:2,start:'09:50',end:'11:20',repeat:'weekly',enabled:true,studyMin:0},
-      {id:'sw-tu',type:'studyWindow',name:'Studium zwischen Uni',weekday:2,start:'11:30',end:'13:30',repeat:'weekly',enabled:true,studyMin:0},
+      {id:'sw-tu',type:'studyWindow',name:'Lernen',weekday:2,start:'11:30',end:'13:30',repeat:'weekly',enabled:true,studyMin:0},
       {id:'u-tu2',type:'uni',name:'Fertigungstechnik',weekday:2,start:'14:00',end:'15:30',repeat:'weekly',enabled:true,studyMin:0},
       {id:'b-tu',type:'bib',name:'Bib',weekday:2,start:'16:00',end:'20:00',repeat:'weekly',enabled:true,studyMin:180},
 
       {id:'u-w1',type:'uni',name:'TM 3',weekday:3,start:'08:00',end:'09:30',repeat:'weekly',enabled:true,studyMin:0},
       {id:'u-w2',type:'uni',name:'MicroComputer',weekday:3,start:'09:50',end:'11:20',repeat:'weekly',enabled:true,studyMin:0},
-      {id:'sw-w',type:'studyWindow',name:'Studium zwischen Uni',weekday:3,start:'11:30',end:'13:30',repeat:'weekly',enabled:true,studyMin:0},
+      {id:'sw-w',type:'studyWindow',name:'Lernen',weekday:3,start:'11:30',end:'13:30',repeat:'weekly',enabled:true,studyMin:0},
       {id:'lab-w',type:'lab',name:'Numerische Programmierung – Labor',weekday:3,start:'14:00',end:'17:10',repeat:'biweekly',anchor:'',enabled:true,studyMin:0},
       {id:'b-w',type:'bib',name:'Bib',weekday:3,start:'16:00',end:'20:00',repeat:'weekly',enabled:true,studyMin:180},
       {id:'g-w',type:'gym',name:'Gym',weekday:3,start:'20:30',end:'21:45',repeat:'weekly',enabled:true,studyMin:0},
@@ -540,21 +540,21 @@ function plannerDefaults(){
       {id:'u-th1',type:'uni',name:'TM Kinematik',weekday:4,start:'08:00',end:'09:30',repeat:'weekly',enabled:true,studyMin:0},
       {id:'u-th2',type:'uni',name:'Höhere Mathematik 3',weekday:4,start:'09:50',end:'11:20',repeat:'weekly',enabled:true,studyMin:0},
       {id:'u-th3',type:'uni',name:'Rapid Technologies',weekday:4,start:'11:30',end:'13:00',repeat:'weekly',enabled:true,studyMin:0},
-      {id:'sw-th',type:'studyWindow',name:'Studium vor Bib',weekday:4,start:'13:30',end:'15:30',repeat:'weekly',enabled:true,studyMin:0},
+      {id:'sw-th',type:'studyWindow',name:'Lernen',weekday:4,start:'13:30',end:'15:30',repeat:'weekly',enabled:true,studyMin:0},
       {id:'b-th',type:'bib',name:'Bib',weekday:4,start:'16:00',end:'20:00',repeat:'weekly',enabled:true,studyMin:180},
 
       {id:'v-f',type:'vmt',name:'VMT',weekday:5,start:'',end:'',repeat:'weekly',enabled:false,studyMin:0},
 
       {id:'b-sa',type:'bib',name:'Bib',weekday:6,start:'09:00',end:'13:00',repeat:'weekly',enabled:true,studyMin:180},
       {id:'mp-sa',type:'mealprep',name:'Meal Prep',weekday:6,start:'14:00',end:'15:30',repeat:'weekly',enabled:true,studyMin:0},
-      {id:'sw-sa',type:'studyWindow',name:'Studium',weekday:6,start:'15:30',end:'17:30',repeat:'weekly',enabled:true,studyMin:0},
+      {id:'sw-sa',type:'studyWindow',name:'Lernen',weekday:6,start:'15:30',end:'17:30',repeat:'weekly',enabled:true,studyMin:0},
       {id:'g-sa',type:'gym',name:'Gym',weekday:6,start:'18:00',end:'19:15',repeat:'weekly',enabled:true,studyMin:0},
       {id:'c-sa',type:'culture',name:'Kultur',weekday:6,start:'19:30',end:'20:15',repeat:'weekly',enabled:true,studyMin:0},
 
-      {id:'sw-su1',type:'studyWindow',name:'Studium',weekday:0,start:'09:30',end:'12:30',repeat:'weekly',enabled:true,studyMin:0},
+      {id:'sw-su1',type:'studyWindow',name:'Lernen',weekday:0,start:'09:30',end:'12:30',repeat:'weekly',enabled:true,studyMin:0},
       {id:'c-su',type:'culture',name:'Kulturprogramm',weekday:0,start:'13:30',end:'14:45',repeat:'weekly',enabled:true,studyMin:0},
       {id:'g-su',type:'gym',name:'Gym',weekday:0,start:'15:30',end:'16:45',repeat:'weekly',enabled:true,studyMin:0},
-      {id:'sw-su2',type:'studyWindow',name:'Studium',weekday:0,start:'17:30',end:'20:30',repeat:'weekly',enabled:true,studyMin:0}
+      {id:'sw-su2',type:'studyWindow',name:'Lernen',weekday:0,start:'17:30',end:'20:30',repeat:'weekly',enabled:true,studyMin:0}
     ]
   };
 }
@@ -571,6 +571,10 @@ function plannerState(){
       studyHoursByWeekday:{...d.studyHoursByWeekday,...(w.studyHoursByWeekday||{})}
     };
   }
+  // v4.7.1: einheitlicher Name für Lernblöcke – auch für bereits gespeicherte Regeln.
+  state.weeklyPlanner.rules.forEach(r=>{
+    if(r.type==='studyWindow' && (!r.name || /Studium/i.test(r.name))) r.name='Lernen';
+  });
   return state.weeklyPlanner;
 }
 
@@ -787,23 +791,43 @@ function plannerStudyWindows(date,target){
   let rest=Math.max(0,target-bibStudy),blocks=[];
   for(const r of rules.filter(x=>x.type==='studyWindow').sort((a,b)=>a.start.localeCompare(b.start))){
     if(rest<=0)break;const cap=dayPlanDuration(r),use=Math.min(rest,cap);
-    blocks.push({start:r.start,end:addMinsTime(r.start,use),minutes:use,label:r.name});rest-=use;
+    blocks.push({start:r.start,end:addMinsTime(r.start,use),minutes:use,label:'Lernen',source:'outside'});rest-=use;
   }
   if(rest>0){
     const vmt=plannerActualVmt(date,rules);
     if(vmt){
       const vEnd=addMinsTime(vmt.start,plannerState().vmtDurationMin),home=addMinsTime(vEnd,plannerState().vmtTravelMin);
-      blocks.push({start:addMinsTime(home,60),end:addMinsTime(addMinsTime(home,60),rest),minutes:rest,label:'Studium nach VMT (max. realistisch)'});
+      blocks.push({start:addMinsTime(home,60),end:addMinsTime(addMinsTime(home,60),rest),minutes:rest,label:'Lernen',source:'outside'});rest-=rest;
     }else{
-      blocks.push({start:'flexibel',end:'',minutes:rest,label:'Flexibel einplanen'});
+      blocks.push({start:'flexibel',end:'',minutes:rest,label:'Lernen',source:'outside'});rest-=rest;
     }
   }
-  return {bibStudy,blocks,rest};
+  return {bibStudy,blocks,unplanned:Math.max(0,rest)};
 }
 function renderSmartDayPlanner(){
   if(!document.getElementById('smartDayItems'))return;
   plannerState();
-  const date=dayPlanDate,d=parseDate(date),items=plannerAllItems(date),target=flexibleStudyTargetForDate(date),base=baseStudyTargetForDate(date),done=sessionsOn(date),bibStudy=bibUsableStudy(date,target),outside=Math.max(0,target-bibStudy),studyWindows=plannerStudyWindows(date,target),conflicts=plannerConflicts(date);
+  const date=dayPlanDate,d=parseDate(date),baseItems=plannerAllItems(date),target=flexibleStudyTargetForDate(date),base=baseStudyTargetForDate(date),done=sessionsOn(date),studyWindows=plannerStudyWindows(date,target),bibStudy=studyWindows.bibStudy,outside=Math.max(0,target-bibStudy),conflicts=plannerConflicts(date);
+
+  // Every Lernen block is real planned Lernzeit. It counts toward the Tagesziel,
+  // regardless of whether it happens inside Bib or outside.
+  const learningItems=[];
+  const bib=basePlannerRulesForDate(date).find(r=>r.type==='bib');
+  if(bibStudy&&bib){
+    learningItems.push({
+      key:`bib-study:${date}`,type:'studyWindow',name:'Lernen (in der Bib)',
+      start:bib.start,end:addMinsTime(bib.start,bibStudy),minutes:bibStudy,
+      generated:true,virtual:true,learning:true,source:'bib'
+    });
+  }
+  studyWindows.blocks.forEach((b,i)=>learningItems.push({
+    key:`study-block:${date}:${i}`,type:'studyWindow',name:'Lernen',
+    start:b.start,end:b.end,minutes:b.minutes,generated:true,virtual:true,learning:true,source:'outside'
+  }));
+  const plannedLearning=learningItems.reduce((sum,x)=>sum+Number(x.minutes||0),0);
+  const notPlanned=Math.max(0,target-plannedLearning);
+  const notLearned=Math.max(0,target-done);
+
   document.getElementById('smartDayTitle').textContent=(date===todayISO()?'Heute – ':'')+new Intl.DateTimeFormat('de-DE',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'}).format(d);
   const dayPicker=document.getElementById('smartDayDatePicker');if(dayPicker)dayPicker.value=date;
   const dayBtn=document.getElementById('smartDayToday');if(dayBtn)dayBtn.textContent=date===todayISO()?'Heute':fmtDate(date);
@@ -812,44 +836,54 @@ function renderSmartDayPlanner(){
   document.getElementById('smartBibStudy').textContent=minsText(bibStudy);
   document.getElementById('smartOutsideStudy').textContent=minsText(outside);
   document.getElementById('smartStudyDone').textContent=minsText(done);
+
   const msgs=[];
-  if(target!==base)msgs.push(`<div class="planner-alert">↔️ Flexibles Studienziel: ${minsText(base)} ursprünglich → ${minsText(target)} heute. Die Wochensumme bleibt gleich.</div>`);
+  if(target!==base)msgs.push(`<div class="planner-alert">↔️ Flexibles Lernziel: ${minsText(base)} ursprünglich → ${minsText(target)} heute. Die Wochensumme bleibt gleich.</div>`);
   const actualVmt=plannerActualVmt(date,basePlannerRulesForDate(date));
-  if(actualVmt)msgs.push(`<div class="planner-alert">🏭 VMT-Tag: 9 Std. Arbeit + Fahrt/Buffer. Studium wird auf max. ${minsText(plannerState().vmtStudyCapMin)} begrenzt; Überschuss wird auf leichtere Tage verteilt.</div>`);
+  if(actualVmt)msgs.push(`<div class="planner-alert">🏭 VMT-Tag: 9 Std. Arbeit + Fahrt/Buffer. Lernen wird auf max. ${minsText(plannerState().vmtStudyCapMin)} begrenzt; Überschuss wird auf leichtere Tage verteilt.</div>`);
   if(date.startsWith('2026-11')&&plannerState().novemberVmtAccountingOnly)msgs.push(`<div class="planner-good">ℹ️ November 2026: VMT wird als Abrechnungstermin behandelt und blockiert den Tag nicht.</div>`);
   if(conflicts.length)msgs.push(`<div class="planner-alert">⚠️ Konflikt erkannt: ${conflicts.map(esc).join(' · ')}</div>`);
-  if(target){msgs.push(`<div class="${done>=target?'planner-good':'planner-alert'}">📚 Studium: Soll ${minsText(target)} · Erledigt im Lernverlauf ${minsText(done)} · ${done>=target?`+${minsText(done-target)} über Soll`:`${minsText(target-done)} offen`}</div>`)}
+  if(target){
+    msgs.push(`<div class="${notPlanned===0?'planner-good':'planner-alert'}">📘 Lernplanung: Soll ${minsText(target)} · als Lernen eingeplant ${minsText(plannedLearning)} · ${notPlanned===0?'vollständig eingeplant ✅':`${minsText(notPlanned)} noch nicht eingeplant`}</div>`);
+    msgs.push(`<div class="${done>=target?'planner-good':'planner-alert'}">✅ Lernverlauf: erledigt ${minsText(done)} · ${done>=target?`${minsText(done-target)} über Soll`:`noch nicht gelernt ${minsText(notLearned)}`}</div>`);
+  }
   document.getElementById('smartDayMessages').innerHTML=msgs.join('');
-  const grouped={pflicht:[],study:[],personal:[]};
-  items.forEach(x=>{
-    if(['uni','bib','vmt','lab'].includes(x.type))grouped.pflicht.push(x);
-    else if(x.type==='studyWindow'){} // display actual allocated study below instead
-    else grouped.personal.push(x);
+
+  // One chronological timeline: preparation, travel, university, Lernen, Bib,
+  // personal appointments etc. are no longer separated into groups.
+  const timeline=[...baseItems.filter(x=>x.type!=='studyWindow'),...learningItems];
+  const priority={prep:1,travel:2,uni:3,lab:3,studyWindow:4,bib:5,vmt:5,mealprep:6,gym:6,culture:6,other:7};
+  timeline.sort((a,b)=>{
+    const ta=a.start==='flexibel'||!a.start?'99:99':a.start,tb=b.start==='flexibel'||!b.start?'99:99':b.start;
+    return ta.localeCompare(tb)||(priority[a.type]||9)-(priority[b.type]||9)||(a.end||'').localeCompare(b.end||'');
   });
-  if(bibStudy&&basePlannerRulesForDate(date).some(r=>r.type==='bib'))grouped.study.push({key:`bib-study:${date}`,type:'studyWindow',name:'Studium während Bib',start:basePlannerRulesForDate(date).find(r=>r.type==='bib').start,end:'',minutes:bibStudy,generated:true,virtual:true});
-  studyWindows.blocks.forEach((b,i)=>grouped.study.push({key:`study-block:${date}:${i}`,type:'studyWindow',name:b.label,start:b.start,end:b.end,minutes:b.minutes,generated:true,virtual:true}));
+
   const renderItem=x=>{
     const meta=plannerTypeMeta[x.type]||plannerTypeMeta.other,comp=plannerCompletion(date,x.key),manual=!x.generated;
     const dur=x.minutes!=null?x.minutes:(x.start&&x.end?dayPlanDuration(x):0);
     let extra='';
-    if(x.type==='bib')extra=`Arbeitszeit ${minsText(dayPlanDuration(x))} · nutzbare Lernzeit ca. ${minsText(Number(x.studyMin||0))}`;
-    else if(x.type==='vmt')extra=`Arbeitszeit ${minsText(plannerState().vmtDurationMin)} · Lernzeit während Arbeit 0:00`;
-    else extra=`${meta[1]}${dur?' · '+minsText(dur):''}`;
+    if(x.learning){
+      extra=`Lernzeit · ${minsText(dur)}${x.source==='bib'?' · während Bib':''}`;
+    }else if(x.type==='bib'){
+      extra=`Arbeitszeit ${minsText(dayPlanDuration(x))} · davon bis zu ${minsText(Number(x.studyMin||0))} als Lernen nutzbar`;
+    }else if(x.type==='vmt'){
+      extra=`Arbeitszeit ${minsText(plannerState().vmtDurationMin)} · Lernzeit während Arbeit 0:00`;
+    }else{
+      extra=`${meta[1]}${dur?' · '+minsText(dur):''}`;
+    }
     if(comp?.actualMins!=null)extra+=` · Ist ${minsText(comp.actualMins)}`;
-    return `<div class="planner-item ${comp?.done?'done':''}">
+    return `<div class="planner-item ${comp?.done?'done':''} ${x.learning?'planner-learning-item':''}">
       <div class="planner-time">${esc(x.start||'flexibel')}${x.end?`<div class="muted" style="font-size:.7rem">bis ${esc(x.end)}</div>`:''}</div>
-      <div><div class="planner-item-title">${meta[0]} ${esc(x.name||x.title||meta[1])}</div><div class="planner-item-sub">${extra}</div></div>
+      <div><div class="planner-item-title">${x.learning?'📘':meta[0]} ${esc(x.name||x.title||meta[1])}</div><div class="planner-item-sub">${extra}</div></div>
       <div class="planner-actions">
         ${x.virtual?'':`<input type="checkbox" data-planner-done="${esc(x.key)}" ${comp?.done?'checked':''} aria-label="Erledigt">`}
         ${x.virtual?'':`<button class="mini-btn" data-planner-actual="${esc(x.key)}" title="Ist-Zeit">⏱</button>`}
-        ${manual?`<button class="mini-btn" data-dayplan-edit="${esc(x.id)}">✏️</button>`:x.id?.startsWith('auto-')||x.auto?'':`<button class="mini-btn" data-planner-edit-rule="${esc(x.id)}">✏️</button>`}
+        ${manual?`<button class="mini-btn" data-dayplan-edit="${esc(x.id)}">✏️</button>`:x.id?.startsWith('auto-')||x.auto||x.virtual?'':`<button class="mini-btn" data-planner-edit-rule="${esc(x.id)}">✏️</button>`}
       </div>
     </div>`;
   };
   document.getElementById('smartDayItems').innerHTML=
-    `<div class="planner-group"><h3>Pflichttermine</h3>${grouped.pflicht.length?grouped.pflicht.map(renderItem).join(''):'<div class="muted">Keine Pflichttermine.</div>'}</div>`+
-    `<div class="planner-group"><h3>Studienziel – geplant</h3>${grouped.study.length?grouped.study.map(renderItem).join(''):'<div class="muted">Keine Studienzeit geplant.</div>'}</div>`+
-    `<div class="planner-group"><h3>Persönliche Termine</h3>${grouped.personal.length?grouped.personal.map(renderItem).join(''):'<div class="muted">Keine persönlichen Termine.</div>'}</div>`;
+    `<div class="planner-group"><h3>Tagesablauf · chronologisch</h3>${timeline.length?timeline.map(renderItem).join(''):'<div class="muted">Für diesen Tag sind keine Termine geplant.</div>'}</div>`;
 }
 function renderWeekPlanner(){
   if(!document.getElementById('weekOverview'))return;
@@ -859,7 +893,7 @@ function renderWeekPlanner(){
   document.getElementById('weekOverview').innerHTML=dates.map(date=>{
     const r=basePlannerRulesForDate(date),target=targets[date]||0,done=sessionsOn(date),wd=new Intl.DateTimeFormat('de-DE',{weekday:'short',day:'2-digit',month:'2-digit'}).format(parseDate(date));
     const names=r.filter(x=>['uni','lab','bib','vmt','gym','mealprep','culture'].includes(x.type)).slice(0,6);
-    return `<div class="week-day-card ${date===todayISO()?'today':''}" data-week-date="${date}"><div class="wd-title">${wd}</div><div class="wd-target">📚 ${minsText(target)} Soll</div><div class="week-mini">Ist: ${minsText(done)}</div>${names.map(x=>`<div class="week-mini">${(plannerTypeMeta[x.type]||['•'])[0]} ${esc(x.name)} ${x.start?x.start:''}</div>`).join('')}<div class="week-mini"><strong>${done>=target&&target?'✅ Soll erreicht':target?minsText(Math.max(0,target-done))+' offen':'—'}</strong></div></div>`
+    return `<div class="week-day-card ${date===todayISO()?'today':''}" data-week-date="${date}"><div class="wd-title">${wd}</div><div class="wd-target">📘 Lernen ${minsText(target)} Soll</div><div class="week-mini">Im Verlauf: ${minsText(done)}</div>${names.map(x=>`<div class="week-mini">${(plannerTypeMeta[x.type]||['•'])[0]} ${esc(x.name)} ${x.start?x.start:''}</div>`).join('')}<div class="week-mini"><strong>${done>=target&&target?'✅ Soll erreicht':target?minsText(Math.max(0,target-done))+' offen':'—'}</strong></div></div>`
   }).join('');
 }
 function renderPlannerRules(){
