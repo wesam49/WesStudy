@@ -240,6 +240,7 @@ dialog[open]{position:fixed;inset:0;margin:auto}
           <div id="smartDayMessages"></div>
           <div id="smartDayItems"></div>
           <div class="timer-controls" style="margin-top:14px">
+            <button class="btn soft" id="addLearningBlock" type="button">+ Lernblock</button>
             <button class="btn soft" id="moveOpenTomorrow" type="button">Offen → morgen</button>
             <button class="btn soft" id="autoDistributeOpen" type="button">Offen automatisch verteilen</button>
           </div>
@@ -378,7 +379,7 @@ dialog[open]{position:fixed;inset:0;margin:auto}
 (()=>{
 'use strict';
 const KEY='wesstudy_v1';
-const defaultState={version:4.91,theme:'light',lang:'de',dashboardMode:'auto',semester:{name:'',start:'',end:'',hoursPerCredit:17},subjects:[],sessions:[],holiday:null,dailyPlan:{items:[],templates:[]},timerSettings:{sound:true,vibrate:true,notifications:false,autoNext:true},studyProgress:null,meta:{updatedAt:0}};
+const defaultState={version:4.92,theme:'light',lang:'de',dashboardMode:'auto',semester:{name:'',start:'',end:'',hoursPerCredit:17},subjects:[],sessions:[],holiday:null,dailyPlan:{items:[],templates:[]},timerSettings:{sound:true,vibrate:true,notifications:false,autoNext:true},studyProgress:null,meta:{updatedAt:0}};
 let state=load(); let timer={running:false,paused:false,mode:'focus',round:1,totalRounds:4,focusSec:1500,breakSec:300,remaining:1500,startedAt:null,accumulatedFocus:0,interval:null,open:false};
 let calDate=new Date(); let holidayDraft={days:{}}; let deferredPrompt=null;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
@@ -891,7 +892,7 @@ function plannerFreeGaps(date){
 function minsToClock(m){m=((m%1440)+1440)%1440;return `${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`}
 function plannerStudyWindows(date,target){
   const override=plannerState().dayOverrides?.[date];
-  if(Array.isArray(override?.learningBlocks)&&override.learningBlocks.length){
+  if(Array.isArray(override?.learningBlocks)){
     const all=override.learningBlocks.map(b=>({...b})),bibBlocks=all.filter(b=>b.source==='bib'),blocks=all.filter(b=>b.source!=='bib');
     const bibStudy=bibBlocks.reduce((a,b)=>a+Number(b.minutes||0),0),total=all.reduce((a,b)=>a+Number(b.minutes||0),0);
     return {bibStudy,bibBlocks,blocks,unplanned:Math.max(0,target-total),custom:true};
@@ -972,6 +973,11 @@ function renderSmartDayPlanner(){
   if(actualVmt)msgs.push(`<div class="planner-alert">🏭 VMT-Tag: 9 Std. Arbeit + Fahrt/Buffer. Lernen wird auf max. ${minsText(plannerState().vmtStudyCapMin)} begrenzt; Überschuss wird auf leichtere Tage verteilt.</div>`);
   if(date.startsWith('2026-11')&&plannerState().novemberVmtAccountingOnly)msgs.push(`<div class="planner-good">ℹ️ November 2026: VMT wird als Abrechnungstermin behandelt und blockiert den Tag nicht.</div>`);
   if(conflicts.length)msgs.push(`<div class="planner-alert">⚠️ Konflikt erkannt: ${conflicts.map(esc).join(' · ')}</div>`);
+  const nLearn=normalizeLearningBlocks(currentLearningBlocksForDate(date));
+  if(nLearn.conflicts.length){
+    const [i,j]=nLearn.conflicts[0],a=nLearn.list[i],b=nLearn.list[j];
+    msgs.push(`<div class="planner-alert">⚠️ Lernkonflikt: ${esc(a.start)}–${esc(a.end)} überschneidet sich mit ${esc(b.start)}–${esc(b.end)}. Bitte einen Lernblock ändern oder löschen.</div>`);
+  }
   if(target){
     msgs.push(`<div class="${notPlanned===0?'planner-good':'planner-alert'}">📘 Lernplanung: Soll ${minsText(target)} · als Lernen eingeplant ${minsText(plannedLearning)} · ${notPlanned===0?'vollständig eingeplant ✅':`${minsText(notPlanned)} noch nicht eingeplant`}</div>`);
     msgs.push(`<div class="${done>=target?'planner-good':'planner-alert'}">✅ Lernverlauf: erledigt ${minsText(done)} · ${done>=target?`${minsText(done-target)} über Soll`:`noch nicht gelernt ${minsText(notLearned)}`}</div>`);
@@ -1015,6 +1021,7 @@ function renderSmartDayPlanner(){
         ${x.virtual?'':`<input type="checkbox" data-planner-done="${esc(x.key)}" ${comp?.done?'checked':''} aria-label="Erledigt">`}
         ${x.virtual?'':`<button class="mini-btn" data-planner-actual="${esc(x.key)}" title="Ist-Zeit">⏱</button>`}
         ${x.learning?`<button class="mini-btn" data-day-learning-edit="${esc(x.key)}" title="Lernblock für diesen Tag ändern">✏️</button>`:''}
+        ${x.learning?`<button class="mini-btn" data-day-learning-delete="${esc(x.key)}" title="Lernblock löschen">🗑️</button>`:''}
         ${x.type==='wake'?`<button class="mini-btn" data-day-wake-edit="${esc(date)}" title="Aufstehzeit ändern">✏️</button>`:''}
         ${manual?`<button class="mini-btn" data-dayplan-edit="${esc(x.id)}">✏️</button>`:x.id?.startsWith('auto-')||x.auto||x.virtual?'':`<button class="mini-btn" data-planner-edit-rule="${esc(x.id)}">✏️</button>`}
       </div>
@@ -1117,6 +1124,79 @@ function moveStudyOpen(date,mode='tomorrow'){
   else toast(`${minsText(moved)} automatisch auf passende Tage verteilt und in den Tagesplänen eingeplant.`);
 }
 
+
+function normalizeLearningBlocks(blocks){
+  const list=(blocks||[]).map(b=>({
+    ...b,
+    minutes:Math.max(0,timeToMins(b.end)-timeToMins(b.start))
+  })).filter(b=>b.start&&b.end&&timeToMins(b.end)>timeToMins(b.start))
+    .sort((a,b)=>timeToMins(a.start)-timeToMins(b.start));
+
+  const conflicts=[];
+  for(let i=0;i<list.length;i++){
+    for(let j=i+1;j<list.length;j++){
+      if(timeToMins(list[j].start)>=timeToMins(list[i].end))break;
+      if(timeToMins(list[i].start)<timeToMins(list[j].end)&&timeToMins(list[i].end)>timeToMins(list[j].start)){
+        conflicts.push([i,j]);
+      }
+    }
+  }
+  return {list,conflicts};
+}
+function learningBlocksTotal(blocks){
+  return (blocks||[]).reduce((sum,b)=>sum+Math.max(0,timeToMins(b.end)-timeToMins(b.start)),0);
+}
+function saveDayLearningBlocks(date,blocks){
+  const n=normalizeLearningBlocks(blocks);
+  if(n.conflicts.length){
+    const [i,j]=n.conflicts[0],a=n.list[i],b=n.list[j];
+    toast(`Nicht gespeichert: Lernen ${a.start}–${a.end} überschneidet sich mit Lernen ${b.start}–${b.end}.`);
+    return false;
+  }
+  const o=plannerDayOverride(date);
+  o.learningBlocks=n.list;
+  setSemesterTargetMins(date,learningBlocksTotal(n.list));
+  save();
+  return true;
+}
+function deleteLearningBlockFromTag(date,key){
+  const rendered=currentLearningBlocksForDate(date);
+  const pos=rendered.findIndex(x=>x.renderKey===key);
+  if(pos<0)return toast('Lernblock konnte nicht gefunden werden.');
+  const chosen=rendered[pos];
+  if(!confirm(`Lernblock ${chosen.start}–${chosen.end} wirklich löschen?`))return;
+  const remaining=rendered.filter((_,i)=>i!==pos).map(x=>({
+    start:x.start,end:x.end,minutes:Number(x.minutes||0),
+    label:x.source==='bib'?'Lernen (in der Bib)':'Lernen',source:x.source
+  }));
+  if(saveDayLearningBlocks(date,remaining))toast('Lernblock gelöscht.');
+}
+function addLearningBlockFromTag(date){
+  const from=prompt(`Neuer Lernblock am ${fmtDate(date)} – Von (HH:MM):`,'');
+  if(from===null)return;
+  if(!/^\d{2}:\d{2}$/.test(from)||timeToMins(from)>=1440)return toast('Bitte eine gültige Startzeit eingeben.');
+  const to=prompt(`Neuer Lernblock am ${fmtDate(date)} – Bis (HH:MM):`,'');
+  if(to===null)return;
+  if(!/^\d{2}:\d{2}$/.test(to)||timeToMins(to)>=1440||timeToMins(to)<=timeToMins(from))
+    return toast('Bitte eine gültige Endzeit eingeben.');
+
+  const bib=basePlannerRulesForDate(date).find(r=>r.type==='bib');
+  const insideBib=!!(bib&&timeToMins(from)>=timeToMins(bib.start)&&timeToMins(to)<=timeToMins(bib.end));
+  const fixed=plannerGeneratedItems(date).filter(x=>plannerFixedType(x.type)&&x.start&&x.end&&!(insideBib&&x.type==='bib'));
+  const fixedConflict=fixed.find(x=>timeToMins(from)<timeToMins(x.end)&&timeToMins(to)>timeToMins(x.start));
+  if(fixedConflict)return toast(`Dieser Lernblock überschneidet sich mit „${fixedConflict.name}“ (${fixedConflict.start}–${fixedConflict.end}).`);
+
+  const current=currentLearningBlocksForDate(date).map(x=>({
+    start:x.start,end:x.end,minutes:Number(x.minutes||0),
+    label:x.source==='bib'?'Lernen (in der Bib)':'Lernen',source:x.source
+  }));
+  current.push({
+    start:from,end:to,minutes:timeToMins(to)-timeToMins(from),
+    label:insideBib?'Lernen (in der Bib)':'Lernen',
+    source:insideBib?'bib':'outside'
+  });
+  if(saveDayLearningBlocks(date,current))toast('Lernblock hinzugefügt.');
+}
 function currentLearningBlocksForDate(date){
   const target=baseStudyTargetForDate(date),sw=plannerStudyWindows(date,target),arr=[];
   sw.bibBlocks.forEach((b,i)=>arr.push({...b,source:'bib',renderKey:`bib-study:${date}:${i}`}));
@@ -1154,6 +1234,10 @@ function editLearningBlockFromTag(date,key){
   const rendered=currentLearningBlocksForDate(date),chosen=rendered.find(x=>x.renderKey===key);
   if(!chosen)return toast('Lernblock konnte nicht gefunden werden.');
 
+  const action=prompt(`Lernblock ${chosen.start}–${chosen.end}\n1 = Von/Bis ändern\n2 = Löschen`, '1');
+  if(action===null)return;
+  if(String(action).trim()==='2'){deleteLearningBlockFromTag(date,key);return}
+
   const from=prompt(`Lernen am ${fmtDate(date)} – Von (HH:MM):`,chosen.start);
   if(from===null)return;
   if(!/^\d{2}:\d{2}$/.test(from)||timeToMins(from)>=1440)return toast('Bitte eine gültige Startzeit eingeben.');
@@ -1163,40 +1247,44 @@ function editLearningBlockFromTag(date,key){
   if(!/^\d{2}:\d{2}$/.test(to)||timeToMins(to)>=1440||timeToMins(to)<=timeToMins(from))
     return toast('Bitte eine gültige Endzeit nach der Startzeit eingeben.');
 
-  const newMin=timeToMins(to)-timeToMins(from),oldMin=Number(chosen.minutes||0),delta=newMin-oldMin;
-  const currentTarget=baseStudyTargetForDate(date),newTarget=currentTarget+delta,cap=plannerDayStudyCapacity(date);
+  const bib=basePlannerRulesForDate(date).find(r=>r.type==='bib');
+  const insideBib=!!(bib&&timeToMins(from)>=timeToMins(bib.start)&&timeToMins(to)<=timeToMins(bib.end));
+  const fixed=plannerGeneratedItems(date).filter(x=>plannerFixedType(x.type)&&x.start&&x.end&&!(insideBib&&x.type==='bib'));
+  const fixedConflict=fixed.find(x=>timeToMins(from)<timeToMins(x.end)&&timeToMins(to)>timeToMins(x.start));
+  if(fixedConflict)return toast(`Dieser Lernblock überschneidet sich mit „${fixedConflict.name}“ (${fixedConflict.start}–${fixedConflict.end}).`);
 
-  if(chosen.source==='bib'){
-    const bib=basePlannerRulesForDate(date).find(r=>r.type==='bib');
-    if(!bib)return toast('Für diesen Tag wurde keine Bib-Arbeitszeit gefunden.');
-    if(timeToMins(from)<timeToMins(bib.start)||timeToMins(to)>timeToMins(bib.end))
-      return toast(`Lernen (in der Bib) muss innerhalb der Bib-Arbeitszeit ${bib.start}–${bib.end} liegen.`);
-  }else{
-    const fixed=plannerGeneratedItems(date).filter(x=>plannerFixedType(x.type)&&x.start&&x.end);
-    const conflict=fixed.find(x=>timeToMins(from)<timeToMins(x.end)&&timeToMins(to)>timeToMins(x.start));
-    if(conflict)return toast(`Dieser Lernblock überschneidet sich mit „${conflict.name}“ (${conflict.start}–${conflict.end}).`);
+  const updated=rendered.map(x=>({
+    start:x.start,end:x.end,minutes:Number(x.minutes||0),
+    label:x.source==='bib'?'Lernen (in der Bib)':'Lernen',source:x.source
+  }));
+  const pos=rendered.findIndex(x=>x.renderKey===key);
+  const oldDuration=timeToMins(updated[pos].end)-timeToMins(updated[pos].start);
+  const newDuration=timeToMins(to)-timeToMins(from);
+  const delta=newDuration-oldDuration;
+
+  updated[pos]={
+    start:from,end:to,minutes:newDuration,
+    label:insideBib?'Lernen (in der Bib)':'Lernen',
+    source:insideBib?'bib':'outside'
+  };
+
+  const n=normalizeLearningBlocks(updated);
+  if(n.conflicts.length){
+    const [i,j]=n.conflicts[0],a=n.list[i],b=n.list[j];
+    return toast(`Nicht gespeichert: Lernen ${a.start}–${a.end} überschneidet sich mit Lernen ${b.start}–${b.end}.`);
   }
 
-  if(newTarget>cap)return toast(`Die Änderung passt nicht: Tageskapazität ${minsText(cap)}, neues Lernziel wäre ${minsText(newTarget)}.`);
-
-  const pos=rendered.findIndex(x=>x.renderKey===key),o=plannerDayOverride(date);
-  const all=rendered.map(x=>({start:x.start,end:x.end,minutes:Number(x.minutes||0),label:x.source==='bib'?'Lernen (in der Bib)':'Lernen',source:x.source}));
-  const oldEnd=timeToMins(all[pos].end);
-  all[pos].start=from;all[pos].end=to;all[pos].minutes=newMin;
-
-  if(delta){
-    for(let i=pos+1;i<all.length;i++){
-      if(all[i].source==='bib')continue;
-      all[i].start=shiftClock(all[i].start,delta);
-      all[i].end=shiftClock(all[i].end,delta);
+  if(saveDayLearningBlocks(date,n.list)){
+    if(delta){
+      const o=plannerDayOverride(date),oldEnd=timeToMins(chosen.end);
+      o.shiftEvents=o.shiftEvents||[];
+      o.shiftEvents.push({afterMin:oldEnd,delta});
+      save();
+      toast(`Lernblock gespeichert. Spätere flexible Termine wurden um ${delta>=0?'+':''}${delta} Min. verschoben.`);
+    }else{
+      toast('Lernblock gespeichert.');
     }
-    o.shiftEvents=o.shiftEvents||[];
-    o.shiftEvents.push({afterMin:oldEnd,delta});
   }
-  o.learningBlocks=all;
-  setSemesterTargetMins(date,newTarget);
-  save();
-  toast(delta?`Lernblock gespeichert. Spätere flexible Termine wurden um ${delta>=0?'+':''}${delta} Min. verschoben.`:'Lernblock gespeichert.');
 }
 function smartChangeDay(delta){
   const d=parseDate(dayPlanDate);d.setDate(d.getDate()+delta);dayPlanDate=localISO(d);renderDailyPlan();
@@ -1213,7 +1301,11 @@ document.getElementById('smartDayItems').addEventListener('click',e=>{
   if(wake){editWakeFromTag(wake.dataset.dayWakeEdit);return}
   const learn=e.target.closest('[data-day-learning-edit]');
   if(learn){editLearningBlockFromTag(dayPlanDate,learn.dataset.dayLearningEdit);return}
+  const del=e.target.closest('[data-day-learning-delete]');
+  if(del){deleteLearningBlockFromTag(dayPlanDate,del.dataset.dayLearningDelete);return}
 });
+document.getElementById('addLearningBlock').addEventListener('click',()=>addLearningBlockFromTag(dayPlanDate));
+
 
 document.getElementById('smartWeekPrev').onclick=()=>smartChangeWeek(-1);
 document.getElementById('smartWeekNext').onclick=()=>smartChangeWeek(1);
