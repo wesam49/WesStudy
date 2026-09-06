@@ -369,7 +369,7 @@ dialog[open]{position:fixed;inset:0;margin:auto}
 </form></dialog>
 <dialog id="lpDialog"><form method="dialog" class="modal" id="lpForm"><div class="modal-head"><h3 id="lpDialogTitle">Modul bearbeiten</h3><button class="close" value="cancel">✕</button></div><input type="hidden" id="lpId"><div class="form-grid"><div class="field full"><label>Modulname</label><input id="lpName" required></div><div class="field"><label>Leistungspunkte</label><input id="lpCredits" type="number" min="0" step="0.5" required></div><div class="field"><label>Ursprüngliches Semester</label><input id="lpOriginSemester" placeholder="z. B. 3"></div><div class="field"><label>Geplantes Semester</label><select id="lpPlanSemester"><option value="1">1. Semester</option><option value="2">2. Semester</option><option value="3">3. Semester</option><option value="Sommer">Sommer</option><option value="4">4. Semester</option><option value="5">5. Semester</option><option value="6">6. Semester</option><option value="7">7. Semester</option></select></div><div class="field"><label>Status</label><select id="lpStatus"><option value="open">Offen</option><option value="planned">Geplant</option><option value="active">In Bearbeitung</option><option value="exam">Prüfung abgelegt</option><option value="passed">Bestanden</option><option value="failed">Nicht bestanden / Wiederholung</option><option value="postponed">Verschoben</option></select></div><div class="field"><label>Prüfungsdatum (optional)</label><input id="lpExamDate" type="date"></div><div class="field full"><label><input id="lpUseInStudy" type="checkbox"> In den Lernplan übernehmen</label></div></div><div class="timer-controls"><button class="btn primary" value="default">Speichern</button><button class="btn soft" value="cancel">Abbrechen</button><button type="button" class="btn danger hidden" id="lpDelete">Löschen</button></div></form></dialog>
 
-<dialog id="dayPlanDialog"><form method="dialog" class="modal" id="dayPlanForm"><div class="modal-head"><h3 id="dayPlanDialogTitle">Aktivität hinzufügen</h3><button class="close" value="cancel">✕</button></div><input type="hidden" id="dayPlanItemId"><div class="form-grid"><div class="field"><label>Kategorie</label><select id="dayPlanType"><option value="study">📚 Lernen</option><option value="uni">🎓 Uni</option><option value="work">💼 Arbeit / VMT / Bib</option><option value="gym">🏋️ Gym</option><option value="reading">📖 Lesen / Kultur</option><option value="break">☕ Pause</option><option value="other">✨ Termin / Sonstiges</option></select></div><div class="field"><label>Datum</label><input id="dayPlanItemDate" type="date" required></div><div class="field full"><label>Bezeichnung</label><input id="dayPlanTitle" placeholder="z. B. HM3 lernen" required></div><div class="field"><label>Von</label><input id="dayPlanStart" type="time" required></div><div class="field"><label>Bis</label><input id="dayPlanEnd" type="time" required></div><div class="field"><label>Wiederholen</label><select id="dayPlanRepeat"><option value="none">Nicht wiederholen</option><option value="daily">Täglich</option><option value="weekdays">Mo–Fr</option><option value="weekly">Wöchentlich</option><option value="biweekly">Alle 2 Wochen</option></select></div><div class="field"><label>Wiederholen bis</label><input id="dayPlanRepeatUntil" type="date"></div></div><p class="muted" style="margin-top:12px">Lernen wird automatisch mit der Semesterplanung synchronisiert. Andere Aktivitäten bleiben reine Planung und werden nicht automatisch verschoben.</p><div class="timer-controls"><button class="btn primary" value="default">Speichern</button><button class="btn soft" value="cancel">Abbrechen</button><button type="button" class="btn danger hidden" id="deleteDayPlanItem">Löschen</button></div></form></dialog>
+<dialog id="dayPlanDialog"><form method="dialog" class="modal" id="dayPlanForm"><div class="modal-head"><h3 id="dayPlanDialogTitle">Aktivität hinzufügen</h3><button class="close" value="cancel">✕</button></div><input type="hidden" id="dayPlanItemId"><div class="form-grid"><div class="field"><label>Kategorie</label><select id="dayPlanType"><option value="study">📚 Lernen</option><option value="uni">🎓 Uni</option><option value="work">💼 Arbeit / VMT / Bib</option><option value="gym">🏋️ Gym</option><option value="reading">📖 Lesen / Kultur</option><option value="break">☕ Pause</option><option value="other">✨ Termin / Sonstiges</option></select></div><div class="field"><label>Datum</label><input id="dayPlanItemDate" type="date" required></div><div class="field full"><label>Bezeichnung</label><input id="dayPlanTitle" placeholder="z. B. HM3 lernen" required></div><div class="field"><label>Von</label><input id="dayPlanStart" type="time" required></div><div class="field"><label>Bis</label><input id="dayPlanEnd" type="time" required></div><div class="field"><label>Wiederholen</label><select id="dayPlanRepeat"><option value="none">Nicht wiederholen</option><option value="daily">Täglich</option><option value="weekdays">Mo–Fr</option><option value="weekly">Wöchentlich</option><option value="biweekly">Alle 2 Wochen</option></select></div><div class="field"><label>Wiederholen bis</label><input id="dayPlanRepeatUntil" type="date"></div></div><p class="muted" style="margin-top:12px">Lernblöcke planen nur die Uhrzeit. Das Lernziel änderst du separat über „Lernziel“ oder die Semesterplanung.</p><div class="timer-controls"><button class="btn primary" value="default">Speichern</button><button class="btn soft" value="cancel">Abbrechen</button><button type="button" class="btn danger hidden" id="deleteDayPlanItem">Löschen</button></div></form></dialog>
 
 <dialog id="settingsDialog"><form method="dialog" class="modal"><div class="modal-head"><h3>Einstellungen und Daten</h3><button class="close" value="cancel">✕</button></div>
 <div class="cloud-card"><div class="cloud-head"><div><strong>☁️ Konto & Cloud-Sync</strong><div class="muted" id="cloudStatus">Firebase wird geprüft…</div></div><span class="status warn" id="cloudBadge">Lokal</span></div><div id="cloudSignedOut"><div class="timer-controls" style="margin:12px 0 0"><button type="button" class="btn primary" id="cloudGoogleBtn">🔐 Mit Google anmelden</button></div><p class="muted" style="margin:10px 0 0">Deine Lernpläne und Sitzungen werden nach der Anmeldung automatisch mit deinem Google-Konto synchronisiert.</p></div><div id="cloudSignedIn" class="hidden"><div class="metrics" style="margin-top:12px"><span class="pill" id="cloudUserLabel">—</span><span class="pill" id="cloudSyncLabel">Noch nicht synchronisiert</span></div><div id="cloudDataSummary" class="muted" style="margin-top:10px;font-weight:700">Cloud-Inhalt wird geprüft…</div><div class="timer-controls" style="margin:12px 0 0"><button type="button" class="btn soft" id="cloudUploadBtn">⬆️ Dieses Gerät in Cloud</button><button type="button" class="btn soft" id="cloudDownloadBtn">⬇️ Cloud auf dieses Gerät</button><button type="button" class="btn danger" id="cloudLogoutBtn">Abmelden</button></div></div><p class="muted" id="cloudSetupHint" style="margin:10px 0 0"></p></div>
@@ -380,7 +380,7 @@ dialog[open]{position:fixed;inset:0;margin:auto}
 (()=>{
 'use strict';
 const KEY='wesstudy_v1';
-const defaultState={version:5.03,theme:'light',lang:'de',dashboardMode:'auto',semester:{name:'',start:'',end:'',hoursPerCredit:17},subjects:[],sessions:[],holiday:null,dailyPlan:{items:[],templates:[]},timerSettings:{sound:true,vibrate:true,notifications:false,autoNext:true},studyProgress:null,meta:{updatedAt:0}};
+const defaultState={version:5.04,theme:'light',lang:'de',dashboardMode:'auto',semester:{name:'',start:'',end:'',hoursPerCredit:17},subjects:[],sessions:[],holiday:null,dailyPlan:{items:[],templates:[]},timerSettings:{sound:true,vibrate:true,notifications:false,autoNext:true},studyProgress:null,meta:{updatedAt:0}};
 let state=load(); let timer={running:false,paused:false,mode:'focus',round:1,totalRounds:4,focusSec:1500,breakSec:300,remaining:1500,startedAt:null,accumulatedFocus:0,interval:null,open:false};
 let calDate=new Date(); let holidayDraft={days:{}}; let deferredPrompt=null;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
@@ -562,7 +562,11 @@ $('#dayPlanForm').addEventListener('submit',e=>{
     repeatDates(date,mode,until).forEach(d=>{plan.items.push({id:uid(),groupId:group,date:d,type,title,start,end,done:false,repeatMode:mode,repeatUntil:until});affected.add(d)});
   }
   affected.forEach(syncManualLearningToSemester);
-  dayPlanDate=date;save();$('#dayPlanDialog').close();toast(id?'Aktivität aktualisiert':'Aktivität geplant');
+  dayPlanDate=date;
+  $('#dayPlanDialog').close();
+  persistLocal(true);
+  renderAll();
+  toast(id?'Aktivität aktualisiert':'Aktivität geplant');
 });
 $('#deleteDayPlanItem').onclick=()=>{
   const id=$('#dayPlanItemId').value;if(!id)return;
@@ -575,7 +579,10 @@ $('#deleteDayPlanItem').onclick=()=>{
   if(deleteSeries){sameGroup.forEach(i=>affected.add(i.date));plan.items=plan.items.filter(i=>i.groupId!==x.groupId)}
   else{affected.add(x.date);plan.items=plan.items.filter(i=>i.id!==id)}
   affected.forEach(syncManualLearningToSemester);
-  save();$('#dayPlanDialog').close();toast(deleteSeries?'Serie gelöscht':'Aktivität gelöscht');
+  $('#dayPlanDialog').close();
+  persistLocal(true);
+  renderAll();
+  toast(deleteSeries?'Serie gelöscht':'Aktivität gelöscht');
 };
 $('#copyYesterdayPlan').onclick=()=>{const d=parseDate(dayPlanDate);d.setDate(d.getDate()-1);const src=dayPlanItems(localISO(d));if(!src.length)return toast('Gestern gibt es keinen Tagesplan.');const plan=dailyPlanState();src.forEach(x=>plan.items.push({...x,id:uid(),groupId:uid(),date:dayPlanDate,done:false}));save();toast('Plan von gestern kopiert')};
 $('#saveDayTemplate').onclick=()=>{const items=dayPlanItems();if(!items.length)return toast('Dieser Tag ist leer.');const name=prompt('Name der Vorlage, z. B. Uni-Tag');if(!name?.trim())return;dailyPlanState().templates.push({id:uid(),name:name.trim(),items:items.map(({type,title,start,end})=>({type,title,start,end}))});save();toast('Vorlage gespeichert')};
@@ -942,19 +949,9 @@ function manualLearningMinutesForDate(date){
   return dayPlanItems(date).filter(x=>x.type==='study').reduce((sum,x)=>sum+dayPlanDuration(x),0);
 }
 function syncManualLearningToSemester(date){
-  const manual=manualPlannerItemsForDate(date).filter(x=>x.type==='learning');
-  const custom=plannerState().dayOverrides?.[date]?.learningBlocks;
-  const autoCustom=Array.isArray(custom)?custom:[];
-  const all=[
-    ...manual.map(x=>({start:x.start,end:x.end,source:x.source||'outside'})),
-    ...autoCustom
-  ];
-  const n=normalizeLearningBlocks(all);
-  if(n.conflicts.length){
-    const [i,j]=n.conflicts[0],a=n.list[i],b=n.list[j];
-    toast(`Lernkonflikt: ${a.start}–${a.end} überschneidet sich mit ${b.start}–${b.end}.`);
-    return false;
-  }
+  // Lernblöcke verändern das Lernziel nicht.
+  // Diese Funktion bleibt nur als Kompatibilitäts-Hook bestehen.
+  // Überschneidungen werden im Tagesplan separat angezeigt.
   return true;
 }
 function manualLearningConflict(date){
