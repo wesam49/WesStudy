@@ -380,7 +380,7 @@ dialog[open]{position:fixed;inset:0;margin:auto}
 (()=>{
 'use strict';
 const KEY='wesstudy_v1';
-const defaultState={version:5.02,theme:'light',lang:'de',dashboardMode:'auto',semester:{name:'',start:'',end:'',hoursPerCredit:17},subjects:[],sessions:[],holiday:null,dailyPlan:{items:[],templates:[]},timerSettings:{sound:true,vibrate:true,notifications:false,autoNext:true},studyProgress:null,meta:{updatedAt:0}};
+const defaultState={version:5.03,theme:'light',lang:'de',dashboardMode:'auto',semester:{name:'',start:'',end:'',hoursPerCredit:17},subjects:[],sessions:[],holiday:null,dailyPlan:{items:[],templates:[]},timerSettings:{sound:true,vibrate:true,notifications:false,autoNext:true},studyProgress:null,meta:{updatedAt:0}};
 let state=load(); let timer={running:false,paused:false,mode:'focus',round:1,totalRounds:4,focusSec:1500,breakSec:300,remaining:1500,startedAt:null,accumulatedFocus:0,interval:null,open:false};
 let calDate=new Date(); let holidayDraft={days:{}}; let deferredPrompt=null;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
@@ -942,12 +942,20 @@ function manualLearningMinutesForDate(date){
   return dayPlanItems(date).filter(x=>x.type==='study').reduce((sum,x)=>sum+dayPlanDuration(x),0);
 }
 function syncManualLearningToSemester(date){
-  if(!date)return;
-  state.semesterPlan=state.semesterPlan||{days:{}};
-  state.semesterPlan.days=state.semesterPlan.days||{};
-  const mins=manualLearningMinutesForDate(date);
-  if(mins>0)state.semesterPlan.days[date]=mins/60;
-  else delete state.semesterPlan.days[date];
+  const manual=manualPlannerItemsForDate(date).filter(x=>x.type==='learning');
+  const custom=plannerState().dayOverrides?.[date]?.learningBlocks;
+  const autoCustom=Array.isArray(custom)?custom:[];
+  const all=[
+    ...manual.map(x=>({start:x.start,end:x.end,source:x.source||'outside'})),
+    ...autoCustom
+  ];
+  const n=normalizeLearningBlocks(all);
+  if(n.conflicts.length){
+    const [i,j]=n.conflicts[0],a=n.list[i],b=n.list[j];
+    toast(`Lernkonflikt: ${a.start}–${a.end} überschneidet sich mit ${b.start}–${b.end}.`);
+    return false;
+  }
+  return true;
 }
 function manualLearningConflict(date){
   const arr=dayPlanItems(date).filter(x=>x.type==='study'&&x.start&&x.end).sort((a,b)=>a.start.localeCompare(b.start));
@@ -1246,6 +1254,13 @@ function normalizeLearningBlocks(blocks){
 function learningBlocksTotal(blocks){
   return (blocks||[]).reduce((sum,b)=>sum+Math.max(0,timeToMins(b.end)-timeToMins(b.start)),0);
 }
+function learningPlanStatusHtml(target,planned){
+  const diff=target-planned;
+  if(diff>0)return `<b>Soll heute: ${minsText(target)}</b> · Als Lernen eingeplant: <b>${minsText(planned)}</b> · Noch nicht eingeplant: <b>${minsText(diff)}</b>`;
+  if(diff<0)return `<b>Soll heute: ${minsText(target)}</b> · Als Lernen eingeplant: <b>${minsText(planned)}</b> · <b>+${minsText(-diff)} über dem Lernziel</b>`;
+  return `<b>Soll heute: ${minsText(target)}</b> · Als Lernen eingeplant: <b>${minsText(planned)}</b> · vollständig eingeplant ✅`;
+}
+
 function saveDayLearningBlocks(date,blocks){
   const n=normalizeLearningBlocks(blocks);
   if(n.conflicts.length){
@@ -1255,7 +1270,7 @@ function saveDayLearningBlocks(date,blocks){
   }
   const o=plannerDayOverride(date);
   o.learningBlocks=n.list;
-  setSemesterTargetMins(date,learningBlocksTotal(n.list));
+  // Lernblöcke planen nur die Uhrzeit. Das Lernziel/Soll bleibt unabhängig.
   save();
   return true;
 }
