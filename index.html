@@ -111,6 +111,42 @@ dialog[open]{position:fixed;inset:0;margin:auto}
 .week-day-card .wd-target{font-weight:900;color:var(--accent);margin-bottom:7px}
 .week-mini{font-size:.74rem;color:var(--muted);padding:4px 0;border-top:1px solid var(--line)}
 .week-mini:first-of-type{border-top:0}
+/* v5.1 week grid */
+.week-board{display:grid;gap:14px}
+.week-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.week-metric{background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:14px}
+.week-metric .eyebrow{margin-bottom:6px}
+.week-metric strong{font-size:1.75rem;display:block}
+.week-summary-bar{padding:12px 14px;border:1px solid #bfe8d3;background:#eefaf2;border-radius:14px;color:#166b45;font-weight:800}
+.week-grid-shell{border:1px solid var(--line);border-radius:18px;overflow:hidden;background:var(--panel)}
+.week-grid{display:grid;grid-template-columns:76px repeat(7,minmax(0,1fr));align-items:stretch}
+.week-grid .wg-head-left{padding:12px 10px;background:var(--panel2);border-bottom:1px solid var(--line);font-weight:900}
+.week-grid .wg-head{background:var(--panel2);border-left:1px solid var(--line);border-bottom:1px solid var(--line);padding:8px 8px 10px;min-width:0}
+.week-grid .wg-day-name{font-weight:900;text-align:center;line-height:1.25}
+.week-grid .wg-summary{margin-top:8px;border-radius:12px;padding:8px 10px;font-size:.8rem;line-height:1.3;text-align:center;font-weight:700;background:#f2f4fb;color:var(--text)}
+.week-grid .wg-summary.good{background:#e8f7ee;color:#186443}
+.week-grid .wg-summary.warn{background:#fff0e6;color:#8b4d1f}
+.week-grid .wg-time-col{position:relative;height:1008px;background:var(--panel)}
+.week-grid .wg-time-label{position:absolute;left:10px;transform:translateY(-50%);font-weight:800;color:var(--muted);font-variant-numeric:tabular-nums}
+.week-grid .wg-day-col{position:relative;height:1008px;border-left:1px solid var(--line);background:repeating-linear-gradient(to bottom,var(--panel) 0,var(--panel) 55px,var(--line) 56px)}
+.week-grid .wg-day-col::before{content:'';position:absolute;inset:0;background:linear-gradient(to right,transparent calc(100% - 1px),rgba(0,0,0,.03) 0)}
+.week-block{position:absolute;left:6px;right:6px;border-radius:14px;padding:8px 10px;border:1px solid transparent;box-shadow:0 2px 6px rgba(20,24,40,.05);overflow:hidden}
+.week-block .wb-time{font-size:.76rem;font-weight:800;opacity:.8;margin-bottom:2px}
+.week-block .wb-title{font-weight:900;line-height:1.2}
+.week-block .wb-sub{font-size:.72rem;opacity:.78;margin-top:2px}
+.week-block.uni{background:#dff5e5;border-color:#9edab0}
+.week-block.study{background:#dce9ff;border-color:#94b8ff}
+.week-block.makeup{background:#ffe9d8;border-color:#f0b274}
+.week-block.gym{background:#ece2ff;border-color:#bca0ff}
+.week-block.work{background:#eceff4;border-color:#cfd5e3}
+.week-block.reading{background:#fff3cb;border-color:#e3cd72}
+.week-block.other,.week-block.break{background:#f4f4f8;border-color:#d8d8e8}
+.week-legend{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;padding:10px 6px 2px;color:var(--muted);font-size:.86rem}
+.week-legend .lg{display:inline-flex;align-items:center;gap:8px}
+.week-legend i{display:inline-block;width:16px;height:12px;border-radius:6px;border:1px solid transparent}
+.week-legend .u i{background:#dff5e5;border-color:#9edab0}.week-legend .s i{background:#dce9ff;border-color:#94b8ff}.week-legend .m i{background:#ffe9d8;border-color:#f0b274}.week-legend .g i{background:#ece2ff;border-color:#bca0ff}
+@media(max-width:1200px){.week-grid-shell{overflow:auto}.week-grid{min-width:1100px}.week-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:640px){.week-metrics{grid-template-columns:1fr 1fr}}
 .planner-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:12px 0}
 .planner-stat{background:var(--panel2);border-radius:14px;padding:11px}
 .planner-stat strong{display:block;font-size:1.15rem;margin-top:4px}
@@ -413,7 +449,7 @@ dialog[open]{position:fixed;inset:0;margin:auto}
 </form></dialog>
 <dialog id="lpDialog"><form method="dialog" class="modal" id="lpForm"><div class="modal-head"><h3 id="lpDialogTitle">Modul bearbeiten</h3><button class="close" value="cancel">✕</button></div><input type="hidden" id="lpId"><div class="form-grid"><div class="field full"><label>Modulname</label><input id="lpName" required></div><div class="field"><label>Leistungspunkte</label><input id="lpCredits" type="number" min="0" step="0.5" required></div><div class="field"><label>Ursprüngliches Semester</label><input id="lpOriginSemester" placeholder="z. B. 3"></div><div class="field"><label>Geplantes Semester</label><select id="lpPlanSemester"><option value="1">1. Semester</option><option value="2">2. Semester</option><option value="3">3. Semester</option><option value="Sommer">Sommer</option><option value="4">4. Semester</option><option value="5">5. Semester</option><option value="6">6. Semester</option><option value="7">7. Semester</option></select></div><div class="field"><label>Status</label><select id="lpStatus"><option value="open">Offen</option><option value="planned">Geplant</option><option value="active">In Bearbeitung</option><option value="exam">Prüfung abgelegt</option><option value="passed">Bestanden</option><option value="failed">Nicht bestanden / Wiederholung</option><option value="postponed">Verschoben</option></select></div><div class="field"><label>Prüfungsdatum (optional)</label><input id="lpExamDate" type="date"></div><div class="field full"><label><input id="lpUseInStudy" type="checkbox"> In den Lernplan übernehmen</label></div></div><div class="timer-controls"><button class="btn primary" value="default">Speichern</button><button class="btn soft" value="cancel">Abbrechen</button><button type="button" class="btn danger hidden" id="lpDelete">Löschen</button></div></form></dialog>
 
-<dialog id="dayPlanDialog"><form method="dialog" class="modal" id="dayPlanForm"><div class="modal-head"><h3 id="dayPlanDialogTitle">Aktivität hinzufügen</h3><button class="close" value="cancel">✕</button></div><input type="hidden" id="dayPlanItemId"><div class="form-grid"><div class="field"><label>Kategorie</label><select id="dayPlanType"><option value="study">📚 Lernen</option><option value="uni">🎓 Uni</option><option value="work">💼 Arbeit / VMT / Bib</option><option value="gym">🏋️ Gym</option><option value="reading">📖 Lesen / Kultur</option><option value="break">☕ Pause</option><option value="other">✨ Termin / Sonstiges</option></select></div><div class="field"><label>Datum</label><input id="dayPlanItemDate" type="date" required></div><div class="field full"><label>Bezeichnung</label><input id="dayPlanTitle" placeholder="z. B. HM3 lernen" required></div><div class="field"><label>Von</label><input id="dayPlanStart" type="time" required></div><div class="field"><label>Bis</label><input id="dayPlanEnd" type="time" required></div><div class="field"><label>Wiederholen</label><select id="dayPlanRepeat"><option value="none">Nicht wiederholen</option><option value="daily">Täglich</option><option value="weekdays">Mo–Fr</option><option value="weekly">Wöchentlich</option><option value="biweekly">Alle 2 Wochen</option></select></div><div class="field"><label>Wiederholen bis</label><input id="dayPlanRepeatUntil" type="date"></div></div><p class="muted" style="margin-top:12px">Lernblöcke planen nur die Uhrzeit. Das Lernziel änderst du separat über „Lernziel“ oder die Semesterplanung.</p><div class="timer-controls"><button class="btn primary" value="default">Speichern</button><button class="btn soft" value="cancel">Abbrechen</button><button type="button" class="btn danger hidden" id="deleteDayPlanItem">Löschen</button></div></form></dialog>
+<dialog id="dayPlanDialog"><form method="dialog" class="modal" id="dayPlanForm"><div class="modal-head"><h3 id="dayPlanDialogTitle">Aktivität hinzufügen</h3><button class="close" value="cancel">✕</button></div><input type="hidden" id="dayPlanItemId"><div class="form-grid"><div class="field"><label>Kategorie</label><select id="dayPlanType"><option value="study">📚 Lernen</option><option value="makeup">↩️ Nachholen</option><option value="uni">🎓 Uni</option><option value="work">💼 Arbeit / VMT / Bib</option><option value="gym">🏋️ Gym</option><option value="reading">📖 Lesen / Kultur</option><option value="break">☕ Pause</option><option value="other">✨ Termin / Sonstiges</option></select></div><div class="field"><label>Datum</label><input id="dayPlanItemDate" type="date" required></div><div class="field full"><label>Bezeichnung</label><input id="dayPlanTitle" placeholder="z. B. HM3 lernen" required></div><div class="field"><label>Von</label><input id="dayPlanStart" type="time" required></div><div class="field"><label>Bis</label><input id="dayPlanEnd" type="time" required></div><div class="field"><label>Wiederholen</label><select id="dayPlanRepeat"><option value="none">Nicht wiederholen</option><option value="daily">Täglich</option><option value="weekdays">Mo–Fr</option><option value="weekly">Wöchentlich</option><option value="biweekly">Alle 2 Wochen</option></select></div><div class="field"><label>Wiederholen bis</label><input id="dayPlanRepeatUntil" type="date"></div></div><p class="muted" style="margin-top:12px">Lernblöcke planen nur die Uhrzeit. Das Lernziel änderst du separat über „Lernziel“ oder die Semesterplanung.</p><div class="timer-controls"><button class="btn primary" value="default">Speichern</button><button class="btn soft" value="cancel">Abbrechen</button><button type="button" class="btn danger hidden" id="deleteDayPlanItem">Löschen</button></div></form></dialog>
 
 <dialog id="settingsDialog"><form method="dialog" class="modal"><div class="modal-head"><h3>Einstellungen und Daten</h3><button class="close" value="cancel">✕</button></div>
 <div class="cloud-card"><div class="cloud-head"><div><strong>☁️ Konto & Cloud-Sync</strong><div class="muted" id="cloudStatus">Firebase wird geprüft…</div></div><span class="status warn" id="cloudBadge">Lokal</span></div><div id="cloudSignedOut"><div class="timer-controls" style="margin:12px 0 0"><button type="button" class="btn primary" id="cloudGoogleBtn">🔐 Mit Google anmelden</button></div><p class="muted" style="margin:10px 0 0">Deine Lernpläne und Sitzungen werden nach der Anmeldung automatisch mit deinem Google-Konto synchronisiert.</p></div><div id="cloudSignedIn" class="hidden"><div class="metrics" style="margin-top:12px"><span class="pill" id="cloudUserLabel">—</span><span class="pill" id="cloudSyncLabel">Noch nicht synchronisiert</span></div><div id="cloudDataSummary" class="muted" style="margin-top:10px;font-weight:700">Cloud-Inhalt wird geprüft…</div><div class="timer-controls" style="margin:12px 0 0"><button type="button" class="btn soft" id="cloudUploadBtn">⬆️ Dieses Gerät in Cloud</button><button type="button" class="btn soft" id="cloudDownloadBtn">⬇️ Cloud auf dieses Gerät</button><button type="button" class="btn danger" id="cloudLogoutBtn">Abmelden</button></div></div><p class="muted" id="cloudSetupHint" style="margin:10px 0 0"></p></div>
@@ -554,13 +590,15 @@ function deleteSession(id){if(!confirm('Diese Session löschen?'))return;state.s
 
 /* ===== WesStudy v4.4: Tagesplan ===== */
 let dayPlanDate=todayISO();
-const dayPlanTypes={study:['📚','Lernen'],gym:['🏋️','Gym'],reading:['📖','Lesen'],uni:['🎓','Uni'],work:['💼','Arbeit'],break:['☕','Pause'],other:['✨','Sonstiges']};
+const dayPlanTypes={study:['📚','Lernen'],makeup:['↩️','Nachholen'],gym:['🏋️','Gym'],reading:['📖','Lesen'],uni:['🎓','Uni'],work:['💼','Arbeit'],break:['☕','Pause'],other:['✨','Sonstiges']};
+function itemCountsAsLearning(x){return ['study','makeup'].includes(x?.type)}
+function plannedLearningMinutesForDate(date){return dayPlanItems(date).filter(itemCountsAsLearning).reduce((sum,x)=>sum+dayPlanDuration(x),0)}
 function dailyPlanState(){if(!state.dailyPlan)state.dailyPlan={items:[],templates:[]};if(!Array.isArray(state.dailyPlan.items))state.dailyPlan.items=[];if(!Array.isArray(state.dailyPlan.templates))state.dailyPlan.templates=[];return state.dailyPlan}
 function timeToMins(v){if(!v||!v.includes(':'))return 0;const [h,m]=v.split(':').map(Number);return h*60+m}
 function dayPlanDuration(x){return Math.max(0,timeToMins(x.end)-timeToMins(x.start))}
 function dayPlanItems(date=dayPlanDate){return dailyPlanState().items.filter(x=>x.date===date).sort((a,b)=>(a.start||'99:99').localeCompare(b.start||'99:99'))}
 function studyPlanForDate(date){if(state.holiday&&overlapDate(date,state.holiday.start,state.holiday.end))return Number(state.holiday.days?.[date]||0)*60;return Number(state.semesterPlan?.days?.[date]||0)*60}
-function renderDailyPlan(){const wrap=$('#dayPlanTimeline');if(!wrap)return;const d=parseDate(dayPlanDate),items=dayPlanItems(),total=items.reduce((a,x)=>a+dayPlanDuration(x),0),done=items.filter(x=>x.done).reduce((a,x)=>a+dayPlanDuration(x),0),study=items.filter(x=>x.type==='study').reduce((a,x)=>a+dayPlanDuration(x),0),target=studyPlanForDate(dayPlanDate);$('#dayPlanDateLabel').textContent=(dayPlanDate===todayISO()?'Heute · ':'')+new Intl.DateTimeFormat('de-DE',{weekday:'short',day:'2-digit',month:'2-digit',year:'numeric'}).format(d);$('#dayPlanTotal').textContent=minsText(total);$('#dayPlanDone').textContent=minsText(done);$('#dayPlanCount').textContent=items.length;$('#dayPlanStudy').textContent=minsText(study);const st=$('#dayPlanLearningStatus');if(target){const diff=target-study;st.classList.toggle('good',diff<=0);st.innerHTML=`<strong>📚 Lernziel laut ${state.holiday&&overlapDate(dayPlanDate,state.holiday.start,state.holiday.end)?'Ferienplan':'Semesterplanung'}: ${minsText(target)}</strong><div class="muted" style="margin-top:5px">Im Tagesplan eingeplant: ${minsText(study)} · ${diff>0?`Noch ${minsText(diff)} einplanen`:'Lernziel vollständig eingeplant ✅'}</div>`}else{st.classList.remove('good');st.innerHTML=`<strong>📚 Für diesen Tag ist kein Lernziel im Ferien-/Semesterplan eingetragen.</strong><div class="muted" style="margin-top:5px">Du kannst trotzdem Lernblöcke frei in deinen Tagesplan setzen.</div>`}wrap.innerHTML=items.length?items.map(x=>{const [icon,label]=dayPlanTypes[x.type]||dayPlanTypes.other;return `<div class="dayplan-item ${x.done?'done':''}"><div class="dayplan-time">${esc(x.start)}<div class="muted" style="font-size:.72rem">bis ${esc(x.end)}</div></div><div><div class="dayplan-title">${icon} ${esc(x.title)}</div><div class="dayplan-sub">${label} · ${minsText(dayPlanDuration(x))}${x.repeatMode==='biweekly'?' · alle 2 Wochen':x.repeatMode==='weekly'?' · wöchentlich':x.repeatMode==='daily'?' · täglich':x.repeatMode==='weekdays'?' · Mo–Fr':''}</div></div><div class="dayplan-actions"><input class="dayplan-check" type="checkbox" data-dayplan-done="${x.id}" ${x.done?'checked':''} aria-label="Erledigt"><button class="mini-btn" data-dayplan-edit="${x.id}">✏️</button></div></div>`}).join(''):`<div class="card empty"><div class="emoji">🗓️</div><h3>Noch nichts geplant</h3><p>Füge Lernen, Gym, Lesen, Uni, Arbeit oder andere Aktivitäten hinzu.</p><button class="btn primary" id="dayPlanEmptyAdd">+ Erste Aktivität</button></div>`;renderDayTemplates()}
+function renderDailyPlan(){const wrap=$('#dayPlanTimeline');if(!wrap)return;const d=parseDate(dayPlanDate),items=dayPlanItems(),total=items.reduce((a,x)=>a+dayPlanDuration(x),0),done=items.filter(x=>x.done).reduce((a,x)=>a+dayPlanDuration(x),0),study=items.filter(itemCountsAsLearning).reduce((a,x)=>a+dayPlanDuration(x),0),target=studyPlanForDate(dayPlanDate);$('#dayPlanDateLabel').textContent=(dayPlanDate===todayISO()?'Heute · ':'')+new Intl.DateTimeFormat('de-DE',{weekday:'short',day:'2-digit',month:'2-digit',year:'numeric'}).format(d);$('#dayPlanTotal').textContent=minsText(total);$('#dayPlanDone').textContent=minsText(done);$('#dayPlanCount').textContent=items.length;$('#dayPlanStudy').textContent=minsText(study);const st=$('#dayPlanLearningStatus');if(target){const diff=target-study;st.classList.toggle('good',diff<=0);st.innerHTML=`<strong>📚 Lernziel laut ${state.holiday&&overlapDate(dayPlanDate,state.holiday.start,state.holiday.end)?'Ferienplan':'Semesterplanung'}: ${minsText(target)}</strong><div class="muted" style="margin-top:5px">Im Tagesplan eingeplant: ${minsText(study)} · ${diff>0?`Noch ${minsText(diff)} einplanen`:'Lernziel vollständig eingeplant ✅'}</div>`}else{st.classList.remove('good');st.innerHTML=`<strong>📚 Für diesen Tag ist kein Lernziel im Ferien-/Semesterplan eingetragen.</strong><div class="muted" style="margin-top:5px">Du kannst trotzdem Lernblöcke frei in deinen Tagesplan setzen.</div>`}wrap.innerHTML=items.length?items.map(x=>{const [icon,label]=dayPlanTypes[x.type]||dayPlanTypes.other;return `<div class="dayplan-item ${x.done?'done':''}"><div class="dayplan-time">${esc(x.start)}<div class="muted" style="font-size:.72rem">bis ${esc(x.end)}</div></div><div><div class="dayplan-title">${icon} ${esc(x.title)}</div><div class="dayplan-sub">${label} · ${minsText(dayPlanDuration(x))}${x.repeatMode==='biweekly'?' · alle 2 Wochen':x.repeatMode==='weekly'?' · wöchentlich':x.repeatMode==='daily'?' · täglich':x.repeatMode==='weekdays'?' · Mo–Fr':''}</div></div><div class="dayplan-actions"><input class="dayplan-check" type="checkbox" data-dayplan-done="${x.id}" ${x.done?'checked':''} aria-label="Erledigt"><button class="mini-btn" data-dayplan-edit="${x.id}">✏️</button></div></div>`}).join(''):`<div class="card empty"><div class="emoji">🗓️</div><h3>Noch nichts geplant</h3><p>Füge Lernen, Gym, Lesen, Uni, Arbeit oder andere Aktivitäten hinzu.</p><button class="btn primary" id="dayPlanEmptyAdd">+ Erste Aktivität</button></div>`;renderDayTemplates()}
 function changeDayPlanDate(delta){const d=parseDate(dayPlanDate);d.setDate(d.getDate()+delta);dayPlanDate=localISO(d);renderDailyPlan()}
 function openDayPlanItem(id=''){
   const plan=dailyPlanState(),x=id?plan.items.find(i=>i.id===id):null;
@@ -856,6 +894,62 @@ function addMinsTime(t,mins){
   return `${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`;
 }
 function subMinsTime(t,mins){return addMinsTime(t,-Number(mins||0))}
+function isWeekBPattern(date){
+  const ws=plannerWeekStart(date);
+  const anchor='2026-10-05';
+  if(ws<anchor) return false;
+  return ((parseDate(ws)-parseDate(anchor))/86400000)%14===0;
+}
+function pushAutoDayItem(plan,date,type,title,start,end,extra={}){
+  plan.items.push({id:uid(),groupId:uid(),date,type,title,start,end,done:false,autoSemester:true,...extra});
+}
+function generateAutoSemesterAttendance(force=false){
+  const plan=dailyPlanState();
+  const REV='2026-09-hka-auto-semester-v1';
+  if(plan.autoScheduleRevision===REV && !force) return false;
+  plan.items=plan.items.filter(x=>!x.autoSemester);
+  const start=state.semester?.start||'2026-09-28';
+  const end=state.semester?.end||'2027-01-29';
+  if(!start||!end) return false;
+  let d=parseDate(start),last=parseDate(end);
+  while(d<=last){
+    const iso=localISO(d);
+    if(!isLectureFree(iso)){
+      const wd=d.getDay();
+      const weekB=isWeekBPattern(iso);
+      if(wd===1){
+        pushAutoDayItem(plan,iso,'uni','TM Kinematik','08:00','09:30');
+        if(weekB) pushAutoDayItem(plan,iso,'uni','Mikrocomputertechnik LAB','09:50','13:00');
+        else pushAutoDayItem(plan,iso,'uni','Robotik / Mathem. Grundlagen','09:50','11:20');
+        pushAutoDayItem(plan,iso,'uni','Bionik','14:00','15:30');
+      } else if(wd===2){
+        pushAutoDayItem(plan,iso,'uni','HM3','09:50','11:20');
+        pushAutoDayItem(plan,iso,'uni','Fertigungstechnik','14:00','15:30');
+      } else if(wd===3){
+        if(weekB){
+          pushAutoDayItem(plan,iso,'uni','Regelungstechnik LAB','08:00','11:20');
+          pushAutoDayItem(plan,iso,'uni','Regelungstechnik','14:00','15:30');
+          pushAutoDayItem(plan,iso,'uni','Regelungstechnik','15:40','17:10');
+        } else {
+          pushAutoDayItem(plan,iso,'uni','TM Kinematik','08:00','09:30');
+          pushAutoDayItem(plan,iso,'uni','Microcomputer','09:50','11:20');
+          pushAutoDayItem(plan,iso,'uni','Numerische Programmierung Labor','14:00','17:10');
+        }
+      } else if(wd===4){
+        pushAutoDayItem(plan,iso,'uni','TM Kinematik','08:00','09:30');
+        pushAutoDayItem(plan,iso,'uni',weekB?'HM3':'Regelungstechnik','09:50','11:20');
+        pushAutoDayItem(plan,iso,'uni','Rapid Technologies','11:30','13:00');
+      } else if(wd===5){
+        pushAutoDayItem(plan,iso,'uni','Fertigungstechnik','14:00','15:30');
+      }
+    }
+    d=new Date(d.getTime()+86400000);
+  }
+  plan.autoScheduleRevision=REV;
+  save();
+  return true;
+}
+
 function plannerWeekStart(date){
   const d=parseDate(date),shift=(d.getDay()+6)%7;d.setDate(d.getDate()-shift);return localISO(d);
 }
@@ -1025,7 +1119,7 @@ function bibUsableStudy(date,target=flexibleStudyTargetForDate(date)){
   return bib?Math.min(target,Number(bib.studyMin||0)):0;
 }
 function manualLearningMinutesForDate(date){
-  return dayPlanItems(date).filter(x=>x.type==='study').reduce((sum,x)=>sum+dayPlanDuration(x),0);
+  return dayPlanItems(date).filter(itemCountsAsLearning).reduce((sum,x)=>sum+dayPlanDuration(x),0);
 }
 function syncManualLearningToSemester(date){
   // Lernblöcke verändern das Lernziel nicht.
@@ -1034,7 +1128,7 @@ function syncManualLearningToSemester(date){
   return true;
 }
 function manualLearningConflict(date){
-  const arr=dayPlanItems(date).filter(x=>x.type==='study'&&x.start&&x.end).sort((a,b)=>a.start.localeCompare(b.start));
+  const arr=dayPlanItems(date).filter(x=>itemCountsAsLearning(x)&&x.start&&x.end).sort((a,b)=>a.start.localeCompare(b.start));
   for(let i=0;i<arr.length;i++)for(let j=i+1;j<arr.length;j++){
     if(timeToMins(arr[j].start)>=timeToMins(arr[i].end))break;
     if(timeToMins(arr[i].start)<timeToMins(arr[j].end)&&timeToMins(arr[i].end)>timeToMins(arr[j].start))return [arr[i],arr[j]];
@@ -1166,8 +1260,7 @@ function renderSmartDayPlanner(){
     msgs.push(`<div class="${notPlanned===0?'planner-good':'planner-alert'}">📘 Lernplanung: Soll ${minsText(target)} · als Lernen eingeplant ${minsText(plannedLearning)} · ${notPlanned===0?'vollständig eingeplant ✅':`${minsText(notPlanned)} noch nicht eingeplant`}</div>`);
     msgs.push(`<div class="${done>=target?'planner-good':'planner-alert'}">✅ Lernverlauf: erledigt ${minsText(done)} · ${done>=target?`${minsText(done-target)} über Soll`:`noch nicht gelernt ${minsText(notLearned)}`}</div>`);
   }
-  const openMakeups=makeupEntries().filter(x=>!x.done).sort((a,b)=>(a.date||'').localeCompare(b.date||''));
-  if(openMakeups.length){msgs.push(`<div class="planner-alert">↩️ Nachholen offen: <strong>${minsText(makeupOpen)}</strong> zusätzlich zum normalen Lernziel.</div><div class="makeup-list">${openMakeups.map(x=>`<div class="makeup-row"><div><strong>${esc(x.title)}</strong><small>${x.type==='semester'?'Semester-Nachholbedarf':fmtDate(x.date)} · ${minsText(x.minutes)}</small></div><div class="makeup-actions"><button class="mini-btn" data-makeup-done="${esc(x.id)}" title="Als nachgeholt markieren">✅</button><button class="mini-btn" data-makeup-delete="${esc(x.id)}" title="Löschen">🗑️</button></div></div>`).join('')}</div>`)}
+  if(makeupOpen>0){msgs.push(`<div class="planner-alert">↩️ Nachholen offen: <strong>${minsText(makeupOpen)}</strong> – im Hintergrund zum Semesterbedarf addiert.</div>`)}
   document.getElementById('smartDayMessages').innerHTML=msgs.join('');
 
   // One chronological timeline: preparation, travel, university, Lernen, Bib,
@@ -1181,7 +1274,7 @@ function renderSmartDayPlanner(){
   });
 
   const renderItem=x=>{
-    if(plannerState().manualMode&&x.type==='study'){x.learning=true;x.minutes=dayPlanDuration(x);}
+    if(plannerState().manualMode&&itemCountsAsLearning(x)){x.learning=true;x.minutes=dayPlanDuration(x);}
     const meta=(x.type==='study'?plannerTypeMeta.studyWindow:plannerTypeMeta[x.type])||plannerTypeMeta.other,comp=plannerCompletion(date,x.key),manual=!x.generated;
     const dur=x.minutes!=null?x.minutes:(x.start&&x.end?dayPlanDuration(x):0);
     let extra='';
@@ -1218,16 +1311,45 @@ function renderSmartDayPlanner(){
   document.getElementById('smartDayItems').innerHTML=
     `<div class="planner-group"><h3>Tagesablauf · chronologisch</h3>${timeline.length?timeline.map(renderItem).join(''):'<div class="muted">Für diesen Tag sind keine Termine geplant.</div>'}</div>`;
 }
+function weekBlockClass(type){return ['uni','study','makeup','gym','work','reading','other','break'].includes(type)?type:'other'}
+function dayHeaderSummaryHtml(target,planned){
+  if(!target)return `<div class="wg-summary">Soll 0:00</div>`;
+  const diff=target-planned;
+  if(diff<=0)return `<div class="wg-summary good">Soll ${minsText(target)} · geplant ${minsText(planned)} ✓</div>`;
+  return `<div class="wg-summary warn">Soll ${minsText(target)} · geplant ${minsText(planned)}<br>offen ${minsText(diff)}</div>`;
+}
 function renderWeekPlanner(){
   if(!document.getElementById('weekOverview'))return;
-  const dates=plannerWeekDates(dayPlanDate),targets=flexibleWeekTargets(dayPlanDate);
-  document.getElementById('weekPlannerLabel').textContent=`${fmtDate(dates[0])} – ${fmtDate(dates[6])}`;
+  const dates=plannerWeekDates(dayPlanDate);
+  const weekStartDate=dates[0],weekEndDate=dates[6];
+  document.getElementById('weekPlannerLabel').textContent=`${fmtDate(weekStartDate)} – ${fmtDate(weekEndDate)}`;
   const weekPicker=document.getElementById('smartWeekDatePicker');if(weekPicker)weekPicker.value=dayPlanDate;
-  document.getElementById('weekOverview').innerHTML=dates.map(date=>{
-    const r=basePlannerRulesForDate(date),target=targets[date]||0,done=sessionsOn(date),wd=new Intl.DateTimeFormat('de-DE',{weekday:'short',day:'2-digit',month:'2-digit'}).format(parseDate(date));
-    const names=r.filter(x=>['uni','lab','bib','vmt','gym','mealprep','culture'].includes(x.type)).slice(0,6);
-    return `<div class="week-day-card ${date===todayISO()?'today':''}" data-week-date="${date}"><div class="wd-title">${wd}</div><div class="wd-target">📘 Lernen ${minsText(target)} Soll</div><div class="week-mini">Im Verlauf: ${minsText(done)}</div>${names.map(x=>`<div class="week-mini">${(plannerTypeMeta[x.type]||['•'])[0]} ${esc(x.name)} ${x.start?x.start:''}</div>`).join('')}<div class="week-mini"><strong>${done>=target&&target?'✅ Soll erreicht':target?minsText(Math.max(0,target-done))+' offen':'—'}</strong></div></div>`
+  const target=dates.reduce((sum,d)=>sum+studyPlanForDate(d),0);
+  const planned=dates.reduce((sum,d)=>sum+plannedLearningMinutesForDate(d),0);
+  const open=Math.max(0,target-planned);
+  const makeupOpen=makeupOpenMins();
+  const timeStart=7*60,timeEnd=25*60,totalMins=timeEnd-timeStart,rowHeight=56,canvasHeight=Math.round(totalMins/60*rowHeight);
+  const labels=[];
+  for(let m=timeStart;m<=timeEnd;m+=60){labels.push({label:minsToClock(m),top:((m-timeStart)/totalMins)*100});}
+  const weekdayFmt=new Intl.DateTimeFormat('de-DE',{weekday:'long'});
+  const shortFmt=new Intl.DateTimeFormat('de-DE',{weekday:'short',day:'2-digit',month:'2-digit'});
+  const metricCard=(title,value)=>`<div class="week-metric"><div class="eyebrow">${title}</div><strong>${value}</strong></div>`;
+  const headHtml=dates.map(date=>{
+    const plannedDay=plannedLearningMinutesForDate(date),targetDay=studyPlanForDate(date);
+    return `<div class="wg-head"><div class="wg-day-name">${esc(weekdayFmt.format(parseDate(date)))}<br>${esc(shortFmt.format(parseDate(date)).split(', ').pop()||fmtDate(date))}</div>${dayHeaderSummaryHtml(targetDay,plannedDay)}</div>`;
   }).join('');
+  const colHtml=dates.map(date=>{
+    const items=dayPlanItems(date).filter(x=>x.start&&x.end).map(x=>{
+      let st=timeToMins(x.start),en=timeToMins(x.end); if(st<timeStart) st+=1440; if(en<=st) en+=1440;
+      const top=((st-timeStart)/totalMins)*100, h=Math.max(2,((en-st)/totalMins)*100);
+      const cls=weekBlockClass(x.type);
+      const sub=(dayPlanTypes[x.type]||dayPlanTypes.other)[1];
+      return `<div class="week-block ${cls}" style="top:${top}%;height:${h}%" title="${esc(x.title)}"><div class="wb-time">${esc(x.start)} – ${esc(x.end)}</div><div class="wb-title">${esc(x.title)}</div><div class="wb-sub">${esc(sub)}</div></div>`;
+    }).join('');
+    return `<div class="wg-day-col" data-week-date="${date}" style="height:${canvasHeight}px">${items}</div>`;
+  }).join('');
+  const timesHtml=labels.map(x=>`<div class="wg-time-label" style="top:${x.top}%">${x.label}</div>`).join('');
+  document.getElementById('weekOverview').innerHTML=`<div class="week-board"><div class="week-metrics">${metricCard('Lernziel',minsText(target))}${metricCard('Geplant',minsText(planned))}${metricCard('Noch offen',minsText(open))}${metricCard('Nachholen offen',minsText(makeupOpen))}</div><div class="week-summary-bar">Wochenplanung: Soll ${minsText(target)} · als Lernen eingeplant ${minsText(planned)} · ${open?`noch offen ${minsText(open)}`:'vollständig eingeplant ✅'}</div><div class="week-grid-shell"><div class="week-grid"><div class="wg-head-left">Uhrzeit</div>${headHtml}<div class="wg-time-col" style="height:${canvasHeight}px">${timesHtml}</div>${colHtml}</div></div><div class="week-legend"><span class="lg u"><i></i> Uni / Pflichttermine</span><span class="lg s"><i></i> Lernen</span><span class="lg m"><i></i> Nachholen</span><span class="lg g"><i></i> Gym</span></div></div>`;
 }
 function renderPlannerRules(){
   const w=plannerState(),g=document.getElementById('plannerGlobalSettings');if(!g)return;
@@ -1915,6 +2037,7 @@ window.WesStudyCloudBridge={
   forceLocalSave:()=>{persistLocal(false);renderAll();},
   toast
 };
+generateAutoSemesterAttendance(false);
 renderAll();
 })();
 </script>
