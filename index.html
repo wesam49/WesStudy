@@ -10,8 +10,8 @@
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="icon-192.png" />
-  <title>WesStudy v5.3.0</title>
-  <meta name="wesstudy-version" content="5.3.0" />
+  <title>WesStudy v5.4.0</title>
+  <meta name="wesstudy-version" content="5.4.0" />
   <style>
     :root{
       --bg:#f4f5fb;--panel:#fff;--panel2:#f8f8fd;--text:#191a25;--muted:#74778b;
@@ -284,6 +284,171 @@ body{background:var(--bg);font-family:Inter,-apple-system,BlinkMacSystemFont,"Se
 }
 @media(max-width:560px){
   .app{padding:12px 12px 94px}.topbar{gap:8px}.actions{gap:5px}.icon-btn{width:40px;height:40px}.grid.cols-4{grid-template-columns:1fr 1fr;gap:9px}.card{padding:14px;border-radius:14px}.big-number{font-size:1.45rem}.eyebrow{font-size:.66rem}.btn{padding:9px 11px;font-size:.82rem}.section-head{gap:8px}.section-head h2{font-size:1.2rem}.semester-date-grid{grid-template-columns:1fr}.nav button{font-size:.54rem}.nav-svg svg{width:17px;height:17px}
+}
+
+
+
+/* ===== WesStudy v5.4 Design 3 ===== */
+:root{
+  --bg:#f6f4ef;
+  --panel:#ffffff;
+  --panel2:#fbfaf7;
+  --text:#132238;
+  --muted:#677384;
+  --line:#dde4ea;
+  --primary:#11243d;
+  --primary2:#233a59;
+  --good:#2f8f6d;
+  --warn:#c08b37;
+  --bad:#c55b65;
+  --shadow:0 10px 30px rgba(13,33,55,.06);
+  --radius:20px;
+  --radius-sm:14px;
+}
+body{background:linear-gradient(180deg,#f7f5f0 0%,#f2f1ec 100%);color:var(--text)}
+[data-theme="dark"]{
+  --bg:#0f1621;
+  --panel:#131d2b;
+  --panel2:#1a2534;
+  --text:#f4f7fb;
+  --muted:#93a0b3;
+  --line:#263243;
+  --primary:#f4f7fb;
+  --primary2:#d7deea;
+  --good:#58b792;
+  --warn:#d3a251;
+  --bad:#dc7681;
+  --shadow:0 18px 42px rgba(0,0,0,.28);
+}
+.brand h1,.logo{font-family:Georgia,"Times New Roman",serif}
+.brand h1{font-size:2.2rem;letter-spacing:-.03em;font-weight:700;color:var(--primary)}
+.brand p{text-transform:uppercase;letter-spacing:.18em;font-size:.68rem}
+.logo{width:58px;height:58px;border-radius:18px;background:var(--primary);font-size:1rem;letter-spacing:-.03em}
+.topbar{align-items:flex-start;padding-top:6px;margin-bottom:24px}
+.actions{gap:10px}
+.icon-btn,.btn,.mini-btn{border-radius:14px}
+.btn.primary{background:var(--primary);border-color:var(--primary)}
+.btn.primary:hover{background:var(--primary2);border-color:var(--primary2)}
+.btn.soft,.icon-btn,.mini-btn{background:var(--panel)}
+.card{border-radius:20px;padding:20px;background:var(--panel)}
+.section-head h2,.card h2,.card h3{font-size:1.55rem;font-weight:800;letter-spacing:-.03em;color:var(--primary)}
+.eyebrow{letter-spacing:.12em;text-transform:uppercase;font-size:.71rem;color:var(--muted)}
+.big-number{font-size:2rem;letter-spacing:-.03em;color:var(--primary)}
+.install-banner{background:#edf3ef;border-color:#d5e4db;color:#223647}
+.install-banner .btn.primary{background:var(--primary);color:#fff}
+.dashboard-mode{display:inline-flex;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:4px;gap:4px;margin-bottom:18px;box-shadow:var(--shadow)}
+.dashboard-mode button{border:0;background:transparent;border-radius:12px;padding:10px 18px;color:var(--muted);font-weight:800}
+.dashboard-mode button.active{background:var(--primary);color:#fff}
+.dashboard-countdown{display:flex;align-items:center;gap:18px;padding:18px 22px;border:1px solid var(--line);background:var(--panel);border-radius:20px;margin-bottom:18px;box-shadow:var(--shadow)}
+.count-number{font-size:2.4rem;font-weight:800;color:var(--primary);min-width:42px;text-align:center}
+.hero{background:linear-gradient(135deg,#11243d,#1e344f 68%,#264463 100%);border-radius:22px}
+.ring{background:conic-gradient(#ffffff calc(var(--p)*1%),rgba(255,255,255,.18) 0)}
+.ring:before{background:#17304b}
+.status.good,.planner-good{background:#eef8f2;color:#2d7258;border-color:#cfe6d8}
+.status.warn{background:#fff6ea;color:#9a6a28;border-color:#ecd8b7}
+.status.bad,.planner-alert{background:#fff3f4;color:#a64d55;border-color:#efcfd4}
+.subject{padding:18px 18px 16px;border-radius:20px}
+.subject-title .dot{width:14px;height:14px}
+.subject-title strong{font-size:1.05rem;line-height:1.2}
+.subject-head{align-items:flex-start;gap:14px}
+.subject-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px}
+.subject-actions .mini-btn{padding:10px 12px;font-size:.84rem;font-weight:700;border-radius:12px}
+.progress{height:12px;border-radius:999px;background:#e8edf1}
+.progress>i{background:#85b69a}
+.progress.good>i{background:#85b69a}
+.metrics{gap:10px}
+.pill,.planner-chip,.status{background:var(--panel2);border-color:var(--line);color:var(--muted)}
+.pill{padding:9px 12px;font-size:.8rem}
+.makeup-row,.holiday-day-row,.week-metric,.planner-stat,.rule-row,.planner-item{background:var(--panel2)}
+.session-icon,.session-row .session-icon,.subject-actions .mini-btn,.icon-btn{background:var(--panel)}
+.form-grid .field input,.form-grid .field select,.field input,.field select,.field textarea,.smart-date-input{background:var(--panel2);border-radius:14px}
+.modal{background:var(--panel);border:1px solid var(--line);border-radius:24px}
+.close{background:var(--panel2)}
+.plan-tabs{display:flex;gap:8px;border:0;margin-bottom:16px}
+.plan-tabs button{border:1px solid var(--line);background:var(--panel);border-radius:14px;padding:11px 16px;font-weight:800;color:var(--muted)}
+.plan-tabs button.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.week-grid-shell{border-radius:20px;box-shadow:var(--shadow)}
+.week-grid .wg-head-left,.week-grid .wg-head{background:#faf8f3}
+.week-grid .wg-summary{background:#f3f6f8}
+.week-block.uni{background:#e6f2e7;border-color:#c3ddc7}
+.week-block.study{background:#e7f0fa;border-color:#bfd2e8}
+.week-block.makeup{background:#faebdc;border-color:#e7c59c}
+.week-block.gym{background:#eee7f6;border-color:#d1bce9}
+.week-block.work{background:#eef1f4;border-color:#d5dbe2}
+.week-block.reading{background:#fbf1d8;border-color:#e8d197}
+#subjectsList,.subject-list{gap:16px}
+
+/* Desktop navigation like Design 3 */
+@media (min-width: 1100px){
+  .app{max-width:none;width:min(1500px,calc(100vw - 48px));margin:0 auto;padding:28px 32px 40px 286px}
+  .nav{left:28px;right:auto;top:26px;bottom:26px;transform:none;width:224px;border-radius:28px;padding:16px 12px;display:flex;flex-direction:column;gap:6px;justify-content:flex-start;background:linear-gradient(180deg,#10243d 0%,#0f2138 100%);border:0;box-shadow:0 18px 44px rgba(10,22,39,.22)}
+  .nav button{display:flex;align-items:center;gap:12px;text-align:left;padding:12px 14px;font-size:.94rem;color:rgba(255,255,255,.78);border-radius:14px}
+  .nav button .nav-svg{height:auto;margin:0}.nav button .nav-svg svg{width:20px;height:20px;margin:0}
+  .nav button.active{background:rgba(255,255,255,.14);color:#fff}
+  .nav::before{content:'WesStudy';display:block;color:#fff;font-family:Georgia,"Times New Roman",serif;font-size:2rem;font-weight:700;letter-spacing:-.03em;padding:4px 12px 14px}
+  .nav::after{content:'Planen. Lernen. Weiterkommen.';display:block;margin-top:auto;color:rgba(255,255,255,.52);text-transform:uppercase;letter-spacing:.14em;font-size:.64rem;line-height:1.7;padding:12px}
+  .topbar{padding-left:0;padding-right:2px}
+}
+
+/* Desktop card rhythm */
+@media (min-width: 900px){
+  .grid.cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .grid.cols-2{grid-template-columns:1.05fr .95fr}
+  [data-page="subjects"] .grid.cols-4,
+  [data-page="history"] .grid.cols-4,
+  [data-page="progress"] .lp-summary,
+  #dailyStudyCard .grid.cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+
+/* Mobile / tablet cleanup */
+@media (max-width: 1099px){
+  .app{padding:18px 16px 96px;max-width:960px}
+  .topbar{margin-bottom:18px}
+  .brand h1{font-size:1.8rem}
+  .nav{width:min(860px,calc(100% - 20px));bottom:10px;border-radius:22px;grid-template-columns:repeat(6,1fr)}
+}
+@media (max-width: 760px){
+  .app{padding:14px 12px 110px}
+  .topbar{flex-direction:column;align-items:stretch;gap:12px}
+  .brand{justify-content:space-between}
+  .brand h1{font-size:1.65rem}
+  .brand p{font-size:.62rem;letter-spacing:.14em}
+  .actions{justify-content:flex-end}
+  .section-head{flex-direction:column;align-items:flex-start}
+  .section-head .btn,.section-head .study-target-control{width:100%}
+  .dashboard-countdown{padding:16px;gap:14px}
+  .count-number{font-size:2rem}
+  .grid.cols-4,.grid.cols-3,.grid.cols-2,.holiday-summary,.planner-summary,#dailyStudyCard .grid.cols-4{grid-template-columns:1fr 1fr !important}
+  .card{padding:16px}
+  .hero-row{flex-direction:column;align-items:flex-start}
+  .ring{width:94px;height:94px}.ring:before{width:72px;height:72px}
+  .big-number{font-size:1.7rem}
+  .week-grid-shell{margin-inline:-4px}
+  .subject{padding:16px}
+  .subject-head{display:grid;grid-template-columns:1fr;gap:12px}
+  .subject-actions{justify-content:stretch;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%}
+  .subject-actions .mini-btn{width:100%;padding:10px 8px;font-size:.78rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .pill{white-space:normal;line-height:1.35;min-height:100%;display:flex;align-items:center}
+  .planner-item{grid-template-columns:54px 1fr;align-items:flex-start}
+  .planner-actions{grid-column:2/3;justify-content:flex-start;flex-wrap:wrap;margin-top:6px}
+  .week-metrics{grid-template-columns:1fr 1fr}
+  .semester-date-grid{grid-template-columns:1fr}
+  .plan-tabs{overflow:auto;padding-bottom:2px;scrollbar-width:none}
+  .plan-tabs::-webkit-scrollbar{display:none}
+  .plan-tabs button{white-space:nowrap}
+}
+@media (max-width: 520px){
+  .grid.cols-4,.grid.cols-3,.grid.cols-2,.holiday-summary,.planner-summary,#dailyStudyCard .grid.cols-4{grid-template-columns:1fr !important}
+  .metrics{grid-template-columns:1fr}
+  .subject-title{align-items:flex-start}
+  .subject-title strong{font-size:1.2rem}
+  .subject-actions{grid-template-columns:1fr 1fr}
+  .subject-head .muted{display:block;max-width:100%;overflow-wrap:anywhere}
+  .nav{gap:2px;padding:6px 5px}.nav button{font-size:.65rem;padding:8px 2px}.nav-svg svg{width:19px;height:19px}
+  .logo{width:48px;height:48px;border-radius:15px;font-size:.92rem}
+  .dashboard-mode{width:100%}.dashboard-mode button{flex:1}
+  .dashboard-countdown{flex-direction:row;align-items:center}
 }
 
 </style>

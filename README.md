@@ -1,45 +1,11 @@
-# WesStudy v4.2 – Google Cloud Sync
+WesStudy v5.4.0 – Design 3 Responsive Refresh
 
-Diese Version ist bereits mit dem Firebase-Projekt `wesstudy-1` verbunden.
+Basis: v5.3.0
 
-## Firebase Voraussetzungen
-- Google Sign-In: aktiviert
-- Authorized Domain: `wesam49.github.io`
-- Cloud Firestore: `(default)`
-- Firestore-Regeln: Zugriff nur auf `/users/{uid}/...` für den angemeldeten Benutzer
-
-## Erstes Anmelden
-1. WesStudy öffnen.
-2. Einstellungen öffnen.
-3. **Mit Google anmelden** drücken.
-4. Beim ersten Login werden vorhandene lokale WesStudy-Daten automatisch in Firestore gespeichert, wenn dort noch keine Cloud-Daten existieren.
-5. Danach werden Änderungen automatisch synchronisiert.
-
-## GitHub Pages
-Alle Dateien aus diesem ZIP in das Root-Verzeichnis des `WesStudy`-Repositories hochladen und vorhandene Dateien ersetzen.
-
-Zum Umgehen alter Browser-Caches:
-`https://wesam49.github.io/WesStudy/?v=4.1`
-
-
-## v4.4 – Tagesplan
-Neue unabhängige Tagesplan-Seite mit Timeline, Kategorien, Wiederholungen, Vorlagen und Tages-Lernziel-Vergleich. Der Tagesplan startet keinen Timer und verändert keine Lernstunden.
-
-## v5.0.6 – Nachholen
-- Separates Nachholkonto zusätzlich zum normalen Lernziel.
-- Nachholzeit kann manuell in Stunden/Minuten hinzugefügt werden.
-- Bei Uni-Terminen kann „Gefehlt → Nachholen“ genutzt werden; die Termindauer wird automatisch übernommen (z. B. 1:30 Std.).
-- Offene Nachholzeit wird im Tagesplan angezeigt und kann als erledigt markiert oder gelöscht werden.
-- Nachholzeit verändert den Semesterbedarf / das normale Lernziel nicht.
-
-## v5.0.7 – Nachholen im Semesterbedarf
-- Nachholen ist jetzt einem Fach zugeordnet.
-- Nachholstunden werden separat getrackt (gesamt / erledigt / offen).
-- Offene Nachholstunden werden zusätzlich zum Semesterplan-Bedarf gerechnet.
-- Der normale Lernumfang-Prozentsatz gilt nur für den CP-Basisbedarf; Nachholen wird vollständig zusätzlich eingeplant.
-- Fächer zeigen eigene Nachholwerte und haben einen ↩️-Button zum Hinzufügen.
-- Verpasste Uni-Termine können weiterhin direkt als Nachholen übernommen werden.
-
-
-## v5.3.0
-Responsive redesign based on Design Option 1: desktop sidebar, mobile bottom navigation, unified premium cards, typography, colors, and emoji-free interface.
+Änderungen:
+- Neues visuelles System im Stil von „Design 3“
+- Ruhigere helle Oberfläche mit dunkelblauen Akzenten
+- Linke Desktop-Seitenleiste statt nur Bottom-Navigation
+- Mobile Karten und Fächerliste responsive überarbeitet
+- Einheitlichere Startseite, Wochenplan-, Fächer- und Semester-Darstellung
+- Bestehende Logik und Datenstruktur beibehalten
