@@ -10,7 +10,7 @@
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="icon-192.png" />
-  <title>WesStudy</title>
+  <title>WesStudy v5.0.6</title>
   <meta name="wesstudy-version" content="4.4" />
   <style>
     :root{
@@ -43,6 +43,7 @@
     .holiday-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.holiday-day-list{display:grid;gap:8px;max-height:250px;overflow:auto;margin-top:12px}.holiday-day-row{display:flex;align-items:center;gap:8px;background:var(--panel2);padding:9px;border-radius:12px}.holiday-day-row input{width:90px;margin-inline-start:auto}
     .session-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}.session-row:last-child{border:0}.session-icon{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:var(--panel2)}.session-info{flex:1}.session-info strong{display:block}.session-info small{color:var(--muted)}
     .toast{position:fixed;top:18px;left:50%;transform:translate(-50%,-25px);opacity:0;z-index:100;background:#20212c;color:#fff;border-radius:14px;padding:12px 16px;transition:.25s;pointer-events:none;box-shadow:var(--shadow)}.toast.show{opacity:1;transform:translate(-50%,0)}
+    .makeup-list{margin:12px 0 0;display:grid;gap:8px}.makeup-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--panel2)}.makeup-row small{display:block;color:var(--muted);margin-top:3px}.makeup-actions{display:flex;gap:6px;align-items:center}.makeup-badge{font-weight:800;color:#a23b00}
     .install-banner{display:none;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;background:#efeefe;border:1px solid #dcd8ff;color:#3f35a9;border-radius:16px;padding:11px 13px}.install-banner.show{display:flex}
     .status{display:inline-flex;align-items:center;gap:6px;font-size:.77rem;border-radius:999px;padding:6px 9px}.status.good{background:#e7fbf4;color:#087b59}.status.warn{background:#fff6df;color:#a96900}.status.bad{background:#ffecef;color:#b82f3b}
 
@@ -258,6 +259,7 @@ dialog[open]{position:fixed;inset:0;margin:auto}
             <div class="planner-stat"><div class="eyebrow">In Bib nutzbar</div><strong id="smartBibStudy">0:00</strong></div>
             <div class="planner-stat"><div class="eyebrow">Außerhalb Bib</div><strong id="smartOutsideStudy">0:00</strong></div>
             <div class="planner-stat"><div class="eyebrow">Ist im Verlauf</div><strong id="smartStudyDone">0:00</strong></div>
+            <div class="planner-stat"><div class="eyebrow">Nachholen offen</div><div style="display:flex;align-items:center;justify-content:space-between;gap:8px"><strong id="smartMakeupOpen">0:00</strong><button class="mini-btn" id="addMakeupManual" type="button" title="Nachholzeit hinzufügen">➕</button></div></div>
           </div>
           <div id="smartDayMessages"></div>
           <div id="smartDayItems"></div>
@@ -341,6 +343,18 @@ dialog[open]{position:fixed;inset:0;margin:auto}
 </form></dialog>
 
 
+<dialog id="makeupDialog"><form method="dialog" class="modal" id="makeupForm">
+<div class="modal-head"><h3>Nachholzeit hinzufügen</h3><button class="close" value="cancel">✕</button></div>
+<div class="form-grid">
+  <div class="field full"><label>Bezeichnung / Fach</label><input id="makeupTitle" placeholder="z. B. Micro Vorlesung" required></div>
+  <div class="field"><label>Datum der verpassten Vorlesung</label><input id="makeupDate" type="date" required></div>
+  <div class="field"><label>Stunden</label><input id="makeupHours" type="number" min="0" max="24" value="1"></div>
+  <div class="field"><label>Minuten</label><input id="makeupMinutes" type="number" min="0" max="59" value="30"></div>
+</div>
+<p class="muted">Diese Zeit ist zusätzlich zum normalen Lernziel. Sie verändert den Semesterbedarf nicht.</p>
+<div class="timer-controls"><button class="btn primary" value="default">Hinzufügen</button><button class="btn soft" value="cancel">Abbrechen</button></div>
+</form></dialog>
+
 <dialog id="plannerRuleDialog"><form method="dialog" class="modal" id="plannerRuleForm">
   <div class="modal-head"><h3 id="plannerRuleDialogTitle">Regel bearbeiten</h3><button class="close" value="cancel">✕</button></div>
   <input type="hidden" id="plannerRuleId">
@@ -402,11 +416,11 @@ dialog[open]{position:fixed;inset:0;margin:auto}
 (()=>{
 'use strict';
 const KEY='wesstudy_v1';
-const defaultState={version:5.05,theme:'light',lang:'de',dashboardMode:'auto',semester:{name:'',start:'',end:'',hoursPerCredit:17,studyTargetPercent:100},subjects:[],sessions:[],holiday:null,dailyPlan:{items:[],templates:[]},timerSettings:{sound:true,vibrate:true,notifications:false,autoNext:true},studyProgress:null,meta:{updatedAt:0}};
+const defaultState={version:5.06,theme:'light',lang:'de',dashboardMode:'auto',semester:{name:'',start:'',end:'',hoursPerCredit:17,studyTargetPercent:100},subjects:[],sessions:[],holiday:null,dailyPlan:{items:[],templates:[]},nachholen:{entries:[]},timerSettings:{sound:true,vibrate:true,notifications:false,autoNext:true},studyProgress:null,meta:{updatedAt:0}};
 let state=load(); let timer={running:false,paused:false,mode:'focus',round:1,totalRounds:4,focusSec:1500,breakSec:300,remaining:1500,startedAt:null,accumulatedFocus:0,interval:null,open:false};
 let calDate=new Date(); let holidayDraft={days:{}}; let deferredPrompt=null;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-function load(){try{const raw=JSON.parse(localStorage.getItem(KEY)||'{}');return {...structuredClone(defaultState),...raw,semester:{...defaultState.semester,...(raw.semester||{})},dailyPlan:{...defaultState.dailyPlan,...(raw.dailyPlan||{}),items:Array.isArray(raw.dailyPlan?.items)?raw.dailyPlan.items:[],templates:Array.isArray(raw.dailyPlan?.templates)?raw.dailyPlan.templates:[]},timerSettings:{...defaultState.timerSettings,...(raw.timerSettings||{})}}}catch{return structuredClone(defaultState)}}
+function load(){try{const raw=JSON.parse(localStorage.getItem(KEY)||'{}');return {...structuredClone(defaultState),...raw,semester:{...defaultState.semester,...(raw.semester||{})},dailyPlan:{...defaultState.dailyPlan,...(raw.dailyPlan||{}),items:Array.isArray(raw.dailyPlan?.items)?raw.dailyPlan.items:[],templates:Array.isArray(raw.dailyPlan?.templates)?raw.dailyPlan.templates:[]},nachholen:{...defaultState.nachholen,...(raw.nachholen||{}),entries:Array.isArray(raw.nachholen?.entries)?raw.nachholen.entries:[]},timerSettings:{...defaultState.timerSettings,...(raw.timerSettings||{})}}}catch{return structuredClone(defaultState)}}
 function persistLocal(syncCloud=true){state.meta={...(state.meta||{}),updatedAt:Date.now()};localStorage.setItem(KEY,JSON.stringify(state));if(syncCloud&&window.WesStudyCloud?.queueSave)window.WesStudyCloud.queueSave(structuredClone(state));}
 function save(){persistLocal(true);renderAll()}
 function uid(){return crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2)}
@@ -422,6 +436,10 @@ function studiedForSubject(id){return state.sessions.filter(x=>x.subjectId===id)
 function totalRequired(){return state.subjects.reduce((a,s)=>a+subjectRequired(s),0)}
 function totalStudied(){return state.sessions.reduce((a,x)=>a+Number(x.minutes||0),0)}
 function totalRemaining(){return Math.max(0,totalRequired()-totalStudied())}
+function makeupEntries(){state.nachholen=state.nachholen||{entries:[]};state.nachholen.entries=Array.isArray(state.nachholen.entries)?state.nachholen.entries:[];return state.nachholen.entries}
+function makeupOpenMins(){return makeupEntries().filter(x=>!x.done).reduce((a,x)=>a+Number(x.minutes||0),0)}
+function makeupForSource(date,sourceKey){return makeupEntries().find(x=>x.date===date&&x.sourceKey===sourceKey)}
+function addMakeupEntry({title,date,minutes,sourceKey=null}){minutes=Math.max(0,Math.round(Number(minutes||0)));if(!title||!date||minutes<=0)return false;if(sourceKey&&makeupForSource(date,sourceKey))return false;makeupEntries().push({id:uid(),title:String(title).trim(),date,minutes,sourceKey,done:false,createdAt:new Date().toISOString()});return true}
 function studyTargetPercent(){return clamp(Number(state.semester?.studyTargetPercent??100)||100,1,100)}
 function studyTargetMins(){return totalRequired()*(studyTargetPercent()/100)}
 function studyTargetRemaining(){return Math.max(0,studyTargetMins()-totalStudied())}
@@ -1101,6 +1119,7 @@ function renderSmartDayPlanner(){
   document.getElementById('smartBibStudy').textContent=minsText(bibStudy);
   document.getElementById('smartOutsideStudy').textContent=minsText(outside);
   document.getElementById('smartStudyDone').textContent=minsText(done);
+  const makeupOpen=makeupOpenMins();document.getElementById('smartMakeupOpen').textContent=minsText(makeupOpen);
 
   const msgs=[];
   if(!plannerState().manualMode){
@@ -1115,6 +1134,8 @@ function renderSmartDayPlanner(){
     msgs.push(`<div class="${notPlanned===0?'planner-good':'planner-alert'}">📘 Lernplanung: Soll ${minsText(target)} · als Lernen eingeplant ${minsText(plannedLearning)} · ${notPlanned===0?'vollständig eingeplant ✅':`${minsText(notPlanned)} noch nicht eingeplant`}</div>`);
     msgs.push(`<div class="${done>=target?'planner-good':'planner-alert'}">✅ Lernverlauf: erledigt ${minsText(done)} · ${done>=target?`${minsText(done-target)} über Soll`:`noch nicht gelernt ${minsText(notLearned)}`}</div>`);
   }
+  const openMakeups=makeupEntries().filter(x=>!x.done).sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  if(openMakeups.length){msgs.push(`<div class="planner-alert">↩️ Nachholen offen: <strong>${minsText(makeupOpen)}</strong> zusätzlich zum normalen Lernziel.</div><div class="makeup-list">${openMakeups.map(x=>`<div class="makeup-row"><div><strong>${esc(x.title)}</strong><small>${fmtDate(x.date)} · ${minsText(x.minutes)}</small></div><div class="makeup-actions"><button class="mini-btn" data-makeup-done="${esc(x.id)}" title="Als nachgeholt markieren">✅</button><button class="mini-btn" data-makeup-delete="${esc(x.id)}" title="Löschen">🗑️</button></div></div>`).join('')}</div>`)}
   document.getElementById('smartDayMessages').innerHTML=msgs.join('');
 
   // One chronological timeline: preparation, travel, university, Lernen, Bib,
@@ -1154,6 +1175,7 @@ function renderSmartDayPlanner(){
       <div class="planner-actions">
         ${x.virtual?'':`<input type="checkbox" data-planner-done="${esc(x.key)}" ${comp?.done?'checked':''} aria-label="Erledigt">`}
         ${x.virtual?'':`<button class="mini-btn" data-planner-actual="${esc(x.key)}" title="Ist-Zeit">⏱</button>`}
+        ${x.type==='uni'&&dur>0?`<button class="mini-btn" data-makeup-missed="${esc(x.key||x.id||x.name)}" data-makeup-title="${esc(x.name||x.title||'Vorlesung')}" data-makeup-minutes="${dur}" title="Gefehlt → Nachholen">↩️</button>`:''}
         ${x.learning&&!manual?`<button class="mini-btn" data-day-learning-edit="${esc(x.key)}" title="Lernblock für diesen Tag ändern">✏️</button>`:''}
         ${x.learning&&!manual?`<button class="mini-btn" data-day-learning-delete="${esc(x.key)}" title="Lernblock löschen">🗑️</button>`:''}
         ${x.type==='wake'?`<button class="mini-btn" data-day-wake-edit="${esc(date)}" title="Aufstehzeit ändern">✏️</button>`:''}
@@ -1451,10 +1473,19 @@ document.getElementById('smartDayItems').addEventListener('click',e=>{
   if(del){deleteLearningBlockFromTag(dayPlanDate,del.dataset.dayLearningDelete);return}
   const manualEdit=e.target.closest('[data-dayplan-edit]');
   if(manualEdit){openDayPlanItem(manualEdit.dataset.dayplanEdit);return}
+  const missed=e.target.closest('[data-makeup-missed]');
+  if(missed){const sourceKey=missed.dataset.makeupMissed,title=missed.dataset.makeupTitle||'Vorlesung',minutes=Number(missed.dataset.makeupMinutes||90);if(makeupForSource(dayPlanDate,sourceKey))return toast('Diese Vorlesung ist bereits im Nachholen erfasst.');if(addMakeupEntry({title,date:dayPlanDate,minutes,sourceKey})){save();toast(`${title}: ${minsText(minutes)} zu Nachholen hinzugefügt`)}return}
 });
 document.getElementById('addLearningBlock').addEventListener('click',()=>openManualActivityForTag(dayPlanDate,'study'));
 document.getElementById('addManualActivity').addEventListener('click',()=>openManualActivityForTag(dayPlanDate,'other'));
+document.getElementById('addMakeupManual').addEventListener('click',()=>{document.getElementById('makeupTitle').value='';document.getElementById('makeupDate').value=dayPlanDate;document.getElementById('makeupHours').value='1';document.getElementById('makeupMinutes').value='30';document.getElementById('makeupDialog').showModal()});
+document.getElementById('makeupForm').addEventListener('submit',e=>{if(e.submitter?.value==='cancel')return;e.preventDefault();const h=Number(document.getElementById('makeupHours').value||0),m=Number(document.getElementById('makeupMinutes').value||0),minutes=Math.round(h*60+m);if(minutes<=0)return toast('Bitte Nachholzeit eingeben.');addMakeupEntry({title:document.getElementById('makeupTitle').value,date:document.getElementById('makeupDate').value,minutes});save();document.getElementById('makeupDialog').close();toast(`${minsText(minutes)} Nachholzeit hinzugefügt`)});
 
+
+document.getElementById('smartDayMessages').addEventListener('click',e=>{
+  const done=e.target.closest('[data-makeup-done]');if(done){const x=makeupEntries().find(v=>v.id===done.dataset.makeupDone);if(x){x.done=true;x.doneAt=new Date().toISOString();save();toast(`${x.title} als nachgeholt markiert`)}return}
+  const del=e.target.closest('[data-makeup-delete]');if(del){const x=makeupEntries().find(v=>v.id===del.dataset.makeupDelete);if(x&&confirm(`Nachhol-Eintrag „${x.title}“ löschen?`)){state.nachholen.entries=makeupEntries().filter(v=>v.id!==x.id);save()}return}
+});
 
 document.getElementById('smartWeekPrev').onclick=()=>smartChangeWeek(-1);
 document.getElementById('smartWeekNext').onclick=()=>smartChangeWeek(1);
@@ -1840,8 +1871,8 @@ document.querySelectorAll('[data-study-target-preset]').forEach(btn=>btn.addEven
 
 window.WesStudyCloudBridge={
   getState:()=>structuredClone(state),
-  hasMeaningfulLocalData:()=>Boolean(state.subjects?.length||state.sessions?.length||state.holiday||state.dailyPlan?.items?.length||state.studyProgress?.modules?.length||state.semester?.start||state.semesterPlan?.days&&Object.keys(state.semesterPlan.days).length||state.weeklyPlanner?.rules?.length),
-  applyCloudState:(incoming)=>{state={...structuredClone(defaultState),...(incoming||{}),semester:{...defaultState.semester,...((incoming||{}).semester||{})},dailyPlan:{...defaultState.dailyPlan,...((incoming||{}).dailyPlan||{}),items:Array.isArray((incoming||{}).dailyPlan?.items)?(incoming||{}).dailyPlan.items:[],templates:Array.isArray((incoming||{}).dailyPlan?.templates)?(incoming||{}).dailyPlan.templates:[]},timerSettings:{...defaultState.timerSettings,...((incoming||{}).timerSettings||{})},meta:{...defaultState.meta,...((incoming||{}).meta||{})}};localStorage.setItem(KEY,JSON.stringify(state));renderAll();},
+  hasMeaningfulLocalData:()=>Boolean(state.subjects?.length||state.sessions?.length||state.holiday||state.dailyPlan?.items?.length||state.nachholen?.entries?.length||state.studyProgress?.modules?.length||state.semester?.start||state.semesterPlan?.days&&Object.keys(state.semesterPlan.days).length||state.weeklyPlanner?.rules?.length),
+  applyCloudState:(incoming)=>{state={...structuredClone(defaultState),...(incoming||{}),semester:{...defaultState.semester,...((incoming||{}).semester||{})},dailyPlan:{...defaultState.dailyPlan,...((incoming||{}).dailyPlan||{}),items:Array.isArray((incoming||{}).dailyPlan?.items)?(incoming||{}).dailyPlan.items:[],templates:Array.isArray((incoming||{}).dailyPlan?.templates)?(incoming||{}).dailyPlan.templates:[]},nachholen:{...defaultState.nachholen,...((incoming||{}).nachholen||{}),entries:Array.isArray((incoming||{}).nachholen?.entries)?(incoming||{}).nachholen.entries:[]},timerSettings:{...defaultState.timerSettings,...((incoming||{}).timerSettings||{})},meta:{...defaultState.meta,...((incoming||{}).meta||{})}};localStorage.setItem(KEY,JSON.stringify(state));renderAll();},
   forceLocalSave:()=>{persistLocal(false);renderAll();},
   toast
 };

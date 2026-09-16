@@ -24,3 +24,10 @@ Zum Umgehen alter Browser-Caches:
 
 ## v4.4 – Tagesplan
 Neue unabhängige Tagesplan-Seite mit Timeline, Kategorien, Wiederholungen, Vorlagen und Tages-Lernziel-Vergleich. Der Tagesplan startet keinen Timer und verändert keine Lernstunden.
+
+## v5.0.6 – Nachholen
+- Separates Nachholkonto zusätzlich zum normalen Lernziel.
+- Nachholzeit kann manuell in Stunden/Minuten hinzugefügt werden.
+- Bei Uni-Terminen kann „Gefehlt → Nachholen“ genutzt werden; die Termindauer wird automatisch übernommen (z. B. 1:30 Std.).
+- Offene Nachholzeit wird im Tagesplan angezeigt und kann als erledigt markiert oder gelöscht werden.
+- Nachholzeit verändert den Semesterbedarf / das normale Lernziel nicht.
