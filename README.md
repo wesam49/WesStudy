@@ -31,3 +31,11 @@ Neue unabhängige Tagesplan-Seite mit Timeline, Kategorien, Wiederholungen, Vorl
 - Bei Uni-Terminen kann „Gefehlt → Nachholen“ genutzt werden; die Termindauer wird automatisch übernommen (z. B. 1:30 Std.).
 - Offene Nachholzeit wird im Tagesplan angezeigt und kann als erledigt markiert oder gelöscht werden.
 - Nachholzeit verändert den Semesterbedarf / das normale Lernziel nicht.
+
+## v5.0.7 – Nachholen im Semesterbedarf
+- Nachholen ist jetzt einem Fach zugeordnet.
+- Nachholstunden werden separat getrackt (gesamt / erledigt / offen).
+- Offene Nachholstunden werden zusätzlich zum Semesterplan-Bedarf gerechnet.
+- Der normale Lernumfang-Prozentsatz gilt nur für den CP-Basisbedarf; Nachholen wird vollständig zusätzlich eingeplant.
+- Fächer zeigen eigene Nachholwerte und haben einen ↩️-Button zum Hinzufügen.
+- Verpasste Uni-Termine können weiterhin direkt als Nachholen übernommen werden.
