@@ -30,7 +30,7 @@
     .brand h1{font-size:1.15rem;margin:0}.brand p{font-size:.82rem;color:var(--muted);margin:3px 0 0}.actions{display:flex;gap:8px}
     .icon-btn,.btn{border:0;border-radius:14px;background:var(--panel);color:var(--text);box-shadow:var(--shadow);padding:11px 14px}.icon-btn{width:44px;height:44px;padding:0;display:grid;place-items:center}.btn{font-weight:750}.btn.primary{background:linear-gradient(135deg,var(--primary),var(--primary2));color:white}.btn.soft{background:var(--panel2);box-shadow:none}.btn.danger{background:#fff0f1;color:#c63c48;box-shadow:none}.btn.good{background:#e8fff7;color:#0c8a63;box-shadow:none}
     .nav{position:fixed;z-index:30;bottom:12px;left:50%;transform:translateX(-50%);width:min(760px,calc(100% - 24px));display:grid;grid-template-columns:repeat(6,1fr);gap:5px;padding:7px;background:rgba(255,255,255,.86);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.7);border-radius:22px;box-shadow:0 16px 50px rgba(20,22,60,.2)}
-    [data-theme="dark"] .nav{background:rgba(24,26,34,.9);border-color:#30333e}.nav button{border:0;background:transparent;color:var(--muted);padding:8px 3px;border-radius:15px;font-size:.72rem}.nav button span{display:block;font-size:1.25rem;margin-bottom:2px}.nav button.active{background:var(--primary);color:#fff}
+    [data-theme="dark"] .nav{background:rgba(24,26,34,.9);border-color:#30333e}.nav button{border:0;background:transparent;color:var(--muted);padding:8px 3px;border-radius:15px;font-size:.72rem}.nav button span{display:block;margin-bottom:2px}.nav-svg{height:21px}.nav-svg svg{width:21px;height:21px;display:block;margin:0 auto}.nav button.active{background:var(--primary);color:#fff}
     .page{display:none}.page.active{display:block}.grid{display:grid;gap:16px}.grid.cols-4{grid-template-columns:repeat(4,1fr)}.grid.cols-3{grid-template-columns:repeat(3,1fr)}.grid.cols-2{grid-template-columns:repeat(2,1fr)}
     .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}.card.flat{box-shadow:none}.card h2,.card h3{margin:0 0 12px}.eyebrow{font-size:.78rem;color:var(--muted);font-weight:700}.big-number{font-size:1.75rem;font-weight:900;margin-top:5px}.muted{color:var(--muted)}
     .hero{background:linear-gradient(135deg,#6656f4,#9385ff);color:white;border:0;position:relative;overflow:hidden}.hero:after{content:"";position:absolute;width:190px;height:190px;border-radius:50%;background:rgba(255,255,255,.10);left:-45px;top:-55px}.hero-row{display:flex;align-items:center;justify-content:space-between;gap:18px;position:relative;z-index:2}.ring{--p:0;width:116px;height:116px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#fff calc(var(--p)*1%),rgba(255,255,255,.23) 0);flex:none}.ring:before{content:"";position:absolute;width:88px;height:88px;border-radius:50%;background:#7465f6}.ring strong{position:relative;z-index:2;font-size:1.35rem}.progress{height:10px;background:var(--line);border-radius:999px;overflow:hidden}.progress>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--primary),#9a8dff);border-radius:inherit}.progress.good>i{background:var(--good)}
@@ -52,7 +52,7 @@
     .dayplan-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:16px}
     .dayplan-date{display:flex;align-items:center;gap:8px}.dayplan-date strong{min-width:160px;text-align:center}
     .dayplan-timeline{display:grid;gap:10px}.dayplan-item{display:grid;grid-template-columns:76px 1fr auto;gap:12px;align-items:center;padding:13px;border:1px solid var(--line);background:var(--panel);border-radius:17px}.dayplan-item.done{opacity:.58}.dayplan-item.done .dayplan-title{text-decoration:line-through}.dayplan-time{font-weight:900;font-variant-numeric:tabular-nums;color:var(--primary)}.dayplan-title{font-weight:850}.dayplan-sub{font-size:.78rem;color:var(--muted);margin-top:3px}.dayplan-actions{display:flex;align-items:center;gap:6px}.dayplan-check{width:24px;height:24px;accent-color:var(--primary)}.dayplan-learning{padding:14px;border-radius:16px;background:var(--panel2);border:1px solid var(--line);margin-bottom:16px}.dayplan-learning.good{border-color:#bdebdc;background:#effbf7}.template-row{display:flex;gap:8px;flex-wrap:wrap}.template-row select{flex:1;min-width:170px;border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:13px;padding:11px}
-    @media(max-width:560px){.nav{grid-template-columns:repeat(6,1fr);gap:2px}.nav button{font-size:.62rem;padding:7px 1px}.nav button span{font-size:1.08rem}.dayplan-item{grid-template-columns:62px 1fr;}.dayplan-actions{grid-column:2;justify-content:flex-end}.dayplan-date{width:100%;justify-content:space-between}.dayplan-date strong{min-width:0;flex:1}}
+    @media(max-width:560px){.nav{grid-template-columns:repeat(6,1fr);gap:2px}.nav button{font-size:.62rem;padding:7px 1px}.nav-svg svg{width:19px;height:19px}.dayplan-item{grid-template-columns:62px 1fr;}.dayplan-actions{grid-column:2;justify-content:flex-end}.dayplan-date{width:100%;justify-content:space-between}.dayplan-date strong{min-width:0;flex:1}}
 
     .cloud-card{border:1px solid var(--line);background:var(--panel2);border-radius:18px;padding:14px}.cloud-head{display:flex;align-items:center;justify-content:space-between;gap:12px}.cloud-head strong{display:block;margin-bottom:3px}.cloud-card .timer-controls{justify-content:flex-start}.cloud-card .btn{box-shadow:none}.cloud-card input{background:var(--panel);}
     @media(max-width:850px){.grid.cols-4{grid-template-columns:repeat(2,1fr)}.grid.cols-3{grid-template-columns:1fr}.grid.cols-2{grid-template-columns:1fr}.holiday-summary{grid-template-columns:1fr 1fr 1fr}}
@@ -104,7 +104,7 @@ dialog[open]{position:fixed;inset:0;margin:auto}
 .plan-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
 .plan-tabs button{border:0;border-radius:12px;padding:10px 14px;background:var(--panel2);font-weight:800;color:var(--muted);cursor:pointer}
 .plan-tabs button.active{background:var(--accent);color:#fff}
-.week-overview{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
+.week-overview{display:block;width:100%}
 .week-day-card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:10px;min-width:0}
 .week-day-card.today{outline:2px solid var(--accent)}
 .week-day-card .wd-title{font-weight:900;margin-bottom:7px}
@@ -118,8 +118,8 @@ dialog[open]{position:fixed;inset:0;margin:auto}
 .week-metric .eyebrow{margin-bottom:6px}
 .week-metric strong{font-size:1.75rem;display:block}
 .week-summary-bar{padding:12px 14px;border:1px solid #bfe8d3;background:#eefaf2;border-radius:14px;color:#166b45;font-weight:800}
-.week-grid-shell{border:1px solid var(--line);border-radius:18px;overflow:hidden;background:var(--panel)}
-.week-grid{display:grid;grid-template-columns:76px repeat(7,minmax(0,1fr));align-items:stretch}
+.week-grid-shell{border:1px solid var(--line);border-radius:18px;overflow-x:auto;overflow-y:hidden;background:var(--panel);width:100%}
+.week-grid{display:grid;grid-template-columns:74px repeat(7,minmax(135px,1fr));align-items:stretch;min-width:1040px;width:100%}
 .week-grid .wg-head-left{padding:12px 10px;background:var(--panel2);border-bottom:1px solid var(--line);font-weight:900}
 .week-grid .wg-head{background:var(--panel2);border-left:1px solid var(--line);border-bottom:1px solid var(--line);padding:8px 8px 10px;min-width:0}
 .week-grid .wg-day-name{font-weight:900;text-align:center;line-height:1.25}
@@ -145,8 +145,24 @@ dialog[open]{position:fixed;inset:0;margin:auto}
 .week-legend .lg{display:inline-flex;align-items:center;gap:8px}
 .week-legend i{display:inline-block;width:16px;height:12px;border-radius:6px;border:1px solid transparent}
 .week-legend .u i{background:#dff5e5;border-color:#9edab0}.week-legend .s i{background:#dce9ff;border-color:#94b8ff}.week-legend .m i{background:#ffe9d8;border-color:#f0b274}.week-legend .g i{background:#ece2ff;border-color:#bca0ff}
-@media(max-width:1200px){.week-grid-shell{overflow:auto}.week-grid{min-width:1100px}.week-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:1200px){.week-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:640px){.week-metrics{grid-template-columns:1fr 1fr}}
+.week-board{width:100%;min-width:0}
+.week-metrics{width:100%}
+.week-metric{min-width:0}
+.week-metric strong{font-variant-numeric:tabular-nums}
+.week-grid .wg-head{min-width:135px}
+.week-block{font-size:.9rem}
+.week-block .wb-title{word-break:normal;overflow-wrap:anywhere}
+@media(max-width:760px){
+  .week-metrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .week-metric{padding:10px}
+  .week-metric strong{font-size:1.35rem}
+  .week-summary-bar{font-size:.88rem}
+  .week-grid{min-width:980px;grid-template-columns:64px repeat(7,130px)}
+  .week-grid .wg-head{min-width:130px}
+}
+
 .planner-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:12px 0}
 .planner-stat{background:var(--panel2);border-radius:14px;padding:11px}
 .planner-stat strong{display:block;font-size:1.15rem;margin-top:4px}
@@ -170,8 +186,8 @@ dialog[open]{position:fixed;inset:0;margin:auto}
 .rule-row small{display:block;color:var(--muted);margin-top:3px}
 .rule-actions{display:flex;gap:5px}
 .actual-input{width:62px!important;padding:6px!important;font-size:.78rem!important}
-@media(max-width:900px){.week-overview{grid-template-columns:repeat(2,minmax(0,1fr))}.planner-summary{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:560px){.week-overview{grid-template-columns:1fr}.planner-item{grid-template-columns:62px 1fr auto}.planner-summary{grid-template-columns:1fr 1fr}}
+@media(max-width:900px){.planner-summary{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.planner-item{grid-template-columns:62px 1fr auto}.planner-summary{grid-template-columns:1fr 1fr}}
 
 
 /* ===== v4.7 synchronized planner ===== */
@@ -358,7 +374,14 @@ dialog[open]{position:fixed;inset:0;margin:auto}
   </main>
 </div>
 
-<nav class="nav"><button class="active" data-nav="home"><span>🏠</span>Start</button><button data-nav="subjects"><span>📚</span>Fächer</button><button data-nav="dayplan"><span>🗓️</span>Tag</button><button data-nav="progress"><span>🎓</span>LP</button><button data-nav="holiday"><span>🏖️</span>Ferien</button><button data-nav="history"><span>📊</span>Verlauf</button></nav>
+<nav class="nav">
+<button class="active" data-nav="home"><span class="nav-svg"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5v9a1.5 1.5 0 0 1-1.5 1.5H15v-6H9v6H4.5A1.5 1.5 0 0 1 3 19.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></span>Start</button>
+<button data-nav="subjects"><span class="nav-svg"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5zM4 5.5v15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Fächer</button>
+<button data-nav="dayplan"><span class="nav-svg"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 3v4M16 3v4M3 10h18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>Tag</button>
+<button data-nav="progress"><span class="nav-svg"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 9 9-5 9 5-9 5zM7 12.5V17c2.8 2 7.2 2 10 0v-4.5M21 10v6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>LP</button>
+<button data-nav="holiday"><span class="nav-svg"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v16M4 12h16M6.5 6.5l11 11M17.5 6.5l-11 11" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></span>Ferien</button>
+<button data-nav="history"><span class="nav-svg"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V10M12 20V4M19 20v-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>Verlauf</button>
+</nav>
 <div class="toast" id="toast"></div>
 
 <dialog id="semesterDialog"><form method="dialog" class="modal" id="semesterForm"><div class="modal-head"><h3>Semester einrichten</h3><button class="close" value="cancel">✕</button></div><div class="form-grid"><div class="field"><label>Semestername</label><input id="semesterName" required placeholder="z. B. Wintersemester 2026"></div><div class="field"><label>Stunden pro Credit</label><input id="hoursPerCredit" type="number" min="1" max="100" value="17" required></div><div class="field"><label>Beginn der Vorlesungszeit</label><input id="semesterStart" type="date" required></div><div class="field"><label>Ende der Vorlesungszeit</label><input id="semesterEnd" type="date" required></div></div><p class="muted">Die Berechnung gilt nur für die Vorlesungszeit, nicht für die Prüfungsphase.</p><div class="timer-controls"><button class="btn primary" value="default">Speichern</button><button class="btn soft" value="cancel">Abbrechen</button></div></form></dialog>
