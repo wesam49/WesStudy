@@ -10,8 +10,8 @@
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="icon-192.png" />
-  <title>WesStudy v5.4.2</title>
-  <meta name="wesstudy-version" content="5.4.2" />
+  <title>WesStudy v5.4.3</title>
+  <meta name="wesstudy-version" content="5.4.3" />
   <style>
     :root{
       --bg:#f4f5fb;--panel:#fff;--panel2:#f8f8fd;--text:#191a25;--muted:#74778b;
@@ -511,6 +511,50 @@ body{background:linear-gradient(180deg,#f7f5f0 0%,#f2f1ec 100%);color:var(--text
   #subjectsMakeupSummary .metrics{grid-template-columns:1fr!important}
 }
 
+
+/* ===== v5.4.3 refined mobile UI ===== */
+.nav button.active{background:#eef7f1;color:#16825d}
+.btn.primary{background:linear-gradient(135deg,#08264f,#143a70);border-color:#08264f;color:#fff}
+.btn.primary:hover{filter:brightness(.98)}
+.hero .btn{color:#5b4bf0!important}
+.session-row{display:grid;grid-template-columns:64px minmax(0,1fr) auto;align-items:center;gap:14px;padding:18px 0;border-bottom:1px solid var(--line)}
+.session-row:last-child{border-bottom:0}
+.session-icon{width:56px;height:56px;border-radius:999px;display:grid;place-items:center;border:1px solid var(--line);background:var(--panel2);color:var(--primary)}
+.session-icon svg{width:28px;height:28px;display:block}
+.session-info{min-width:0}
+.session-info strong{display:block;font-size:1.12rem;line-height:1.15;margin-bottom:4px;color:#102347}
+.session-meta{display:flex;flex-direction:column;gap:3px;color:var(--muted);font-size:.95rem;line-height:1.28}
+.session-meta span{display:block}
+.session-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.session-actions .mini-btn{border-radius:16px;padding:11px 16px;background:#fff;font-size:.96rem;font-weight:800}
+.past-days-list{display:grid;gap:0}
+.past-day-row{display:grid;grid-template-columns:64px minmax(0,1fr) auto;align-items:center;gap:14px;padding:18px 0;border-top:1px solid var(--line);cursor:pointer}
+.past-day-row:first-child{border-top:1px solid var(--line)}
+.past-day-main{display:flex;flex-direction:column;gap:4px;min-width:0}
+.past-day-date{font-size:1.12rem;font-weight:900;line-height:1.15;color:#102347}
+.past-day-sub{font-size:.96rem;line-height:1.35;color:var(--muted)}
+.past-day-icon.good{background:#e9f8ef;color:#16825d;border-color:#d3eedc}
+.past-day-icon.warn{background:#fff3dc;color:#b7791f;border-color:#f5dfad}
+.past-day-icon.bad{background:#ffe8eb;color:#c2414b;border-color:#f3c9ce}
+.past-day-icon.neutral{background:var(--panel2);color:var(--muted)}
+.past-day-status{display:inline-flex;align-items:center;gap:8px;padding:11px 16px;border-radius:999px;font-weight:900;white-space:nowrap;font-size:.98rem}
+.past-day-status svg{width:18px;height:18px;display:block}
+.past-day-status.good{background:#e9f8ef;color:#16825d}
+.past-day-status.warn{background:#fff3dc;color:#b7791f}
+.past-day-status.bad{background:#ffe8eb;color:#c2414b}
+.past-day-status.neutral{background:var(--panel2);color:var(--muted)}
+#pastStudyBacklog{margin-top:18px;font-size:1.04rem;font-weight:900;color:#102347}
+#pastStudyBacklog.good{color:#16825d}
+#pastStudyBacklog.bad{color:#102347}
+@media (max-width:760px){
+  .session-row,.past-day-row{grid-template-columns:56px minmax(0,1fr);align-items:start;gap:12px;padding:16px 0}
+  .session-icon,.past-day-icon{width:52px;height:52px}
+  .session-info strong{font-size:1.06rem}
+  .session-actions,.past-day-status{grid-column:2;justify-content:flex-start;margin-top:4px}
+  .session-actions .mini-btn{padding:10px 14px}
+  #dailyStudyCard .grid.cols-4,#dailyStudyCard .progress,#dailyStudyCard .timer-controls{display:none!important}
+  #dailyStudyCard .section-head{margin-bottom:0}
+}
 </style>
 </head>
 <body>
@@ -896,8 +940,31 @@ function renderHome(){
  const pos=mode==='holiday'?holidayPlanPosition():totalPlanPosition();const planName=mode==='holiday'?'Ferienplan':'Gesamtplan';if(Math.abs(pos)<1){$('#planStatus').textContent=`Du bist genau im ${planName}`}else{$('#planStatus').textContent=pos>0?`Du bist ${hoursText(pos)} vor dem ${planName}`:`Du bist ${hoursText(Math.abs(pos))} hinter dem ${planName}`};$('#planStatus').className='dashboard-status '+(pos>=0?'good':'bad');
  $('#creditsTotal').textContent=`${state.subjects.reduce((a,s)=>a+Number(s.credits),0)} CP`;$('#subjectsCount').textContent=`${state.subjects.length} Fächer`;$('#homeSubjects').innerHTML=state.subjects.length?state.subjects.slice().sort((a,b)=>(subjectRequired(b)-studiedForSubject(b.id))-(subjectRequired(a)-studiedForSubject(a.id))).slice(0,3).map(s=>subjectHTML(s,true)).join(''):`<div class="empty">Noch keine Fächer vorhanden</div>`;renderRecent()
 }
-function renderRecent(){const rows=state.sessions.slice().sort((a,b)=>(b.date+b.createdAt).localeCompare(a.date+a.createdAt)).slice(0,5);$('#recentSessions').innerHTML=rows.length?rows.map(sessionHTML).join(''):`<div class="empty">Noch keine Sessions vorhanden</div>`}
-function sessionHTML(x,actions=false){const s=state.subjects.find(y=>y.id===x.subjectId),mk=isMakeupSession(x);return `<div class="session-row"><div class="session-icon">${mk?'':'Zeit'}</div><div class="session-info"><strong>${esc(s?.name||'Gelöschtes Fach')} ${mk?'<span class="pill" style="margin-left:6px">Nachholen</span>':''}</strong><small>${fmtDate(x.date)} · ${minsText(x.minutes)} · ${mk?'Nachholzeit':'Normales Lernen'}</small></div>${actions?`<button class="mini-btn" data-edit-session="${x.id}">Bearbeiten</button><button class="mini-btn" data-delete-session="${x.id}">Löschen</button>`:''}</div>`}
+function renderRecent(){const rows=state.sessions.slice().sort((a,b)=>(b.date+b.createdAt).localeCompare(a.date+a.createdAt)).slice(0,5);$('#recentSessions').innerHTML=rows.length?rows.map(x=>sessionHTML(x,true)).join(''):`<div class="empty">Noch keine Sessions vorhanden</div>`}
+function hexToRgba(hex,alpha=.14){
+  const h=String(hex||'').trim().replace('#','');
+  if(!/^[0-9a-fA-F]{3}([0-9a-fA-F]{3})?$/.test(h)) return alpha>=1?'rgb(109,93,252)':`rgba(109,93,252,${alpha})`;
+  const full=h.length===3?h.split('').map(c=>c+c).join(''):h;
+  const num=parseInt(full,16),r=(num>>16)&255,g=(num>>8)&255,b=num&255;
+  return alpha>=1?`rgb(${r},${g},${b})`:`rgba(${r},${g},${b},${alpha})`;
+}
+function sessionSymbol(kind='normal'){
+  if(kind==='makeup') return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8V4m0 0H2m4 0 3 3M18 16v4m0 0h4m-4 0-3-3M4 12a8 8 0 0 1 13.7-5.7M20 12a8 8 0 0 1-13.7 5.7" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 18h3V9H5zm5 0h4V5h-4zm6 0h3v-8h-3z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+}
+function sessionIconHTML(color='#6d5dfc',kind='normal'){
+  const bg=hexToRgba(color,.14),bd=hexToRgba(color,.22);
+  return `<div class="session-icon" style="background:${bg};color:${esc(color)};border-color:${bd}">${sessionSymbol(kind)}</div>`;
+}
+function statusSymbol(kind='good'){
+  if(kind==='warn') return '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M12 8v4l2.5 1.8" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  if(kind==='bad') return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 8l8 8M16 8l-8 8" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></svg>';
+  if(kind==='neutral') return '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="2.1" fill="currentColor"/></svg>';
+  return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 12 3 3 7-8" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+}
+function sessionHTML(x,actions=false){
+  const s=state.subjects.find(y=>y.id===x.subjectId),mk=isMakeupSession(x),color=s?.color||'#6d5dfc';
+  return `<div class="session-row">${sessionIconHTML(color,mk?'makeup':'normal')}<div class="session-info"><strong>${esc(s?.name||'Gelöschtes Fach')}</strong><div class="session-meta"><span>${fmtDate(x.date)} · ${minsText(x.minutes)}</span><span>${mk?'Nachholzeit':'Normales Lernen'}</span></div></div>${actions?`<div class="session-actions"><button class="mini-btn" data-edit-session="${x.id}">Bearbeiten</button><button class="mini-btn" data-delete-session="${x.id}">Löschen</button></div>`:''}</div>`}
 function subjectOptionsForStudyType(type,current=''){const list=type==='makeup'?state.subjects.filter(s=>makeupRequiredForSubject(s.id)>0):state.subjects;const html=list.length?list.map(s=>`<option value="${s.id}">${esc(s.name)}${type==='makeup'?` · offen ${minsText(makeupOpenForSubject(s.id))}`:''}</option>`).join(''):`<option value="">${type==='makeup'?'Noch kein Nachholbedarf vorhanden':'Füge zuerst ein Fach hinzu'}</option>`;return {html,list,current:list.some(s=>s.id===current)?current:(list[0]?.id||'')}}
 function updateStudySubjectSelect(typeId,subjectId){const type=document.getElementById(typeId)?.value||'normal',el=document.getElementById(subjectId);if(!el)return;const old=el.value,r=subjectOptionsForStudyType(type,old);el.innerHTML=r.html;el.value=r.current;if(typeId==='manualStudyType'){const h=document.getElementById('manualStudyHint');if(h)h.textContent=type==='makeup'?'Diese Session reduziert den offenen Nachholbedarf des gewählten Fachs und zählt nicht doppelt zum normalen Fachfortschritt.':'Diese Zeit zählt zum normalen Lernfortschritt des Fachs.'}}
 function populateSubjectSelects(){const options=state.subjects.length?state.subjects.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join(''):'<option value="">Füge zuerst ein Fach hinzu</option>';for(const id of ['makeupSubject']){const el=document.getElementById(id);if(!el)continue;const old=el.value;el.innerHTML=options;if([...el.options].some(o=>o.value===old))el.value=old}updateStudySubjectSelect('manualStudyType','manualSubject');updateStudySubjectSelect('dailyStudyType','dailyStudySubject')}
@@ -2102,33 +2169,40 @@ function openDailyStudyEntry(date=todayISO(),full=false){
 }
 function renderDailyStudyTracking(){
   const today=todayISO(),planned=plannedStudyMinsForDate(today),done=sessionsOn(today),open=Math.max(0,planned-done),pct=planned?clamp(done/planned*100,0,100):(done?100:0);
-  $('#dailyStudyTitle').textContent=`Heute – ${fmtDate(today)}`;
+  $('#dailyStudyTitle').textContent=`Heute — ${fmtDate(today)}`;
   $('#dailyStudySource').textContent=planned?`Aus dem ${dailyStudySourceForDate(today)}`:'Für heute ist keine Lernzeit geplant';
   $('#dailyTrackPlanned').textContent=minsText(planned);$('#dailyTrackDone').textContent=minsText(done);$('#dailyTrackOpen').textContent=minsText(open);$('#dailyTrackPercent').textContent=`${Math.round(pct)}%`;$('#dailyTrackProgress').style.width=`${pct}%`;
   const badge=$('#dailyStudyBadge');
   badge.className='status '+(planned&&done>=planned?'good':planned&&done?'warn':(!planned&&done?'good':''));
-  badge.textContent=planned?(done>=planned?'Erledigt':done?'Teilweise':'Offen'):(done?'Zusätzlich gelernt':'Nicht geplant');
+  badge.textContent=planned?(done>=planned?'Erledigt':done?'Offen':'Nicht geplant'):(done?'Zusätzlich gelernt':'Nicht geplant');
   $('#markTodayDone').disabled=!planned||done>=planned||!state.subjects.length;$('#enterTodayHours').disabled=!state.subjects.length;
   const dates=new Set();
   if(state.holiday?.days) Object.keys(state.holiday.days).forEach(d=>{if(d<today)dates.add(d)});
   if(state.semesterPlan?.days) Object.keys(state.semesterPlan.days).forEach(d=>{if(d<today)dates.add(d)});
-  // Lernverlauf (state.sessions) ist die einzige Quelle für "Erledigt".
-  // Dadurch erscheinen auch zusätzliche Lerntage ohne Ferien-/Semesterplan.
   state.sessions.forEach(x=>{if(x?.date&&x.date<today&&Number(x.minutes||0)>0)dates.add(x.date)});
   const rows=[...dates].sort().reverse().slice(0,10);
   let backlog=0;
-  $('#pastStudyDays').innerHTML=rows.length?rows.map(d=>{
+  $('#pastStudyDays').innerHTML=rows.length?`<div class="past-days-list">${rows.map(d=>{
     const pl=plannedStudyMinsForDate(d),dn=sessionsOn(d),op=Math.max(0,pl-dn),extra=Math.max(0,dn-pl);
     backlog+=op;
-    let status,icon;
-    if(pl===0&&dn>0){status=`+${minsText(dn)} zusätzlich`;icon='✓'}
-    else if(pl===0){status='Nicht geplant';icon=''}
-    else if(dn>=pl){status=extra?`✓ Erreicht · +${minsText(extra)}`:'✓ Erreicht';icon='✓'}
-    else if(dn>0){status=`${minsText(op)} offen`;icon=''}
-    else{status='Nicht geschafft';icon=''}
-    return `<div class="session-row" data-past-day="${d}" style="cursor:pointer"><div class="session-icon">${icon}</div><div class="session-info"><strong>${fmtDate(d)}</strong><small>Geplant ${minsText(pl)} · Erledigt ${minsText(dn)}</small></div><strong>${status}</strong></div>`
-  }).join(''):'<div class="muted">Noch keine vergangenen Plan- oder Lerntage.</div>';
-  $('#pastStudyBacklog').textContent=backlog?`Gesamtrückstand aus den angezeigten Tagen: ${minsText(backlog)}`:'Kein Rückstand in den angezeigten Tagen';
+    let tone='neutral',label='Nicht geplant';
+    if(pl===0&&dn>0){tone='good';label='Zusätzlich gelernt'}
+    else if(pl===0){tone='neutral';label='Nicht geplant'}
+    else if(dn>=pl){tone='good';label='Erreicht'}
+    else if(dn>0){tone='warn';label=`${minsText(op)} offen`}
+    else{tone='bad';label='Nicht gelernt'}
+    const subtitle=`Geplant ${minsText(pl)} · Erledigt ${minsText(dn)}${extra>0&&pl>0?` · +${minsText(extra)} zusätzlich`:''}`;
+    return `<div class="past-day-row" data-past-day="${d}">
+      <div class="session-icon past-day-icon ${tone}">${statusSymbol(tone)}</div>
+      <div class="past-day-main">
+        <div class="past-day-date">${fmtDate(d)}</div>
+        <div class="past-day-sub">${subtitle}</div>
+      </div>
+      <div class="past-day-status ${tone}">${statusSymbol(tone)}<span>${label}</span></div>
+    </div>`}).join('')}</div>`:'<div class="muted">Noch keine vergangenen Plan- oder Lerntage.</div>';
+  const backlogEl=$('#pastStudyBacklog');
+  backlogEl.textContent=backlog?`Gesamtrückstand aus den angezeigten Tagen: ${minsText(backlog)}`:'Kein Rückstand in den angezeigten Tagen';
+  backlogEl.className=backlog?'bad':'good';
 }
 $('#markTodayDone').onclick=()=>openDailyStudyEntry(todayISO(),true);
 $('#enterTodayHours').onclick=()=>openDailyStudyEntry(todayISO(),false);
@@ -2174,7 +2248,28 @@ state.lang='de'; persistLocal(false); state.timerSettings={...defaultState.timer
 
 
 function statusLabel(v){const de={open:'Offen',planned:'Geplant',active:'In Bearbeitung',exam:'Prüfung abgelegt',passed:'Bestanden',failed:'Wiederholung',postponed:'Verschoben'};return de[v]||v}
-function renderStudyProgress(){const sp=state.studyProgress,mods=sp.modules||[],norm=n=>String(n||'').trim().toLowerCase().replace(/\s+/g,' '),uniqueMap=new Map();for(const m of mods){const k=norm(m.name);if(!k)continue;if(!uniqueMap.has(k))uniqueMap.set(k,m);else{const prev=uniqueMap.get(k);if(Number(m.lp||0)>Number(prev.lp||0))uniqueMap.set(k,m)}}const uniqueMods=[...uniqueMap.values()],total=uniqueMods.reduce((a,m)=>a+Number(m.lp||0),0),passedNames=new Set(mods.filter(m=>m.status==='passed').map(m=>norm(m.name))),passed=uniqueMods.filter(m=>passedNames.has(norm(m.name))).reduce((a,m)=>a+Number(m.lp||0),0),currentNames=new Set(mods.filter(m=>String(m.planSemester)===String(sp.currentSemester)&&m.status!=='passed').map(m=>norm(m.name))),current=uniqueMods.filter(m=>currentNames.has(norm(m.name))&&!passedNames.has(norm(m.name))).reduce((a,m)=>a+Number(m.lp||0),0);sp.degreeTotal=total;$('#lpTotal').textContent=total+' LP';$('#lpPassed').textContent=passed+' LP';$('#lpOpen').textContent=Math.max(0,total-passed)+' LP';$('#lpCurrent').textContent=current+' LP';$('#degreeTotalLp').value=total;$('#currentPlanSemester').value=sp.currentSemester;const order=['1','2','3','Sommer','4','5','6','7'];$('#lpGroups').innerHTML=order.map(sem=>{const rows=mods.filter(m=>String(m.planSemester)===sem);if(!rows.length)return'';const semUnique=new Map();for(const m of rows){const k=norm(m.name);if(!semUnique.has(k)||Number(m.lp||0)>Number(semUnique.get(k).lp||0))semUnique.set(k,m)}const sum=[...semUnique.values()].reduce((a,m)=>a+Number(m.lp||0),0),done=[...semUnique.values()].filter(m=>passedNames.has(norm(m.name))).reduce((a,m)=>a+Number(m.lp||0),0);return `<div class="card lp-semester"><div class="lp-semester-head"><div><h3>${sem==='Sommer'?'Sommer':sem+'. Semester'}</h3><div class="muted">${done}/${sum} LP</div></div><span class="status ${sem===String(sp.currentSemester)?'good':''}">${sem===String(sp.currentSemester)?'Aktuell':sum+' LP'}</span></div><div class="lp-table">${rows.map(m=>`<div class="lp-row ${sem===String(sp.currentSemester)?'lp-current':''}"><div><strong>${esc(m.name)}</strong><div class="muted lp-origin">${'Aus Semester'} ${esc(m.originSemester||'—')}</div></div><b>${m.lp} LP</b><span class="lp-status ${m.status}">${statusLabel(m.status)}</span><button class="mini-btn" data-edit-lp="${m.id}">Bearbeiten</button></div>`).join('')}</div></div>`}).join('')}
+function renderStudyProgress(){
+  const sp=state.studyProgress,mods=sp.modules||[],norm=n=>String(n||'').trim().toLowerCase().replace(/\s+/g,' '),key=m=>`${norm(m.name)}__${Number(m.lp||0)}`;
+  const uniqueMap=new Map();
+  for(const m of mods){
+    const k=key(m);if(!k)continue;
+    if(!uniqueMap.has(k)) uniqueMap.set(k,m);
+    else {
+      const prev=uniqueMap.get(k);
+      const score=v=>({passed:5,active:4,exam:3,planned:2,open:1,failed:0,postponed:0}[v]??0);
+      if(score(m.status)>score(prev.status)||String(m.planSemester)>String(prev.planSemester)) uniqueMap.set(k,m);
+    }
+  }
+  const uniqueMods=[...uniqueMap.values()];
+  const total=uniqueMods.reduce((a,m)=>a+Number(m.lp||0),0);
+  const passedKeys=new Set(mods.filter(m=>m.status==='passed').map(key));
+  const currentKeys=new Set(mods.filter(m=>String(m.planSemester)===String(sp.currentSemester)&&m.status!=='passed').map(key));
+  const passed=uniqueMods.filter(m=>passedKeys.has(key(m))).reduce((a,m)=>a+Number(m.lp||0),0);
+  const current=uniqueMods.filter(m=>currentKeys.has(key(m))&&!passedKeys.has(key(m))).reduce((a,m)=>a+Number(m.lp||0),0);
+  sp.degreeTotal=total;$('#lpTotal').textContent=total+' LP';$('#lpPassed').textContent=passed+' LP';$('#lpOpen').textContent=Math.max(0,total-passed)+' LP';$('#lpCurrent').textContent=current+' LP';$('#degreeTotalLp').value=total;$('#currentPlanSemester').value=sp.currentSemester;
+  const order=['1','2','3','Sommer','4','5','6','7'];
+  $('#lpGroups').innerHTML=order.map(sem=>{const rows=mods.filter(m=>String(m.planSemester)===sem);if(!rows.length)return'';const semUnique=new Map();for(const m of rows){const k=key(m);if(!semUnique.has(k))semUnique.set(k,m)}const semRows=[...semUnique.values()],sum=semRows.reduce((a,m)=>a+Number(m.lp||0),0),done=semRows.filter(m=>passedKeys.has(key(m))).reduce((a,m)=>a+Number(m.lp||0),0);return `<div class="card lp-semester"><div class="lp-semester-head"><div><h3>${sem==='Sommer'?'Sommer':sem+'. Semester'}</h3><div class="muted">${done}/${sum} LP</div></div><span class="status ${sem===String(sp.currentSemester)?'good':''}">${sem===String(sp.currentSemester)?'Aktuell':sum+' LP'}</span></div><div class="lp-table">${rows.map(m=>`<div class="lp-row ${sem===String(sp.currentSemester)?'lp-current':''}"><div><strong>${esc(m.name)}</strong><div class="muted lp-origin">Aus Semester ${esc(m.originSemester||'—')}</div></div><b>${m.lp} LP</b><span class="lp-status ${m.status}">${statusLabel(m.status)}</span><button class="mini-btn" data-edit-lp="${m.id}">Bearbeiten</button></div>`).join('')}</div></div>`}).join('')
+}
 function openLp(id){const m=id?state.studyProgress.modules.find(x=>x.id===id):null;$('#lpId').value=m?.id||'';$('#lpName').value=m?.name||'';$('#lpCredits').value=m?.lp||'';$('#lpOriginSemester').value=m?.originSemester||'';$('#lpPlanSemester').value=m?.planSemester||state.studyProgress.currentSemester;$('#lpStatus').value=m?.status||'open';$('#lpExamDate').value=m?.examDate||'';$('#lpUseInStudy').checked=!!m?.useInStudy;$('#lpDelete').classList.toggle('hidden',!m);$('#lpDialogTitle').textContent=m?'Modul bearbeiten':'Modul hinzufügen';$('#lpDialog').showModal()}
 $('#addLpModule').onclick=()=>openLp();$('#lpForm').addEventListener('submit',e=>{if(e.submitter?.value==='cancel')return;e.preventDefault();const id=$('#lpId').value||uid(),old=state.studyProgress.modules.find(x=>x.id===id),m={id,name:$('#lpName').value.trim(),lp:Number($('#lpCredits').value),originSemester:$('#lpOriginSemester').value.trim(),planSemester:$('#lpPlanSemester').value,status:$('#lpStatus').value,examDate:$('#lpExamDate').value,useInStudy:$('#lpUseInStudy').checked,subjectId:old?.subjectId||null};if(m.useInStudy&&!m.subjectId){const existing=state.subjects.find(s=>s.name.trim().toLowerCase()===m.name.toLowerCase());if(existing)m.subjectId=existing.id;else{m.subjectId=uid();state.subjects.push({id:m.subjectId,name:m.name,credits:m.lp,color:'#6d5dfc',start:state.semester.start||'',end:state.semester.end||''})}}if(old)state.studyProgress.modules=state.studyProgress.modules.map(x=>x.id===id?m:x);else state.studyProgress.modules.push(m);save();$('#lpDialog').close()});
 $('#lpDelete').onclick=()=>{const id=$('#lpId').value;if(!id)return;if(confirm('Dieses Modul aus der LP-Planung löschen?')){state.studyProgress.modules=state.studyProgress.modules.filter(x=>x.id!==id);save();$('#lpDialog').close()}};
