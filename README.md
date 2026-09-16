@@ -39,3 +39,7 @@ Neue unabhängige Tagesplan-Seite mit Timeline, Kategorien, Wiederholungen, Vorl
 - Der normale Lernumfang-Prozentsatz gilt nur für den CP-Basisbedarf; Nachholen wird vollständig zusätzlich eingeplant.
 - Fächer zeigen eigene Nachholwerte und haben einen ↩️-Button zum Hinzufügen.
 - Verpasste Uni-Termine können weiterhin direkt als Nachholen übernommen werden.
+
+
+## v5.3.0
+Responsive redesign based on Design Option 1: desktop sidebar, mobile bottom navigation, unified premium cards, typography, colors, and emoji-free interface.
