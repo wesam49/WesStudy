@@ -10,8 +10,8 @@
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="icon-192.png" />
-  <title>WesStudy v5.4.1</title>
-  <meta name="wesstudy-version" content="5.4.1" />
+  <title>WesStudy v5.4.2</title>
+  <meta name="wesstudy-version" content="5.4.2" />
   <style>
     :root{
       --bg:#f4f5fb;--panel:#fff;--panel2:#f8f8fd;--text:#191a25;--muted:#74778b;
@@ -465,6 +465,52 @@ body{background:linear-gradient(180deg,#f7f5f0 0%,#f2f1ec 100%);color:var(--text
 .subject-actions .mini-btn:empty::before{content:'+ Nachholen'}
 .subject-actions .mini-btn:empty{min-width:104px}
 
+
+/* ===== v5.4.2 compact mobile layout ===== */
+@media (max-width:760px){
+  .topbar{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;padding-top:2px;margin-bottom:14px}
+  .brand{display:contents}
+  .brand .logo{grid-column:1;width:56px;height:56px;border-radius:18px;font-size:1rem}
+  .brand>div:last-child{grid-column:2;min-width:0}
+  .brand h1{font-size:1.55rem;margin:0;line-height:1.05}
+  .brand p{display:none}
+  .actions{grid-column:3;display:flex;justify-content:flex-end;gap:8px}
+  .icon-btn{width:48px;height:48px;border-radius:16px}
+  .dashboard-mode{margin:0 0 12px;width:100%}
+  .dashboard-countdown{margin-bottom:12px;padding:14px 16px}
+  .hero{margin-bottom:12px!important;padding:16px}.hero-row{display:grid;grid-template-columns:1fr auto;align-items:center;gap:12px}.hero-row>div:first-child{min-width:0}.hero .ring{width:84px;height:84px}.hero .ring:before{width:64px;height:64px}.hero .big-number{color:#fff!important}.hero #heroRemaining{color:rgba(255,255,255,.84)}
+  [data-page="home"]>.grid.cols-4{display:grid!important;grid-template-columns:1fr 1fr!important;gap:10px!important;margin-bottom:12px!important}
+  [data-page="home"]>.grid.cols-4>.card{padding:14px;min-height:128px}
+  [data-page="home"]>.grid.cols-4>.card .big-number{font-size:1.55rem}
+  [data-page="home"]>.grid.cols-4>.card .muted{font-size:.86rem;line-height:1.35}
+  [data-page="subjects"]>.grid.cols-4{display:grid!important;grid-template-columns:1fr 1fr!important;gap:10px!important;margin-bottom:12px!important}
+  [data-page="subjects"]>.grid.cols-4>.card{padding:14px;min-height:118px}
+  [data-page="subjects"]>.grid.cols-4>.card .big-number{font-size:1.55rem}
+  [data-page="subjects"] .section-head{margin-bottom:10px}.section-head h2{font-size:1.75rem}.section-head .muted{font-size:.9rem;line-height:1.35}
+  [data-page="subjects"] .section-head>.btn.primary{align-self:flex-end;width:auto;padding:11px 14px}
+  #subjectsMakeupSummary{padding:16px}
+  #subjectsMakeupSummary .section-head{display:grid;grid-template-columns:1fr auto;align-items:end;gap:12px}
+  #subjectsMakeupSummary .section-head .btn{width:auto;white-space:nowrap}
+  #subjectsMakeupSummary .metrics{grid-template-columns:1fr 1fr}
+  .subject-list{gap:12px}
+  .subject{padding:14px;border-radius:18px}
+  .subject-head{grid-template-columns:1fr!important}.subject-actions{grid-template-columns:1fr 1fr!important}
+  .subject-actions .mini-btn:empty{min-width:0}.subject-actions .mini-btn:empty::before{content:'+ Nachholen'}
+  .metrics{grid-template-columns:1fr 1fr!important}
+}
+@media (max-width:430px){
+  .app{padding:12px 10px 108px}
+  .topbar{grid-template-columns:auto 1fr auto;gap:10px}
+  .brand .logo{width:50px;height:50px;border-radius:16px}
+  .brand h1{font-size:1.38rem}
+  .actions{gap:6px}.icon-btn{width:44px;height:44px;border-radius:14px}
+  [data-page="home"]>.grid.cols-4,[data-page="subjects"]>.grid.cols-4{grid-template-columns:1fr 1fr!important;gap:8px!important}
+  [data-page="home"]>.grid.cols-4>.card,[data-page="subjects"]>.grid.cols-4>.card{padding:12px;min-height:108px}
+  [data-page="home"]>.grid.cols-4>.card .big-number,[data-page="subjects"]>.grid.cols-4>.card .big-number{font-size:1.42rem}
+  [data-page="home"]>.grid.cols-4>.card .eyebrow,[data-page="subjects"]>.grid.cols-4>.card .eyebrow{font-size:.64rem}
+  #subjectsMakeupSummary .metrics{grid-template-columns:1fr!important}
+}
+
 </style>
 </head>
 <body>
@@ -482,7 +528,6 @@ body{background:linear-gradient(180deg,#f7f5f0 0%,#f2f1ec 100%);color:var(--text
       <div class="dashboard-countdown" id="dashboardCountdown"><div class="count-number" id="countdownNumber">—</div><div><strong id="countdownTitle">Zeitraum einrichten</strong><div class="muted" id="countdownDate">Lege Semester- und Feriendaten fest.</div></div></div>
       <div class="card hero" style="margin-bottom:16px"><div class="hero-row"><div><div style="opacity:.85;font-size:.86rem">Fortschritt zum Lernziel</div><div class="big-number" id="heroStudied">0 Std.</div><div style="opacity:.85;margin:8px 0" id="heroRemaining">verbleibend 0 Std.</div><button class="btn" style="background:white;color:#5c4de0;box-shadow:none" data-open="manualSessionDialog">Lernzeit eintragen</button></div><div class="ring" id="overallRing"><strong id="overallPercent">0%</strong></div></div></div>
       <div class="grid cols-4" style="margin-bottom:16px">
-        <div class="card"><div class="eyebrow" id="dailyNeedLabel">Täglich erforderlich</div><div class="big-number" id="dailyNeed">0:00</div><div class="muted" id="dailyNeedHint">Nach verbleibenden Tagen</div></div>
         <div class="card"><div class="eyebrow" id="weeklyNeedLabel">Wöchentlich erforderlich</div><div class="big-number" id="weeklyNeed">0:00</div><div class="muted" id="weeklyNeedHint">Um im Plan zu bleiben</div></div>
         <div class="card"><div class="eyebrow" id="todayStudiedLabel">Heute gelernt</div><div class="big-number" id="todayStudied">0:00</div><div class="muted" id="todayStatus">Starte deine erste Session</div></div>
         <div class="card"><div class="eyebrow">Heute geplant</div><div class="big-number" id="todayPlanned">0:00</div><div class="muted" id="todayPlannedStatus">Aus der Semesterplanung</div></div>
@@ -837,13 +882,13 @@ function renderHome(){
  const targetMetrics=document.getElementById('studyTargetMetrics');if(targetMetrics)targetMetrics.innerHTML=`<span class="pill">Basisbedarf ${hoursText(req)}</span><span class="pill">Nachholen gesamt ${hoursText(makeupTotalMins())}</span><span class="pill">Gesamtbedarf inkl. Nachholen ${hoursText(totalRequiredWithMakeup())}</span><span class="pill">Dein Lernziel ${targetPct.toFixed(0)}% + Nachholen = ${hoursText(target)}</span><span class="pill">Nachholen offen ${hoursText(makeupOpenMins())}</span><span class="pill">Ferien geplant ${hoursText(holidayForTarget)}</span><span class="pill">Im Semester einzuplanen ${hoursText(semesterTarget)}</span><span class="pill">Semester noch offen ${hoursText(semesterOpen)}</span>`;
  if(mode==='holiday'){
    const h=state.holiday,plan=holidayPlannedMins(),hDone=holidayDoneMins(),hRem=Math.max(0,plan-hDone),hDaily=holidayDailyNeed();
-   $('#dailyNeedLabel').textContent='Pro geplantem Ferientag';$('#dailyNeed').textContent=minsText(hDaily);$('#dailyNeedHint').textContent='Automatisch nach verbleibenden Plantagen';
+   document.getElementById('dailyNeedLabel')&&(document.getElementById('dailyNeedLabel').textContent='Pro geplantem Ferientag');document.getElementById('dailyNeed')&&(document.getElementById('dailyNeed').textContent=minsText(hDaily));document.getElementById('dailyNeedHint')&&(document.getElementById('dailyNeedHint').textContent='Automatisch nach verbleibenden Plantagen');
    $('#weeklyNeedLabel').textContent='Ferienplan verbleibend';$('#weeklyNeed').textContent=minsText(hRem);$('#weeklyNeedHint').textContent=`Von ${minsText(plan)} geplant`;
    $('#todayStudiedLabel').textContent='Heute in den Ferien gelernt';$('#todayStudied').textContent=minsText(todayMins);$('#todayStatus').textContent=isHolidayStudyDate(today)?(todayMins?'Wird vollständig im Ferienfortschritt erfasst':'Heute zählt automatisch zum Ferienfortschritt'):'Außerhalb des eingetragenen Ferienzeitraums';
    $('#semesterPreview').classList.remove('hidden');const plannedHoliday=Math.min(baseStudyTargetMins(),holidayPlannedMins()),projectedSemesterRemaining=Math.max(0,baseStudyTargetMins()-plannedHoliday)+makeupOpenMins(),semesterDays=state.semester.start&&state.semester.end?daysInclusive(state.semester.start,state.semester.end):0,projectedDaily=semesterDays?projectedSemesterRemaining/semesterDays:0;$('#previewRequired').textContent=`Gesamtbedarf inkl. Nachholen ${hoursText(totalRequiredWithMakeup())}`;const previewTarget=document.getElementById('previewTarget');if(previewTarget)previewTarget.textContent=`Lernziel ${studyTargetPercent().toFixed(0)}% = ${hoursText(target)}`;$('#previewHolidayPlanned').textContent=`Ferien geplant ${hoursText(plannedHoliday)}`;$('#previewRemaining').textContent=`Im Semester ${hoursText(projectedSemesterRemaining)}`;$('#previewDaily').textContent=`${minsText(projectedDaily)}/Tag im Semester`;$('#previewWeekly').textContent=`${minsText(projectedDaily*7)}/Woche`;
    const startDays=daysUntil(state.semester.start);$('#countdownNumber').textContent=startDays===null?'—':startDays;$('#countdownTitle').textContent=startDays===0?'Das Semester beginnt heute':`Noch ${startDays??'—'} Tage bis Semesterbeginn`;$('#countdownDate').textContent=state.semester.start?fmtDate(state.semester.start):'Semesterbeginn noch nicht festgelegt';
  }else{
-   const dNeed=dailyNeed();$('#dailyNeedLabel').textContent='Täglich erforderlich';$('#dailyNeed').textContent=minsText(dNeed);$('#dailyNeedHint').textContent='Wird täglich aus Reststunden und Resttagen neu berechnet';
+   const dNeed=dailyNeed();document.getElementById('dailyNeedLabel')&&(document.getElementById('dailyNeedLabel').textContent='Täglich erforderlich');document.getElementById('dailyNeed')&&(document.getElementById('dailyNeed').textContent=minsText(dNeed));document.getElementById('dailyNeedHint')&&(document.getElementById('dailyNeedHint').textContent='Wird täglich aus Reststunden und Resttagen neu berechnet');
    $('#weeklyNeedLabel').textContent='Wöchentlich erforderlich';$('#weeklyNeed').textContent=minsText(dNeed*7);$('#weeklyNeedHint').textContent='Um im Plan zu bleiben';
    $('#todayStudiedLabel').textContent='Heute gelernt';$('#todayStudied').textContent=minsText(todayMins);$('#todayStatus').textContent=todayMins>=dNeed&&dNeed>0?'Tagesziel erreicht':todayMins?`verbleibend ${minsText(Math.max(0,dNeed-todayMins))}`:'Starte deine erste Session';
    $('#semesterPreview').classList.add('hidden');const endDays=daysUntil(state.semester.end);$('#countdownNumber').textContent=endDays===null?'—':endDays;$('#countdownTitle').textContent=endDays===0?'Das Semester endet heute':`Noch ${endDays??'—'} Tage bis Semesterende`;$('#countdownDate').textContent=state.semester.end?fmtDate(state.semester.end):'Semesterende noch nicht festgelegt';
@@ -2129,7 +2174,7 @@ state.lang='de'; persistLocal(false); state.timerSettings={...defaultState.timer
 
 
 function statusLabel(v){const de={open:'Offen',planned:'Geplant',active:'In Bearbeitung',exam:'Prüfung abgelegt',passed:'Bestanden',failed:'Wiederholung',postponed:'Verschoben'};return de[v]||v}
-function renderStudyProgress(){const sp=state.studyProgress,mods=sp.modules||[],total=mods.reduce((a,m)=>a+Number(m.lp||0),0),passed=mods.filter(m=>m.status==='passed').reduce((a,m)=>a+Number(m.lp||0),0),current=mods.filter(m=>String(m.planSemester)===String(sp.currentSemester)&&m.status!=='passed').reduce((a,m)=>a+Number(m.lp||0),0);sp.degreeTotal=total;$('#lpTotal').textContent=total+' LP';$('#lpPassed').textContent=passed+' LP';$('#lpOpen').textContent=Math.max(0,total-passed)+' LP';$('#lpCurrent').textContent=current+' LP';$('#degreeTotalLp').value=total;$('#currentPlanSemester').value=sp.currentSemester;const order=['1','2','3','Sommer','4','5','6','7'];$('#lpGroups').innerHTML=order.map(sem=>{const rows=mods.filter(m=>String(m.planSemester)===sem);if(!rows.length)return'';const sum=rows.reduce((a,m)=>a+Number(m.lp||0),0),done=rows.filter(m=>m.status==='passed').reduce((a,m)=>a+Number(m.lp||0),0);return `<div class="card lp-semester"><div class="lp-semester-head"><div><h3>${sem==='Sommer'?'Sommer':sem+'. Semester'}</h3><div class="muted">${done}/${sum} LP</div></div><span class="status ${sem===String(sp.currentSemester)?'good':''}">${sem===String(sp.currentSemester)?'Aktuell':sum+' LP'}</span></div><div class="lp-table">${rows.map(m=>`<div class="lp-row ${sem===String(sp.currentSemester)?'lp-current':''}"><div><strong>${esc(m.name)}</strong><div class="muted lp-origin">${'Aus Semester'} ${esc(m.originSemester||'—')}</div></div><b>${m.lp} LP</b><span class="lp-status ${m.status}">${statusLabel(m.status)}</span><button class="mini-btn" data-edit-lp="${m.id}">Bearbeiten</button></div>`).join('')}</div></div>`}).join('')}
+function renderStudyProgress(){const sp=state.studyProgress,mods=sp.modules||[],norm=n=>String(n||'').trim().toLowerCase().replace(/\s+/g,' '),uniqueMap=new Map();for(const m of mods){const k=norm(m.name);if(!k)continue;if(!uniqueMap.has(k))uniqueMap.set(k,m);else{const prev=uniqueMap.get(k);if(Number(m.lp||0)>Number(prev.lp||0))uniqueMap.set(k,m)}}const uniqueMods=[...uniqueMap.values()],total=uniqueMods.reduce((a,m)=>a+Number(m.lp||0),0),passedNames=new Set(mods.filter(m=>m.status==='passed').map(m=>norm(m.name))),passed=uniqueMods.filter(m=>passedNames.has(norm(m.name))).reduce((a,m)=>a+Number(m.lp||0),0),currentNames=new Set(mods.filter(m=>String(m.planSemester)===String(sp.currentSemester)&&m.status!=='passed').map(m=>norm(m.name))),current=uniqueMods.filter(m=>currentNames.has(norm(m.name))&&!passedNames.has(norm(m.name))).reduce((a,m)=>a+Number(m.lp||0),0);sp.degreeTotal=total;$('#lpTotal').textContent=total+' LP';$('#lpPassed').textContent=passed+' LP';$('#lpOpen').textContent=Math.max(0,total-passed)+' LP';$('#lpCurrent').textContent=current+' LP';$('#degreeTotalLp').value=total;$('#currentPlanSemester').value=sp.currentSemester;const order=['1','2','3','Sommer','4','5','6','7'];$('#lpGroups').innerHTML=order.map(sem=>{const rows=mods.filter(m=>String(m.planSemester)===sem);if(!rows.length)return'';const semUnique=new Map();for(const m of rows){const k=norm(m.name);if(!semUnique.has(k)||Number(m.lp||0)>Number(semUnique.get(k).lp||0))semUnique.set(k,m)}const sum=[...semUnique.values()].reduce((a,m)=>a+Number(m.lp||0),0),done=[...semUnique.values()].filter(m=>passedNames.has(norm(m.name))).reduce((a,m)=>a+Number(m.lp||0),0);return `<div class="card lp-semester"><div class="lp-semester-head"><div><h3>${sem==='Sommer'?'Sommer':sem+'. Semester'}</h3><div class="muted">${done}/${sum} LP</div></div><span class="status ${sem===String(sp.currentSemester)?'good':''}">${sem===String(sp.currentSemester)?'Aktuell':sum+' LP'}</span></div><div class="lp-table">${rows.map(m=>`<div class="lp-row ${sem===String(sp.currentSemester)?'lp-current':''}"><div><strong>${esc(m.name)}</strong><div class="muted lp-origin">${'Aus Semester'} ${esc(m.originSemester||'—')}</div></div><b>${m.lp} LP</b><span class="lp-status ${m.status}">${statusLabel(m.status)}</span><button class="mini-btn" data-edit-lp="${m.id}">Bearbeiten</button></div>`).join('')}</div></div>`}).join('')}
 function openLp(id){const m=id?state.studyProgress.modules.find(x=>x.id===id):null;$('#lpId').value=m?.id||'';$('#lpName').value=m?.name||'';$('#lpCredits').value=m?.lp||'';$('#lpOriginSemester').value=m?.originSemester||'';$('#lpPlanSemester').value=m?.planSemester||state.studyProgress.currentSemester;$('#lpStatus').value=m?.status||'open';$('#lpExamDate').value=m?.examDate||'';$('#lpUseInStudy').checked=!!m?.useInStudy;$('#lpDelete').classList.toggle('hidden',!m);$('#lpDialogTitle').textContent=m?'Modul bearbeiten':'Modul hinzufügen';$('#lpDialog').showModal()}
 $('#addLpModule').onclick=()=>openLp();$('#lpForm').addEventListener('submit',e=>{if(e.submitter?.value==='cancel')return;e.preventDefault();const id=$('#lpId').value||uid(),old=state.studyProgress.modules.find(x=>x.id===id),m={id,name:$('#lpName').value.trim(),lp:Number($('#lpCredits').value),originSemester:$('#lpOriginSemester').value.trim(),planSemester:$('#lpPlanSemester').value,status:$('#lpStatus').value,examDate:$('#lpExamDate').value,useInStudy:$('#lpUseInStudy').checked,subjectId:old?.subjectId||null};if(m.useInStudy&&!m.subjectId){const existing=state.subjects.find(s=>s.name.trim().toLowerCase()===m.name.toLowerCase());if(existing)m.subjectId=existing.id;else{m.subjectId=uid();state.subjects.push({id:m.subjectId,name:m.name,credits:m.lp,color:'#6d5dfc',start:state.semester.start||'',end:state.semester.end||''})}}if(old)state.studyProgress.modules=state.studyProgress.modules.map(x=>x.id===id?m:x);else state.studyProgress.modules.push(m);save();$('#lpDialog').close()});
 $('#lpDelete').onclick=()=>{const id=$('#lpId').value;if(!id)return;if(confirm('Dieses Modul aus der LP-Planung löschen?')){state.studyProgress.modules=state.studyProgress.modules.filter(x=>x.id!==id);save();$('#lpDialog').close()}};
