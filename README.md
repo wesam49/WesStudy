@@ -1,7 +1,10 @@
-WesStudy v5.4.2
-- Mobile Header kompakter
-- Startseite KPIs als 2x2 Grid
-- Täglich erforderlich entfernt
-- Fächer-KPIs als 2x2 Grid
-- Hero-Kontrast verbessert
-- Gesamt-LP zählt Wiederholungen desselben Moduls nicht doppelt
+WesStudy v5.4.4
+
+Änderungen:
+- Wochenstatus: Gelb bei noch offenen Lernstunden, Grün nur bei vollständig geplanter Woche.
+- Desktop-Sidebar neu angeordnet, kein Text-Overlap, geringerer Abstand zum Hauptinhalt.
+- Sidebar im Light Mode an das helle Design angepasst.
+- Nachholen-Bereich klar als eigener Abschnitt mit Rahmen abgesetzt.
+- Fortschritt-zum-Lernziel-Karte im Light Mode hell und kontrastreich gestaltet.
+- Letzte Sessions: unterschiedliche Fach-Icons je nach Fachtyp; Farbe weiterhin aus „Fach bearbeiten“.
+- Dark Mode weiterhin separat abgestimmt.

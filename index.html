@@ -10,8 +10,8 @@
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="icon-192.png" />
-  <title>WesStudy v5.4.3</title>
-  <meta name="wesstudy-version" content="5.4.3" />
+  <title>WesStudy v5.4.4</title>
+  <meta name="wesstudy-version" content="5.4.4" />
   <style>
     :root{
       --bg:#f4f5fb;--panel:#fff;--panel2:#f8f8fd;--text:#191a25;--muted:#74778b;
@@ -555,6 +555,45 @@ body{background:linear-gradient(180deg,#f7f5f0 0%,#f2f1ec 100%);color:var(--text
   #dailyStudyCard .grid.cols-4,#dailyStudyCard .progress,#dailyStudyCard .timer-controls{display:none!important}
   #dailyStudyCard .section-head{margin-bottom:0}
 }
+
+/* ===== v5.4.4 requested refinements ===== */
+.week-summary-bar.pending{background:#fff4df!important;border-color:#efd6a4!important;color:#8b5d14!important}
+.week-summary-bar.complete{background:#edf8f1!important;border-color:#cfe6d8!important;color:#256846!important}
+#subjectsMakeupSummary{border:2px solid #d7e5dc!important;background:#fbfdfb!important;box-shadow:0 12px 28px rgba(38,88,62,.06)!important;padding:20px!important}
+#subjectsMakeupSummary + #subjectsList{margin-top:22px}
+.hero{background:#f7faf8!important;color:var(--text)!important;border:1px solid #dbe7df!important;box-shadow:0 8px 22px rgba(32,68,48,.05)!important}
+.hero .big-number{color:#102347!important}
+.hero #heroRemaining{color:#5e6f7e!important}
+.hero>*,.hero-row{color:var(--text)!important}
+.hero .ring{background:conic-gradient(#2f8f6d calc(var(--p)*1%),#dbe7df 0)!important}
+.hero .ring:before{background:#ffffff!important}
+.hero .ring strong{color:#102347!important}
+.hero .btn{background:#ffffff!important;border:1px solid #d7e1dc!important;color:#365eea!important}
+[data-theme="dark"] .hero{background:#17242b!important;border-color:#2c3d45!important;color:#f4f7fb!important}
+[data-theme="dark"] .hero .big-number,[data-theme="dark"] .hero .ring strong{color:#f4f7fb!important}
+[data-theme="dark"] .hero #heroRemaining{color:#aeb9bf!important}
+[data-theme="dark"] .hero .ring:before{background:#17242b!important}
+[data-theme="dark"] #subjectsMakeupSummary{background:#16251f!important;border-color:#2d4a3d!important}
+@media(min-width:961px){
+  body{padding-left:0!important}
+  .app{max-width:none!important;width:auto!important;margin-left:284px!important;margin-right:28px!important;padding:28px 0 60px!important}
+  .nav{left:28px!important;top:26px!important;bottom:26px!important;width:224px!important;padding:22px 12px 16px!important;background:#f8faf9!important;border:1px solid #dbe4df!important;box-shadow:0 14px 36px rgba(25,52,39,.09)!important}
+  .nav::before{content:'WesStudy'!important;position:static!important;display:block!important;order:0!important;margin:0 12px 2px!important;padding:0!important;color:#102347!important;font-family:Georgia,'Times New Roman',serif!important;font-size:1.85rem!important;line-height:1.05!important;font-weight:700!important}
+  .nav::after{content:'PLANEN · LERNEN · WEITERKOMMEN'!important;position:static!important;display:block!important;order:0!important;margin:0 12px 18px!important;padding:0!important;color:#7b8995!important;font-size:.57rem!important;line-height:1.45!important;letter-spacing:.11em!important;text-transform:uppercase!important}
+  .nav button{order:1!important;margin:0 4px!important;padding:12px 14px!important;color:#566574!important;border-radius:14px!important;font-size:.94rem!important}
+  .nav button:hover{background:#f0f5f2!important;color:#173c2d!important}
+  .nav button.active{background:#edf7f1!important;color:#21825f!important;box-shadow:none!important}
+  .nav-svg svg{color:currentColor!important}
+  [data-theme="dark"] .nav{background:#121f27!important;border-color:#283740!important}
+  [data-theme="dark"] .nav::before{color:#f4f7fb!important}
+  [data-theme="dark"] .nav::after{color:#81909b!important}
+  [data-theme="dark"] .nav button{color:#aeb9bf!important}
+  [data-theme="dark"] .nav button.active{background:#1d382e!important;color:#6fc39a!important}
+}
+@media(max-width:960px){
+  .hero{padding:18px!important}
+  #subjectsMakeupSummary{padding:16px!important}
+}
 </style>
 </head>
 <body>
@@ -948,11 +987,40 @@ function hexToRgba(hex,alpha=.14){
   const num=parseInt(full,16),r=(num>>16)&255,g=(num>>8)&255,b=num&255;
   return alpha>=1?`rgb(${r},${g},${b})`:`rgba(${r},${g},${b},${alpha})`;
 }
-function sessionSymbol(kind='normal'){
-  if(kind==='makeup') return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8V4m0 0H2m4 0 3 3M18 16v4m0 0h4m-4 0-3-3M4 12a8 8 0 0 1 13.7-5.7M20 12a8 8 0 0 1-13.7 5.7" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-  return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 18h3V9H5zm5 0h4V5h-4zm6 0h3v-8h-3z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+function subjectIconType(name=''){
+  const n=String(name||'').toLowerCase();
+  if(/mikro|micro|informatik|info\b/.test(n)) return 'computer';
+  if(/hm\s*\d|mathem|numerisch/.test(n)) return 'math';
+  if(/regel|control/.test(n)) return 'control';
+  if(/robot/.test(n)) return 'robot';
+  if(/bionik|bio/.test(n)) return 'leaf';
+  if(/fertig|produktion|entwicklung/.test(n)) return 'tool';
+  if(/bauelement|et\s*\d|elektr|sensor|aktor/.test(n)) return 'circuit';
+  if(/tm\s*\d|mechanik|fem/.test(n)) return 'gear';
+  if(/cad/.test(n)) return 'cube';
+  if(/qualität/.test(n)) return 'check';
+  if(/projekt|praxis|bachelor/.test(n)) return 'briefcase';
+  return 'book';
 }
-function sessionIconHTML(color='#6d5dfc',kind='normal'){
+function sessionSymbol(kind='book'){
+  if(kind==='makeup') return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8V4m0 0H2m4 0 3 3M18 16v4m0 0h4m-4 0-3-3M4 12a8 8 0 0 1 13.7-5.7M20 12a8 8 0 0 1-13.7 5.7" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  const icons={
+    computer:'<svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9 20h6M12 16v4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+    math:'<svg viewBox="0 0 24 24"><path d="M17 5H8l5 7-5 7h9" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    control:'<svg viewBox="0 0 24 24"><path d="M4 7h7m4 0h5M4 17h3m4 0h9M11 4v6M7 14v6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="13" cy="7" r="2" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="9" cy="17" r="2" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>',
+    robot:'<svg viewBox="0 0 24 24"><path d="M6 18h4m4 0h4M8 18v-4l4-3 3 2 2-4M12 11V7l3-2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="15" cy="5" r="2" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>',
+    leaf:'<svg viewBox="0 0 24 24"><path d="M19 5c-7 0-12 3-12 8 0 3 2 5 5 5 5 0 7-6 7-13Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M6 19c2-4 5-7 10-10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+    tool:'<svg viewBox="0 0 24 24"><path d="M14 6a4 4 0 0 0-5 5L4 16l4 4 5-5a4 4 0 0 0 5-5l-3 2-3-3 2-3Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>',
+    circuit:'<svg viewBox="0 0 24 24"><rect x="8" y="8" width="8" height="8" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M10 3v5m4-5v5m-4 8v5m4-5v5M3 10h5m-5 4h5m8-4h5m-5 4h5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>',
+    gear:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3v2m0 14v2M3 12h2m14 0h2M5.6 5.6 7 7m10 10 1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+    cube:'<svg viewBox="0 0 24 24"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="m4 7.5 8 4.5 8-4.5M12 12v9" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>',
+    check:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m8 12 2.6 2.6L16 9" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    briefcase:'<svg viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9 7V5h6v2M4 12h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+    book:'<svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5zM4 5.5v15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+  };
+  return icons[kind]||icons.book;
+}
+function sessionIconHTML(color='#6d5dfc',kind='book'){
   const bg=hexToRgba(color,.14),bd=hexToRgba(color,.22);
   return `<div class="session-icon" style="background:${bg};color:${esc(color)};border-color:${bd}">${sessionSymbol(kind)}</div>`;
 }
@@ -964,7 +1032,7 @@ function statusSymbol(kind='good'){
 }
 function sessionHTML(x,actions=false){
   const s=state.subjects.find(y=>y.id===x.subjectId),mk=isMakeupSession(x),color=s?.color||'#6d5dfc';
-  return `<div class="session-row">${sessionIconHTML(color,mk?'makeup':'normal')}<div class="session-info"><strong>${esc(s?.name||'Gelöschtes Fach')}</strong><div class="session-meta"><span>${fmtDate(x.date)} · ${minsText(x.minutes)}</span><span>${mk?'Nachholzeit':'Normales Lernen'}</span></div></div>${actions?`<div class="session-actions"><button class="mini-btn" data-edit-session="${x.id}">Bearbeiten</button><button class="mini-btn" data-delete-session="${x.id}">Löschen</button></div>`:''}</div>`}
+  return `<div class="session-row">${sessionIconHTML(color,mk?'makeup':subjectIconType(s?.name))}<div class="session-info"><strong>${esc(s?.name||'Gelöschtes Fach')}</strong><div class="session-meta"><span>${fmtDate(x.date)} · ${minsText(x.minutes)}</span><span>${mk?'Nachholzeit':'Normales Lernen'}</span></div></div>${actions?`<div class="session-actions"><button class="mini-btn" data-edit-session="${x.id}">Bearbeiten</button><button class="mini-btn" data-delete-session="${x.id}">Löschen</button></div>`:''}</div>`}
 function subjectOptionsForStudyType(type,current=''){const list=type==='makeup'?state.subjects.filter(s=>makeupRequiredForSubject(s.id)>0):state.subjects;const html=list.length?list.map(s=>`<option value="${s.id}">${esc(s.name)}${type==='makeup'?` · offen ${minsText(makeupOpenForSubject(s.id))}`:''}</option>`).join(''):`<option value="">${type==='makeup'?'Noch kein Nachholbedarf vorhanden':'Füge zuerst ein Fach hinzu'}</option>`;return {html,list,current:list.some(s=>s.id===current)?current:(list[0]?.id||'')}}
 function updateStudySubjectSelect(typeId,subjectId){const type=document.getElementById(typeId)?.value||'normal',el=document.getElementById(subjectId);if(!el)return;const old=el.value,r=subjectOptionsForStudyType(type,old);el.innerHTML=r.html;el.value=r.current;if(typeId==='manualStudyType'){const h=document.getElementById('manualStudyHint');if(h)h.textContent=type==='makeup'?'Diese Session reduziert den offenen Nachholbedarf des gewählten Fachs und zählt nicht doppelt zum normalen Fachfortschritt.':'Diese Zeit zählt zum normalen Lernfortschritt des Fachs.'}}
 function populateSubjectSelects(){const options=state.subjects.length?state.subjects.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join(''):'<option value="">Füge zuerst ein Fach hinzu</option>';for(const id of ['makeupSubject']){const el=document.getElementById(id);if(!el)continue;const old=el.value;el.innerHTML=options;if([...el.options].some(o=>o.value===old))el.value=old}updateStudySubjectSelect('manualStudyType','manualSubject');updateStudySubjectSelect('dailyStudyType','dailyStudySubject')}
@@ -1754,7 +1822,7 @@ function renderWeekPlanner(){
     return `<div class="wg-day-col" data-week-date="${date}" style="height:${canvasHeight}px">${items}</div>`;
   }).join('');
   const timesHtml=labels.map(x=>`<div class="wg-time-label" style="top:${x.top}%">${x.label}</div>`).join('');
-  document.getElementById('weekOverview').innerHTML=`<div class="week-board"><div class="week-metrics">${metricCard('Lernziel',minsText(target))}${metricCard('Geplant',minsText(planned))}${metricCard('Noch offen',minsText(open))}${metricCard('Nachholen offen',minsText(makeupOpen))}</div><div class="week-summary-bar">Wochenplanung: Soll ${minsText(target)} · als Lernen eingeplant ${minsText(planned)} · ${open?`noch offen ${minsText(open)}`:'vollständig eingeplant ✓'}</div><div class="week-grid-shell"><div class="week-grid"><div class="wg-head-left">Uhrzeit</div>${headHtml}<div class="wg-time-col" style="height:${canvasHeight}px">${timesHtml}</div>${colHtml}</div></div><div class="week-legend"><span class="lg u"><i></i> Uni / Pflichttermine</span><span class="lg s"><i></i> Lernen</span><span class="lg m"><i></i> Nachholen</span><span class="lg g"><i></i> Gym</span></div></div>`;
+  document.getElementById('weekOverview').innerHTML=`<div class="week-board"><div class="week-metrics">${metricCard('Lernziel',minsText(target))}${metricCard('Geplant',minsText(planned))}${metricCard('Noch offen',minsText(open))}${metricCard('Nachholen offen',minsText(makeupOpen))}</div><div class="week-summary-bar ${open?'pending':'complete'}">Wochenplanung: Soll ${minsText(target)} · als Lernen eingeplant ${minsText(planned)} · ${open?`noch offen ${minsText(open)}`:'vollständig eingeplant ✓'}</div><div class="week-grid-shell"><div class="week-grid"><div class="wg-head-left">Uhrzeit</div>${headHtml}<div class="wg-time-col" style="height:${canvasHeight}px">${timesHtml}</div>${colHtml}</div></div><div class="week-legend"><span class="lg u"><i></i> Uni / Pflichttermine</span><span class="lg s"><i></i> Lernen</span><span class="lg m"><i></i> Nachholen</span><span class="lg g"><i></i> Gym</span></div></div>`;
 }
 function renderPlannerRules(){
   const w=plannerState();
