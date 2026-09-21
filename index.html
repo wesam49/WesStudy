@@ -72,7 +72,7 @@
     .lp-status{font-size:.75rem;padding:6px 8px;border-radius:999px;text-align:center;background:var(--panel)}.lp-status.passed{background:#e7fbf4;color:#087b59}.lp-status.failed{background:#ffecef;color:#b82f3b}.lp-status.active{background:#eeeaff;color:#5747dc}.lp-status.planned{background:#fff6df;color:#a96900}
     .setting-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px;background:var(--panel2);border-radius:14px}.setting-row input{width:22px;height:22px}
     html[dir="ltr"] .day{text-align:left}
-    @media(max-width:720px){.lp-summary{grid-template-columns:1fr 1fr}.lp-row{grid-template-columns:minmax(0,1fr) 54px 92px auto}.lp-row .lp-origin{display:none}.nav button{font-size:.64rem}.nav button span{font-size:1.1rem}.topbar{padding-inline:2px}.actions{gap:6px}.icon-btn{width:42px;height:42px}.section-head{align-items:flex-start}.timer-controls{gap:8px}.timer-controls .btn{min-width:0;flex:1;padding:11px 8px}}
+    @media(max-width:720px){.lp-summary{grid-template-columns:1fr 1fr}.lp-row{grid-template-columns:minmax(0,1fr) 54px 92px auto}.lp-row .lp-origin{display:block;margin-top:4px;font-size:.76rem}.nav button{font-size:.64rem}.nav button span{font-size:1.1rem}.topbar{padding-inline:2px}.actions{gap:6px}.icon-btn{width:42px;height:42px}.section-head{align-items:flex-start}.timer-controls{gap:8px}.timer-controls .btn{min-width:0;flex:1;padding:11px 8px}}
     @media(max-width:430px){.app{padding-inline:10px}.card{padding:14px}.timer-display{font-size:clamp(3.5rem,20vw,5.5rem)}.lp-summary{gap:8px}.lp-row{grid-template-columns:minmax(0,1fr) 46px 78px auto;padding:8px}.nav{width:calc(100% - 12px);gap:2px}.nav button{padding:7px 1px}.brand h1{font-size:1.05rem}}
   
 /* ===== WesStudy v3 fixes ===== */
@@ -880,7 +880,7 @@ body{background:linear-gradient(180deg,#f7f5f0 0%,#f2f1ec 100%);color:var(--text
 (()=>{
 'use strict';
 const KEY='wesstudy_v1';
-const defaultState={version:5.09,theme:'light',lang:'de',dashboardMode:'auto',semester:{name:'',start:'',end:'',hoursPerCredit:17,studyTargetPercent:100},subjects:[],sessions:[],holiday:null,dailyPlan:{items:[],templates:[]},nachholen:{entries:[]},timerSettings:{sound:true,vibrate:true,notifications:false,autoNext:true},studyProgress:null,meta:{updatedAt:0}};
+const defaultState={version:5.45,theme:'light',lang:'de',dashboardMode:'auto',semester:{name:'',start:'',end:'',hoursPerCredit:17,studyTargetPercent:100},subjects:[],sessions:[],holiday:null,dailyPlan:{items:[],templates:[]},nachholen:{entries:[]},timerSettings:{sound:true,vibrate:true,notifications:false,autoNext:true},studyProgress:null,meta:{updatedAt:0}};
 let state=load(); let timer={running:false,paused:false,mode:'focus',round:1,totalRounds:4,focusSec:1500,breakSec:300,remaining:1500,startedAt:null,accumulatedFocus:0,interval:null,open:false};
 let calDate=new Date(); let holidayDraft={days:{}}; let deferredPrompt=null;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
