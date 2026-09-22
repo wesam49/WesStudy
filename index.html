@@ -10,7 +10,7 @@
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="icon-192.png" />
-  <title>WesStudy v5.4.5</title>
+  <title>WesStudy v5.4.6</title>
   <meta name="wesstudy-version" content="5.4.4" />
   <style>
     :root{
@@ -606,6 +606,16 @@ body{background:linear-gradient(180deg,#f7f5f0 0%,#f2f1ec 100%);color:var(--text
   .week-grid .week-block.overlap{padding:5px 6px}
   .week-grid .week-block.overlap .wb-title{font-size:.74rem}
 }
+/* v5.4.6 — direct actions from weekly calendar */
+.week-block[data-week-item-id]{cursor:pointer;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.week-block.week-pressing{transform:scale(.985);filter:brightness(.98)}
+.week-item-menu{position:fixed;z-index:99999;min-width:164px;padding:6px;background:var(--panel);border:1px solid var(--line);border-radius:13px;box-shadow:0 14px 36px rgba(20,30,50,.18);display:none}
+.week-item-menu.open{display:block}
+.week-item-menu button{display:flex;align-items:center;width:100%;border:0;background:transparent;color:var(--text);padding:10px 12px;border-radius:9px;font:inherit;font-weight:750;text-align:left;cursor:pointer}
+.week-item-menu button:hover,.week-item-menu button:focus-visible{background:var(--panel2);outline:none}
+.week-item-menu button.danger{color:#b23b3b}
+.week-item-menu .menu-sep{height:1px;background:var(--line);margin:4px 5px}
+[data-theme="dark"] .week-item-menu{box-shadow:0 16px 42px rgba(0,0,0,.42)}
 
 </style>
 </head>
@@ -1860,7 +1870,7 @@ function renderWeekPlanner(){
       const gap=4;
       const width=`calc((100% - ${gap*(cols-1)}px) / ${cols})`;
       const left=`calc(${(col/cols)*100}% + ${col?gap*col/cols:0}px)`;
-      return `<div class="week-block ${cls} ${cols>1?'overlap':''}" style="top:${top}%;height:${h}%;left:${left};width:${width};right:auto" title="${esc(x.title)}"><div class="wb-time">${esc(x.start)} – ${esc(x.end)}</div><div class="wb-title">${esc(x.title)}</div><div class="wb-sub">${esc(sub)}</div></div>`;
+      return `<div class="week-block ${cls} ${cols>1?'overlap':''}" ${x.id?`data-week-item-id="${esc(x.id)}"`:''} data-week-item-date="${esc(date)}" style="top:${top}%;height:${h}%;left:${left};width:${width};right:auto" title="${esc(x.title)}"><div class="wb-time">${esc(x.start)} – ${esc(x.end)}</div><div class="wb-title">${esc(x.title)}</div><div class="wb-sub">${esc(sub)}</div></div>`;
     }).join('');
     return `<div class="wg-day-col" data-week-date="${date}" style="height:${canvasHeight}px">${items}</div>`;
   }).join('');
@@ -2195,7 +2205,74 @@ document.getElementById('editSmartStudyTarget').onclick=()=>{
 
 document.getElementById('moveOpenTomorrow').onclick=()=>moveStudyOpen(dayPlanDate,'tomorrow');
 document.getElementById('autoDistributeOpen').onclick=()=>moveStudyOpen(dayPlanDate,'auto');
-document.getElementById('weekOverview').addEventListener('click',e=>{const c=e.target.closest('[data-week-date]');if(c){dayPlanDate=c.dataset.weekDate;plannerSwitchTab('day');renderDailyPlan()}});
+// Direct edit/delete actions on the weekly calendar.
+let weekMenuItemId='',weekMenuSuppressClickUntil=0,weekLongPressTimer=null,weekPressStart=null;
+function ensureWeekItemMenu(){
+  let menu=document.getElementById('weekItemMenu');
+  if(menu)return menu;
+  menu=document.createElement('div');
+  menu.id='weekItemMenu';menu.className='week-item-menu';menu.setAttribute('role','menu');
+  menu.innerHTML='<button type="button" data-week-action="edit" role="menuitem">Bearbeiten</button><div class="menu-sep"></div><button type="button" class="danger" data-week-action="delete" role="menuitem">Löschen</button>';
+  document.body.appendChild(menu);
+  menu.addEventListener('click',e=>{
+    const b=e.target.closest('[data-week-action]');if(!b||!weekMenuItemId)return;
+    const id=weekMenuItemId;hideWeekItemMenu();
+    if(b.dataset.weekAction==='edit')openDayPlanItem(id);
+    if(b.dataset.weekAction==='delete')deleteDayPlanItemFromWeek(id);
+  });
+  return menu;
+}
+function hideWeekItemMenu(){const m=document.getElementById('weekItemMenu');if(m)m.classList.remove('open');weekMenuItemId=''}
+function showWeekItemMenu(id,x,y){
+  if(!id)return;const menu=ensureWeekItemMenu();weekMenuItemId=id;menu.classList.add('open');
+  menu.style.left='0px';menu.style.top='0px';
+  const r=menu.getBoundingClientRect(),pad=8;
+  const left=Math.max(pad,Math.min(x,window.innerWidth-r.width-pad));
+  const top=Math.max(pad,Math.min(y,window.innerHeight-r.height-pad));
+  menu.style.left=left+'px';menu.style.top=top+'px';
+}
+function deleteDayPlanItemFromWeek(id){
+  const plan=dailyPlanState(),x=plan.items.find(i=>i.id===id);if(!x)return;
+  const sameGroup=plan.items.filter(i=>i.groupId&&i.groupId===x.groupId);
+  let deleteSeries=false;
+  if(sameGroup.length>1){const a=prompt('Löschen:\n1 = Nur diesen Termin\n2 = Ganze Serie','1');if(a===null)return;deleteSeries=String(a).trim()==='2'}
+  else if(!confirm('Diese Aktivität löschen?'))return;
+  const affected=new Set();
+  if(deleteSeries){sameGroup.forEach(i=>affected.add(i.date));plan.items=plan.items.filter(i=>i.groupId!==x.groupId)}
+  else{affected.add(x.date);plan.items=plan.items.filter(i=>i.id!==id)}
+  affected.forEach(syncManualLearningToSemester);
+  persistLocal(true);renderAll();toast(deleteSeries?'Serie gelöscht':'Aktivität gelöscht');
+}
+const weekOverviewEl=document.getElementById('weekOverview');
+weekOverviewEl.addEventListener('contextmenu',e=>{
+  const block=e.target.closest('.week-block[data-week-item-id]');if(!block)return;
+  e.preventDefault();e.stopPropagation();weekMenuSuppressClickUntil=Date.now()+700;
+  showWeekItemMenu(block.dataset.weekItemId,e.clientX,e.clientY);
+});
+weekOverviewEl.addEventListener('pointerdown',e=>{
+  const block=e.target.closest('.week-block[data-week-item-id]');if(!block||e.pointerType==='mouse')return;
+  hideWeekItemMenu();weekPressStart={x:e.clientX,y:e.clientY,block,id:block.dataset.weekItemId};
+  block.classList.add('week-pressing');
+  clearTimeout(weekLongPressTimer);weekLongPressTimer=setTimeout(()=>{
+    if(!weekPressStart)return;weekMenuSuppressClickUntil=Date.now()+900;
+    showWeekItemMenu(weekPressStart.id,weekPressStart.x,weekPressStart.y);
+    navigator.vibrate?.(20);weekPressStart.block.classList.remove('week-pressing');weekPressStart=null;
+  },550);
+});
+weekOverviewEl.addEventListener('pointermove',e=>{
+  if(!weekPressStart)return;
+  if(Math.hypot(e.clientX-weekPressStart.x,e.clientY-weekPressStart.y)>10){clearTimeout(weekLongPressTimer);weekPressStart.block.classList.remove('week-pressing');weekPressStart=null}
+});
+['pointerup','pointercancel','pointerleave'].forEach(type=>weekOverviewEl.addEventListener(type,()=>{
+  clearTimeout(weekLongPressTimer);if(weekPressStart?.block)weekPressStart.block.classList.remove('week-pressing');weekPressStart=null;
+}));
+weekOverviewEl.addEventListener('click',e=>{
+  if(Date.now()<weekMenuSuppressClickUntil){e.preventDefault();e.stopPropagation();return}
+  const c=e.target.closest('[data-week-date]');if(c){hideWeekItemMenu();dayPlanDate=c.dataset.weekDate;plannerSwitchTab('day');renderDailyPlan()}
+});
+document.addEventListener('pointerdown',e=>{if(!e.target.closest('#weekItemMenu')&&!e.target.closest('.week-block[data-week-item-id]'))hideWeekItemMenu()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')hideWeekItemMenu()});
+window.addEventListener('resize',hideWeekItemMenu);window.addEventListener('scroll',hideWeekItemMenu,true);
 document.getElementById('smartDayItems').addEventListener('change',e=>{if(e.target.matches('[data-planner-done]'))setPlannerCompletion(dayPlanDate,e.target.dataset.plannerDone,{done:e.target.checked})});
 document.getElementById('smartDayItems').addEventListener('click',e=>{
   const a=e.target.closest('[data-planner-actual]');if(a){const cur=plannerCompletion(dayPlanDate,a.dataset.plannerActual)?.actualMins||0,v=prompt('Tatsächliche Dauer in Minuten:',String(cur));if(v!==null&&Number(v)>=0)setPlannerCompletion(dayPlanDate,a.dataset.plannerActual,{actualMins:Number(v)})}

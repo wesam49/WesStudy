@@ -8,3 +8,9 @@ WesStudy v5.4.4
 - Fortschritt-zum-Lernziel-Karte im Light Mode hell und kontrastreich gestaltet.
 - Letzte Sessions: unterschiedliche Fach-Icons je nach Fachtyp; Farbe weiterhin aus „Fach bearbeiten“.
 - Dark Mode weiterhin separat abgestimmt.
+
+
+## v5.4.6
+- Wochenansicht: Long-Press auf Mobilgeräten öffnet Bearbeiten/Löschen.
+- Desktop: Rechtsklick auf einen Termin öffnet Bearbeiten/Löschen.
+- Normaler Klick behält die bisherige Tagesnavigation.
