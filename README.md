@@ -35,3 +35,8 @@ WesStudy v5.4.4
 ## v5.5.1
 - Fixed the JavaScript syntax error in v5.5.0 that made the whole app non-interactive.
 - Quick weekly Soll edit remains enabled by tapping/clicking the Soll summary.
+
+## v5.5.2
+- Changing Semesterbeginn/-ende now keeps existing Semesterplan values inside the range and auto-adds missing days from actual planned `study`/`makeup` blocks in `dailyPlan`.
+- Extending the semester into a new month therefore updates `Verplant`, `Noch offen`, `Freie Tage`, and `Rest Ø` immediately when study blocks already exist there.
+- Shrinking the range still excludes days outside the semester without deleting the underlying calendar appointments.

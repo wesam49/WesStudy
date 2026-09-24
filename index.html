@@ -1069,7 +1069,7 @@ function renderRounds(){const n=Number($('#roundCount')?.value||timer.totalRound
 function nav(page){$$('.page').forEach(x=>x.classList.toggle('active',x.dataset.page===page));$$('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.nav===page));scrollTo({top:0,behavior:'smooth'});if(page==='dayplan')renderDailyPlan()}
 function openDialog(id){const d=$('#'+id);if(id==='semesterDialog'){const s=state.semester;$('#semesterName').value=s.name||'';$('#semesterStart').value=s.start||'';$('#semesterEnd').value=s.end||'';$('#hoursPerCredit').value=s.hoursPerCredit||17}if(id==='subjectDialog'&&!$('#subjectId').value){$('#subjectForm').reset();$('#subjectColor').value='#6d5dfc';$('#subjectId').value='';$('#subjectModalTitle').textContent='Fach hinzufügen'}if(id==='holidayDialog')prepareHolidayDialog();if(id==='manualSessionDialog'&&!$('#manualSessionId').value){$('#manualSessionForm').reset();$('#manualStudyType').value='normal';$('#manualDate').value=todayISO();$('#manualSessionTitle').textContent='Session manuell hinzufügen';populateSubjectSelects()}d.showModal()}
 
-$('#semesterForm').addEventListener('submit',e=>{if(e.submitter?.value==='cancel')return; e.preventDefault();const start=$('#semesterStart').value,end=$('#semesterEnd').value;if(end<start)return toast('Das Enddatum muss nach dem Startdatum liegen.');state.semester={name:$('#semesterName').value.trim(),start,end,hoursPerCredit:Number($('#hoursPerCredit').value)};save();$('#semesterDialog').close();toast('Semester wurde gespeichert')});
+$('#semesterForm').addEventListener('submit',e=>{if(e.submitter?.value==='cancel')return; e.preventDefault();const start=$('#semesterStart').value,end=$('#semesterEnd').value;if(end<start)return toast('Das Enddatum muss nach dem Startdatum liegen.');state.semester={name:$('#semesterName').value.trim(),start,end,hoursPerCredit:Number($('#hoursPerCredit').value)};state.semesterPlan=state.semesterPlan||{days:{}};state.semesterPlan.days=Object.fromEntries(Object.entries(state.semesterPlan.days||{}).filter(([d])=>d>=start&&d<=end));syncSemesterPlanMissingDaysFromDailyStudy(start,end);save();renderAll();$('#semesterDialog').close();toast('Semester wurde gespeichert · vorhandene Lernblöcke im neuen Zeitraum wurden berücksichtigt')});
 $('#subjectForm').addEventListener('submit',e=>{if(e.submitter?.value==='cancel')return;e.preventDefault();const id=$('#subjectId').value;const data={id:id||uid(),name:$('#subjectName').value.trim(),credits:Number($('#subjectCredits').value),color:$('#subjectColor').value,start:$('#subjectStart').value,end:$('#subjectEnd').value};if(data.end&&data.start&&data.end<data.start)return toast('Das Enddatum des Fachs ist ungültig.');if(id)state.subjects=state.subjects.map(s=>s.id===id?data:s);else state.subjects.push(data);save();$('#subjectDialog').close();$('#subjectId').value='';toast(id?'Fach wurde bearbeitet':'Fach wurde hinzugefügt')});
 function editSubject(id){const s=state.subjects.find(x=>x.id===id);if(!s)return;$('#subjectId').value=s.id;$('#subjectName').value=s.name;$('#subjectCredits').value=s.credits;$('#subjectColor').value=s.color;$('#subjectStart').value=s.start||'';$('#subjectEnd').value=s.end||'';$('#subjectModalTitle').textContent='Fach bearbeiten';$('#subjectDialog').showModal()}
 function deleteSubject(id){const s=state.subjects.find(x=>x.id===id);if(!s||!confirm(`Fach löschen ${s.name} und alle zugehörigen Sessions?`))return;state.subjects=state.subjects.filter(x=>x.id!==id);state.sessions=state.sessions.filter(x=>x.subjectId!==id);state.nachholen=state.nachholen||{entries:[]};state.nachholen.entries=(Array.isArray(state.nachholen.entries)?state.nachholen.entries:[]).filter(x=>x.subjectId!==id);save();toast('Fach wurde gelöscht')}
@@ -1090,6 +1090,22 @@ let dayPlanDate=todayISO();
 const dayPlanTypes={study:['','Lernen'],makeup:['','Nachholen'],gym:['','Gym'],reading:['','Lesen'],uni:['','Uni'],work:['','Arbeit'],break:['','Pause'],other:['','Sonstiges']};
 function itemCountsAsLearning(x){return ['study','makeup'].includes(x?.type)}
 function plannedLearningMinutesForDate(date){return dayPlanItems(date).filter(itemCountsAsLearning).reduce((sum,x)=>sum+dayPlanDuration(x),0)}
+function syncSemesterPlanMissingDaysFromDailyStudy(start=state.semester?.start,end=state.semester?.end){
+  if(!start||!end||end<start)return false;
+  state.semesterPlan=state.semesterPlan||{days:{}};
+  state.semesterPlan.days=state.semesterPlan.days||{};
+  const totals={};
+  (state.dailyPlan?.items||[]).forEach(x=>{
+    if(!x?.date||x.date<start||x.date>end||!itemCountsAsLearning(x))return;
+    const mins=dayPlanDuration(x);
+    if(mins>0)totals[x.date]=(totals[x.date]||0)+mins;
+  });
+  let changed=false;
+  Object.entries(totals).forEach(([d,mins])=>{
+    if(state.semesterPlan.days[d]==null&&mins>0){state.semesterPlan.days[d]=mins/60;changed=true}
+  });
+  return changed;
+}
 function dailyPlanState(){if(!state.dailyPlan)state.dailyPlan={items:[],templates:[]};if(!Array.isArray(state.dailyPlan.items))state.dailyPlan.items=[];if(!Array.isArray(state.dailyPlan.templates))state.dailyPlan.templates=[];return state.dailyPlan}
 function timeToMins(v){if(!v||!v.includes(':'))return 0;const [h,m]=v.split(':').map(Number);return h*60+m}
 function dayPlanDuration(x){return Math.max(0,timeToMins(x.end)-timeToMins(x.start))}
@@ -2353,7 +2369,8 @@ if(simpleSemesterSave)simpleSemesterSave.addEventListener('click',()=>{
   state.semester.start=start;state.semester.end=end;
   const w=plannerState();w.semesterStart=start;w.semesterEnd=end;
   if(state.semesterPlan?.days){state.semesterPlan.days=Object.fromEntries(Object.entries(state.semesterPlan.days).filter(([d])=>d>=start&&d<=end));}
-  save();renderAll();toast('Semesterzeitraum gespeichert');
+  syncSemesterPlanMissingDaysFromDailyStudy(start,end);
+  save();renderAll();toast('Semesterzeitraum gespeichert · vorhandene Lernblöcke im neuen Zeitraum wurden berücksichtigt');
 });
 
 plannerState();
