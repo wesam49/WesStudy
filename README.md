@@ -20,3 +20,14 @@ WesStudy v5.4.4
 - Die starre Tageskapazitäts-Prüfung beim manuellen Semesterplan wurde entfernt.
 - Mehr als 5 Stunden pro Tag können jetzt manuell eingetragen und gespeichert werden.
 - Die intelligente Auto-Verteilung darf weiterhin interne Kapazitäten als Planungshilfe verwenden; sie blockiert den manuellen Semesterplan nicht mehr.
+
+
+## v5.4.9
+- Semesterplan-Felder akzeptieren beliebige Dezimalwerte (`step="any"`).
+- Keine Rundung mehr auf 0,25 Stunden / 15-Minuten-Schritte.
+- Werte wie 3,83 / 4,1 / 5,55 werden akzeptiert und minutengenau gespeichert.
+
+## v5.5.0
+- Wochenansicht: Klick/Tap auf die tägliche Soll-Anzeige bearbeitet das Soll direkt, ohne in die Tagesansicht zu wechseln.
+- Direkte Soll-Eingabe akzeptiert beliebige Dezimalwerte (Komma oder Punkt) und speichert minutengenau.
+- Keyboard: Enter/Leertaste auf der Soll-Anzeige öffnet die Bearbeitung.
