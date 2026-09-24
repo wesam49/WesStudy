@@ -31,3 +31,7 @@ WesStudy v5.4.4
 - Wochenansicht: Klick/Tap auf die tägliche Soll-Anzeige bearbeitet das Soll direkt, ohne in die Tagesansicht zu wechseln.
 - Direkte Soll-Eingabe akzeptiert beliebige Dezimalwerte (Komma oder Punkt) und speichert minutengenau.
 - Keyboard: Enter/Leertaste auf der Soll-Anzeige öffnet die Bearbeitung.
+
+## v5.5.1
+- Fixed the JavaScript syntax error in v5.5.0 that made the whole app non-interactive.
+- Quick weekly Soll edit remains enabled by tapping/clicking the Soll summary.

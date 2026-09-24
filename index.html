@@ -1835,7 +1835,7 @@ function renderWeekPlanner(){
   const metricCard=(title,value)=>`<div class="week-metric"><div class="eyebrow">${title}</div><strong>${value}</strong></div>`;
   const headHtml=dates.map(date=>{
     const plannedDay=plannedLearningMinutesForDate(date),targetDay=studyPlanForDate(date);
-    return `<div class="wg-head"><div class="wg-day-name">${esc(weekdayFmt.format(parseDate(date)))}<br>${esc(shortFmt.format(parseDate(date)).split(', ').pop()||fmtDate(date))}</div>${dayHeaderSummaryHtml(date,targetDay,plannedDay)}</div>;
+    return `<div class="wg-head"><div class="wg-day-name">${esc(weekdayFmt.format(parseDate(date)))}<br>${esc(shortFmt.format(parseDate(date)).split(', ').pop()||fmtDate(date))}</div>${dayHeaderSummaryHtml(date,targetDay,plannedDay)}</div>`;
   }).join('');
   const colHtml=dates.map(date=>{
     const raw=dayPlanItems(date).filter(x=>x.start&&x.end).map((x,idx)=>{
