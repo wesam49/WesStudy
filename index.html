@@ -11,7 +11,7 @@
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="icon-192.png" />
   <title>WesStudy v5.4.6</title>
-  <meta name="wesstudy-version" content="5.4.4" />
+  <meta name="wesstudy-version" content="5.4.8" />
   <style>
     :root{
       --bg:#f4f5fb;--panel:#fff;--panel2:#f8f8fd;--text:#191a25;--muted:#74778b;
@@ -2623,16 +2623,13 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-open="subj
   function applyWeekday(){
     if(!state.semester.start||!state.semester.end)return toast('Lege zuerst Semesterbeginn und Semesterende fest.');
     const weekday=Number(document.getElementById('semesterWeekday').value),hours=Number(document.getElementById('defaultSemesterHours').value||0);if(hours<=0)return;
-    let limited=0;
     semesterAllDates().forEach(iso=>{
       if(parseDate(iso).getDay()!==weekday)return;
-      const requested=Math.round(hours*60/15)*15,cap=plannerDayStudyCapacity(iso);
-      const use=Math.min(requested,cap);
-      if(use<requested)limited++;
-      if(use>0)semesterDraft.days[iso]=use/60;
+      const requested=Math.round(hours*60/15)*15;
+      if(requested>0)semesterDraft.days[iso]=requested/60;
     });
+    setSemesterPlanError('');
     renderSemesterCalendar();renderSelectedSemesterDays();
-    if(limited){setSemesterPlanError(`Hinweis: ${limited} Tage hatten nicht genug freie Zeit. Sie wurden automatisch auf ihre sinnvoll verfügbare Lernkapazität begrenzt.`);toast(`${limited} Tage wurden begrenzt – Details im Semesterplan.`)}else{setSemesterPlanError('');}
   }
   document.getElementById('openSemesterPlan').onclick=()=>{if(!state.semester.start||!state.semester.end)return toast('Lege zuerst den Semesterzeitraum fest.');prepareSemesterPlanDialog();document.getElementById('semesterPlanDialog').showModal()};
   document.getElementById('openSemesterPlanHome').onclick=document.getElementById('openSemesterPlan').onclick;
@@ -2641,10 +2638,10 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-open="subj
   document.getElementById('syncSemesterFromWeek').onclick=()=>{syncSemesterPlanFromWeeklyPattern(true);semesterDraft={days:{...(state.semesterPlan?.days||{})}};renderSemesterCalendar();renderSelectedSemesterDays();save();toast('Semesterplanung wurde intelligent aus dem Gesamtbedarf und den verfügbaren Zeitfenstern verteilt')};
   document.getElementById('applySemesterWeekday').onclick=applyWeekday;
   document.getElementById('clearSemesterPlan').onclick=()=>{if(confirm('Alle geplanten Semestertage löschen?')){semesterDraft.days={};renderSemesterCalendar();renderSelectedSemesterDays()}};
-  document.getElementById('semesterCalendar').addEventListener('click',e=>{const b=e.target.closest('[data-sem-cal-date]');if(!b||b.disabled)return;const d=b.dataset.semCalDate;if(semesterDraft.days[d]!=null)delete semesterDraft.days[d];else{const req=Number(document.getElementById('defaultSemesterHours').value||4)*60,cap=plannerDayStudyCapacity(d);if(req>cap){setSemesterPlanError(`Hinweis: ${fmtDate(d)}: Gewünscht ${minsText(req)}, aber nur ${minsText(cap)} passen sinnvoll in den Tagesplan. Der Tag wurde auf ${minsText(cap)} begrenzt.`);toast('Semesterplanung: Stunden mussten begrenzt werden.')}semesterDraft.days[d]=Math.min(req,cap)/60}renderSemesterCalendar();renderSelectedSemesterDays()});
-  document.getElementById('selectedSemesterDays').addEventListener('change',e=>{if(!e.target.matches('[data-semester-hours]'))return;const d=e.target.dataset.semesterHours,req=Math.round(Number(e.target.value||0)*60/15)*15,cap=plannerDayStudyCapacity(d);if(req>cap){setSemesterPlanError(`Fehler: ${fmtDate(d)} kann nicht auf ${minsText(req)} gesetzt werden. Im Tagesplan sind nur ${minsText(cap)} sinnvoll verfügbar. ${minsText(req-cap)} passen nicht hinein. Bitte reduziere die Lernzeit oder verteile den Rest auf einen anderen Tag.`);toast('Änderung nicht übernommen – Grund steht unten im Semesterplan.');e.target.value=Number(semesterDraft.days[d]||0);return}else{setSemesterPlanError('');}if(req>0)semesterDraft.days[d]=req/60;else delete semesterDraft.days[d];renderSemesterCalendar();renderSelectedSemesterDays()});
+  document.getElementById('semesterCalendar').addEventListener('click',e=>{const b=e.target.closest('[data-sem-cal-date]');if(!b||b.disabled)return;const d=b.dataset.semCalDate;if(semesterDraft.days[d]!=null)delete semesterDraft.days[d];else{const req=Math.round(Number(document.getElementById('defaultSemesterHours').value||4)*60/15)*15;if(req>0)semesterDraft.days[d]=req/60}setSemesterPlanError('');renderSemesterCalendar();renderSelectedSemesterDays()});
+  document.getElementById('selectedSemesterDays').addEventListener('change',e=>{if(!e.target.matches('[data-semester-hours]'))return;const d=e.target.dataset.semesterHours,req=Math.round(Number(e.target.value||0)*60/15)*15;setSemesterPlanError('');if(req>0)semesterDraft.days[d]=req/60;else delete semesterDraft.days[d];renderSemesterCalendar();renderSelectedSemesterDays()});
   document.getElementById('selectedSemesterDays').addEventListener('click',e=>{const b=e.target.closest('[data-remove-semester-day]');if(!b)return;delete semesterDraft.days[b.dataset.removeSemesterDay];renderSemesterCalendar();renderSelectedSemesterDays()});
-  document.getElementById('semesterPlanForm').addEventListener('submit',e=>{if(e.submitter?.value==='cancel')return;e.preventDefault();const entries=Object.entries(semesterDraft.days).filter(([d])=>overlapDate(d,state.semester.start,state.semester.end));const bad=entries.find(([d,h])=>Number(h||0)*60>plannerDayStudyCapacity(d)+1);if(bad){const req=Number(bad[1]||0)*60,cap=plannerDayStudyCapacity(bad[0]);setSemesterPlanError(`Fehler: Plan konnte nicht gespeichert werden. ${fmtDate(bad[0])}: Gewünscht ${minsText(req)}, verfügbar ${minsText(cap)}. ${minsText(Math.max(0,req-cap))} können an diesem Tag nicht sinnvoll eingeplant werden. Bitte reduziere die Stunden oder wähle einen anderen Tag.`);return toast('Plan nicht gespeichert – bitte Hinweis im Semesterplan prüfen.')}setSemesterPlanError('');state.semesterPlan={days:Object.fromEntries(entries)};const wp=plannerState();wp.smartPlanRevision='manual';Object.keys(wp.dayOverrides||{}).forEach(d=>{if(state.semesterPlan.days[d]!=null&&wp.dayOverrides[d])wp.dayOverrides[d].learningBlocks=null});save();document.getElementById('semesterPlanDialog').close();toast('Semesterplanung gespeichert – Tag wurde automatisch synchronisiert')});
+  document.getElementById('semesterPlanForm').addEventListener('submit',e=>{if(e.submitter?.value==='cancel')return;e.preventDefault();const entries=Object.entries(semesterDraft.days).filter(([d])=>overlapDate(d,state.semester.start,state.semester.end));setSemesterPlanError('');state.semesterPlan={days:Object.fromEntries(entries)};const wp=plannerState();wp.smartPlanRevision='manual';Object.keys(wp.dayOverrides||{}).forEach(d=>{if(state.semesterPlan.days[d]!=null&&wp.dayOverrides[d])wp.dayOverrides[d].learningBlocks=null});save();document.getElementById('semesterPlanDialog').close();toast('Semesterplanung gespeichert – ohne tägliche Stundenbegrenzung')});
 
   const prevRenderAll=renderAll;renderAll=function(){prevRenderAll();renderSemesterPlanCard()};
   renderSemesterPlanCard();

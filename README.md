@@ -14,3 +14,9 @@ WesStudy v5.4.4
 - Wochenansicht: Long-Press auf Mobilgeräten öffnet Bearbeiten/Löschen.
 - Desktop: Rechtsklick auf einen Termin öffnet Bearbeiten/Löschen.
 - Normaler Klick behält die bisherige Tagesnavigation.
+
+
+## v5.4.8
+- Die starre Tageskapazitäts-Prüfung beim manuellen Semesterplan wurde entfernt.
+- Mehr als 5 Stunden pro Tag können jetzt manuell eingetragen und gespeichert werden.
+- Die intelligente Auto-Verteilung darf weiterhin interne Kapazitäten als Planungshilfe verwenden; sie blockiert den manuellen Semesterplan nicht mehr.
