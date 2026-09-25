@@ -619,6 +619,26 @@ body{background:linear-gradient(180deg,#f7f5f0 0%,#f2f1ec 100%);color:var(--text
 .week-item-menu .menu-sep{height:1px;background:var(--line);margin:4px 5px}
 [data-theme="dark"] .week-item-menu{box-shadow:0 16px 42px rgba(0,0,0,.42)}
 
+
+.mobile-goal-progress-line{display:none;}
+@media (max-width:760px){
+  .mobile-goal-progress-line{
+    display:block !important;
+    width:100%;
+    height:8px;
+    margin:14px 0 10px;
+    background:rgba(24,80,59,.12);
+    border-radius:999px;
+    overflow:hidden;
+  }
+  .mobile-goal-progress-line>span{
+    display:block;
+    height:100%;
+    background:#2f8f68;
+    border-radius:999px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -980,6 +1000,16 @@ function renderSubjects(){
  const ids=[...new Set(makeupEntries().map(x=>x.subjectId).filter(Boolean))];
  ml.innerHTML=ids.length?ids.map(id=>{const sub=state.subjects.find(s=>s.id===id),total=makeupRequiredForSubject(id),studied=makeupStudyMins(id)+makeupLegacyDoneForSubject(id),credited=makeupDoneForSubject(id),open=makeupOpenForSubject(id),pct=total?clamp(credited/total*100,0,100):0,entries=makeupEntries().filter(x=>x.subjectId===id).sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||''));return `<div class="subject"><div class="subject-head"><div class="subject-title"><span class="dot" style="background:${esc(sub?.color||'#6d5dfc')}"></span><div><strong> ${esc(sub?.name||'Gelöschtes Fach')}</strong><div class="muted" style="font-size:.78rem">Nachholbedarf · wie ein eigener Lernfortschritt</div></div></div><div class="subject-actions"><button class="mini-btn" data-add-makeup-session="${id}" title="Nachhol-Session hinzufügen">+ Session</button><button class="mini-btn" data-add-makeup-subject="${id}" title="Weiteren Nachholbedarf hinzufügen">＋ Bedarf</button></div></div><div class="progress good" style="margin-top:12px"><i style="width:${pct}%"></i></div><div class="metrics"><span class="pill">Gesamt ${hoursText(total)}</span><span class="pill">Nachgeholt ${hoursText(studied)}</span><span class="pill">Offen ${hoursText(open)}</span><span class="pill">${pct.toFixed(0)}%</span></div><div class="makeup-list">${entries.map(x=>`<div class="makeup-row"><div><strong>${esc(x.title)}</strong><small>${x.type==='semester'?'Semester-Nachholbedarf':fmtDate(x.date)} · ${minsText(x.minutes)}</small></div><div class="makeup-actions"><button class="mini-btn" data-edit-makeup="${x.id}" title="Nachholbedarf bearbeiten">Bearbeiten</button><button class="mini-btn" data-sub-makeup-delete="${x.id}" title="Nachholbedarf löschen">Löschen</button></div></div>`).join('')}</div></div>`}).join(''):`<div class="muted" style="text-align:center;padding:10px">Noch keine Nachholstunden eingetragen.</div>`;
 }
+
+function getEffectiveTodayTargetMinutes(dateStr){
+  const fromSemesterPlan = Number((state.semesterPlan?.days||{})[dateStr]||0) * 60;
+  if(fromSemesterPlan > 0) return Math.round(fromSemesterPlan);
+  const dayStudyItems = (state.dailyPlan?.items||[]).filter(x =>
+    x.date===dateStr && x.type==="study" && x.start && x.end
+  );
+  return Math.round(dayStudyItems.reduce((acc,x)=>acc+Math.max(0,minutes(x.end)-minutes(x.start)),0));
+}
+
 function renderHome(){
  const req=totalRequired(),target=studyTargetMins(),done=totalStudied()+makeupDoneMins(),rem=studyTargetRemaining(),p=target?clamp(done/target*100,0,100):0,mode=activeDashboardMode(),today=todayISO(),todayMins=sessionsOn(today);
  const todayPlannedHours=mode==='holiday'?Number(state.holiday?.days?.[today]||0):Number(state.semesterPlan?.days?.[today]||0),todayPlannedMins=todayPlannedHours*60;$('#todayPlanned').textContent=minsText(todayPlannedMins);$('#todayPlannedStatus').textContent=todayPlannedMins?(todayMins>=todayPlannedMins?'Geplante Lernzeit erreicht':`Noch ${minsText(Math.max(0,todayPlannedMins-todayMins))} von deinem Tagesplan`):'Für heute nichts geplant';
@@ -2718,6 +2748,24 @@ generateAutoSemesterAttendance(false);
 renderAll();
 })();
 </script>
-<script type="module" src="cloud-sync.js"></script>
+<script type="module" src="cloud-sync.js">
+function ensureMobileGoalProgressLine(){
+  const nodes=[...document.querySelectorAll('section,.card,div')];
+  const card=nodes.find(el=>/Fortschritt zum Lernziel/.test(el.textContent||''));
+  if(!card || card.querySelector('.mobile-goal-progress-line')) return;
+  const m=(card.textContent||'').match(/(\d{1,3})\s*%/);
+  if(!m) return;
+  const pct=Math.max(0,Math.min(100,Number(m[1])));
+  const track=document.createElement('div');
+  track.className='mobile-goal-progress-line';
+  track.innerHTML='<span style="width:'+pct+'%"></span>';
+  const btn=card.querySelector('button,a');
+  if(btn) btn.parentNode.insertBefore(track,btn);
+  else card.appendChild(track);
+}
+document.addEventListener('DOMContentLoaded',()=>setTimeout(ensureMobileGoalProgressLine,50));
+document.addEventListener('click',()=>setTimeout(ensureMobileGoalProgressLine,50));
+
+</script>
 </body>
 </html>

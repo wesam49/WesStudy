@@ -40,3 +40,8 @@ WesStudy v5.4.4
 - Changing Semesterbeginn/-ende now keeps existing Semesterplan values inside the range and auto-adds missing days from actual planned `study`/`makeup` blocks in `dailyPlan`.
 - Extending the semester into a new month therefore updates `Verplant`, `Noch offen`, `Freie Tage`, and `Rest Ø` immediately when study blocks already exist there.
 - Shrinking the range still excludes days outside the semester without deleting the underlying calendar appointments.
+
+## v5.5.3
+- Fixed Today card mismatch with "Heute geplant".
+- Today detail now uses Semesterplan target or actual study blocks as fallback.
+- Added green Lernziel progress bar to mobile dashboard.
