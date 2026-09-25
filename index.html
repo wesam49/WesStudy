@@ -693,6 +693,39 @@ body{background:linear-gradient(180deg,#f7f5f0 0%,#f2f1ec 100%);color:var(--text
   .past-day-status{grid-column:2;margin-top:1px}
 }
 
+
+/* ===== v5.5.5 plan position directly under Lernziel heading ===== */
+.hero-plan-status{
+  display:inline-flex;
+  align-items:center;
+  width:max-content;
+  max-width:100%;
+  margin:6px 0 10px;
+  padding:6px 10px;
+  border-radius:999px;
+  font-size:.86rem;
+  font-weight:900;
+  line-height:1.2;
+}
+.hero-plan-status.good{
+  color:#0f7f57 !important;
+  background:#e7f6ee !important;
+  border:1px solid #ccebdc;
+}
+.hero-plan-status.bad{
+  color:#b4434d !important;
+  background:#fdecef !important;
+  border:1px solid #f5cbd1;
+}
+@media (max-width:760px){
+  .hero-plan-status{
+    margin-top:7px;
+    margin-bottom:10px;
+    font-size:.84rem;
+    padding:6px 9px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -708,7 +741,7 @@ body{background:linear-gradient(180deg,#f7f5f0 0%,#f2f1ec 100%);color:var(--text
       <div id="setupNotice" class="card" style="margin-bottom:16px;display:none"><div class="section-head"><div><h2>Semester einrichten</h2><div class="muted">Lege den Zeitraum fest und füge deine Fächer hinzu.</div></div><button class="btn primary" data-open="semesterDialog">Jetzt einrichten</button></div></div>
       <div class="dashboard-mode" id="dashboardMode"><button type="button" data-mode="holiday">Ferien</button><button type="button" data-mode="semester">Semester</button></div>
       <div class="dashboard-countdown" id="dashboardCountdown"><div class="count-number" id="countdownNumber">—</div><div><strong id="countdownTitle">Zeitraum einrichten</strong><div class="muted" id="countdownDate">Lege Semester- und Feriendaten fest.</div></div></div>
-      <div class="card hero" style="margin-bottom:16px"><div class="hero-row"><div><div style="opacity:.85;font-size:.86rem">Fortschritt zum Lernziel</div><div class="big-number" id="heroStudied">0 Std.</div><div style="opacity:.85;margin:8px 0" id="heroRemaining">verbleibend 0 Std.</div><button class="btn" style="background:white;color:#5c4de0;box-shadow:none" data-open="manualSessionDialog">Lernzeit eintragen</button></div><div class="ring" id="overallRing"><strong id="overallPercent">0%</strong></div></div></div>
+      <div class="card hero" style="margin-bottom:16px"><div class="hero-row"><div><div style="opacity:.85;font-size:.86rem">Fortschritt zum Lernziel</div><div class="dashboard-status hero-plan-status good" id="planStatus">Du bist genau im Ferienplan</div><div class="big-number" id="heroStudied">0 Std.</div><div style="opacity:.85;margin:8px 0" id="heroRemaining">verbleibend 0 Std.</div><button class="btn" style="background:white;color:#5c4de0;box-shadow:none" data-open="manualSessionDialog">Lernzeit eintragen</button></div><div class="ring" id="overallRing"><strong id="overallPercent">0%</strong></div></div></div>
       <div class="grid cols-4" style="margin-bottom:16px">
         <div class="card"><div class="eyebrow" id="weeklyNeedLabel">Wöchentlich erforderlich</div><div class="big-number" id="weeklyNeed">0:00</div><div class="muted" id="weeklyNeedHint">Um im Plan zu bleiben</div></div>
         <div class="card"><div class="eyebrow" id="todayStudiedLabel">Heute gelernt</div><div class="big-number" id="todayStudied">0:00</div><div class="muted" id="todayStatus">Starte deine erste Session</div></div>
@@ -734,7 +767,7 @@ body{background:linear-gradient(180deg,#f7f5f0 0%,#f2f1ec 100%);color:var(--text
         <div id="pastStudyDays"></div>
         <div class="dashboard-status" id="pastStudyBacklog" style="margin-top:12px"></div>
       </div>
-      <div class="card" id="planStatusCard" style="margin-bottom:16px"><div class="dashboard-status" id="planStatus"></div></div>
+      
 
       <div class="card" id="studyTargetCard" style="margin-bottom:16px">
         <div class="section-head">
@@ -1085,7 +1118,7 @@ function renderHome(){
    $('#todayStudiedLabel').textContent='Heute gelernt';$('#todayStudied').textContent=minsText(todayMins);$('#todayStatus').textContent=todayMins>=dNeed&&dNeed>0?'Tagesziel erreicht':todayMins?`verbleibend ${minsText(Math.max(0,dNeed-todayMins))}`:'Starte deine erste Session';
    $('#semesterPreview').classList.add('hidden');const endDays=daysUntil(state.semester.end);$('#countdownNumber').textContent=endDays===null?'—':endDays;$('#countdownTitle').textContent=endDays===0?'Das Semester endet heute':`Noch ${endDays??'—'} Tage bis Semesterende`;$('#countdownDate').textContent=state.semester.end?fmtDate(state.semester.end):'Semesterende noch nicht festgelegt';
  }
- const pos=mode==='holiday'?holidayPlanPosition():totalPlanPosition();const planName=mode==='holiday'?'Ferienplan':'Gesamtplan';if(Math.abs(pos)<1){$('#planStatus').textContent=`Du bist genau im ${planName}`}else{$('#planStatus').textContent=pos>0?`Du bist ${hoursText(pos)} vor dem ${planName}`:`Du bist ${hoursText(Math.abs(pos))} hinter dem ${planName}`};$('#planStatus').className='dashboard-status '+(pos>=0?'good':'bad');
+ const pos=mode==='holiday'?holidayPlanPosition():totalPlanPosition();const planName=mode==='holiday'?'Ferienplan':'Gesamtplan';if(Math.abs(pos)<1){$('#planStatus').textContent=`Du bist genau im ${planName}`}else{$('#planStatus').textContent=pos>0?`Du bist ${hoursText(pos)} vor dem ${planName}`:`Du bist ${hoursText(Math.abs(pos))} hinter dem ${planName}`};$('#planStatus').className='dashboard-status hero-plan-status '+(pos>=0?'good':'bad');
  $('#creditsTotal').textContent=`${state.subjects.reduce((a,s)=>a+Number(s.credits),0)} CP`;$('#subjectsCount').textContent=`${state.subjects.length} Fächer`;$('#homeSubjects').innerHTML=state.subjects.length?state.subjects.slice().sort((a,b)=>(subjectRequired(b)-studiedForSubject(b.id))-(subjectRequired(a)-studiedForSubject(a.id))).slice(0,3).map(s=>subjectHTML(s,true)).join(''):`<div class="empty">Noch keine Fächer vorhanden</div>`;renderRecent()
 }
 function renderRecent(){const rows=state.sessions.slice().sort((a,b)=>(b.date+b.createdAt).localeCompare(a.date+a.createdAt)).slice(0,5);$('#recentSessions').innerHTML=rows.length?rows.map(x=>sessionHTML(x,true)).join(''):`<div class="empty">Noch keine Sessions vorhanden</div>`}

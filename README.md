@@ -53,3 +53,9 @@ WesStudy v5.4.4
 - Completed days show 100% green + "Erreicht".
 - Past incomplete days show yellow progress + remaining time "offen".
 - Today's unfinished time is not counted as backlog until the day becomes a past day.
+
+## v5.5.5
+- Moved the plan-position status directly below "Fortschritt zum Lernziel".
+- Holiday mode: ahead/on-plan is green; behind-plan is red.
+- Semester mode keeps the same logic with "Gesamtplan".
+- Removed the separate lower plan-status card.
