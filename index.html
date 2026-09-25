@@ -639,6 +639,60 @@ body{background:linear-gradient(180deg,#f7f5f0 0%,#f2f1ec 100%);color:var(--text
   }
 }
 
+
+/* ===== v5.5.4 Today + past-days live progress ===== */
+.past-day-row{
+  grid-template-columns:64px minmax(0,1fr);
+  align-items:start;
+}
+.past-day-main{gap:7px}
+.past-day-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.past-day-today{
+  display:inline-flex;align-items:center;justify-content:center;
+  padding:7px 12px;border-radius:999px;background:#e9f8ef;color:#16825d;
+  font-weight:900;font-size:.86rem;white-space:nowrap
+}
+.past-day-progress{
+  width:100%;height:9px;border-radius:999px;overflow:hidden;
+  background:#edf1ef;margin-top:4px
+}
+.past-day-progress > span{
+  display:block;height:100%;border-radius:999px;transition:width .25s ease
+}
+.past-day-progress.good{background:#e3f2e9}
+.past-day-progress.good > span{background:#2b9a6a}
+.past-day-progress.warn{background:#fff0cd}
+.past-day-progress.warn > span{background:#e4a62a}
+.past-day-progress.bad{background:#f7e5e7}
+.past-day-progress.bad > span{background:#c65a63}
+.past-day-progress.neutral{background:var(--panel2)}
+.past-day-progress.neutral > span{background:#a7b0bd}
+.past-day-progress-meta{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  font-size:.9rem;line-height:1.25
+}
+.past-day-progress-meta .done{font-weight:900}
+.past-day-progress-meta.good .done{color:#16825d}
+.past-day-progress-meta.warn .done{color:#b7791f}
+.past-day-progress-meta.bad .done{color:#c2414b}
+.past-day-progress-meta.neutral .done{color:var(--muted)}
+.past-day-status{
+  grid-column:2;
+  width:max-content;
+  margin-top:2px
+}
+.past-days-info{
+  margin-top:16px;padding:14px 16px;border-radius:18px;background:var(--panel2);
+  color:var(--muted);font-size:.92rem;line-height:1.4
+}
+@media (max-width:760px){
+  .past-day-row{grid-template-columns:52px minmax(0,1fr);gap:12px;padding:17px 0}
+  .past-day-head{align-items:flex-start}
+  .past-day-progress{height:8px}
+  .past-day-progress-meta{font-size:.86rem;gap:8px}
+  .past-day-status{grid-column:2;margin-top:1px}
+}
+
 </style>
 </head>
 <body>
@@ -2431,37 +2485,83 @@ function renderDailyStudyTracking(){
   const today=todayISO(),planned=plannedStudyMinsForDate(today),done=sessionsOn(today),open=Math.max(0,planned-done),pct=planned?clamp(done/planned*100,0,100):(done?100:0);
   $('#dailyStudyTitle').textContent=`Heute — ${fmtDate(today)}`;
   $('#dailyStudySource').textContent=planned?`Aus dem ${dailyStudySourceForDate(today)}`:'Für heute ist keine Lernzeit geplant';
-  $('#dailyTrackPlanned').textContent=minsText(planned);$('#dailyTrackDone').textContent=minsText(done);$('#dailyTrackOpen').textContent=minsText(open);$('#dailyTrackPercent').textContent=`${Math.round(pct)}%`;$('#dailyTrackProgress').style.width=`${pct}%`;
+  $('#dailyTrackPlanned').textContent=minsText(planned);
+  $('#dailyTrackDone').textContent=minsText(done);
+  $('#dailyTrackOpen').textContent=minsText(open);
+  $('#dailyTrackPercent').textContent=`${Math.round(pct)}%`;
+  $('#dailyTrackProgress').style.width=`${pct}%`;
   const badge=$('#dailyStudyBadge');
   badge.className='status '+(planned&&done>=planned?'good':planned&&done?'warn':(!planned&&done?'good':''));
   badge.textContent=planned?(done>=planned?'Erledigt':done?'Offen':'Nicht geplant'):(done?'Zusätzlich gelernt':'Nicht geplant');
-  $('#markTodayDone').disabled=!planned||done>=planned||!state.subjects.length;$('#enterTodayHours').disabled=!state.subjects.length;
-  const dates=new Set();
+  $('#markTodayDone').disabled=!planned||done>=planned||!state.subjects.length;
+  $('#enterTodayHours').disabled=!state.subjects.length;
+
+  const dates=new Set([today]);
   if(state.holiday?.days) Object.keys(state.holiday.days).forEach(d=>{if(d<today)dates.add(d)});
   if(state.semesterPlan?.days) Object.keys(state.semesterPlan.days).forEach(d=>{if(d<today)dates.add(d)});
   state.sessions.forEach(x=>{if(x?.date&&x.date<today&&Number(x.minutes||0)>0)dates.add(x.date)});
+
   const rows=[...dates].sort().reverse().slice(0,10);
   let backlog=0;
+
   $('#pastStudyDays').innerHTML=rows.length?`<div class="past-days-list">${rows.map(d=>{
+    const isToday=d===today;
     const pl=plannedStudyMinsForDate(d),dn=sessionsOn(d),op=Math.max(0,pl-dn),extra=Math.max(0,dn-pl);
-    backlog+=op;
+    const dayPct=pl?clamp(dn/pl*100,0,100):(dn?100:0);
+
     let tone='neutral',label='Nicht geplant';
-    if(pl===0&&dn>0){tone='good';label='Zusätzlich gelernt'}
-    else if(pl===0){tone='neutral';label='Nicht geplant'}
-    else if(dn>=pl){tone='good';label='Erreicht'}
-    else if(dn>0){tone='warn';label=`${minsText(op)} offen`}
-    else{tone='bad';label='Nicht gelernt'}
+
+    if(isToday){
+      if(pl===0&&dn>0){tone='good';label='Zusätzlich gelernt'}
+      else if(pl===0){tone='neutral';label='Nicht geplant'}
+      else if(dn>=pl){tone='good';label='Erreicht'}
+      else{
+        // While the day is still active, progress stays green.
+        tone='good';
+        label=`${minsText(op)} offen`;
+      }
+    }else{
+      if(pl===0&&dn>0){tone='good';label='Zusätzlich gelernt'}
+      else if(pl===0){tone='neutral';label='Nicht geplant'}
+      else if(dn>=pl){tone='good';label='Erreicht'}
+      else{
+        tone='warn';
+        label=`${minsText(op)} offen`;
+        backlog+=op;
+      }
+    }
+
     const subtitle=`Geplant ${minsText(pl)} · Erledigt ${minsText(dn)}${extra>0&&pl>0?` · +${minsText(extra)} zusätzlich`:''}`;
+    const progressTone=tone==='bad'?'bad':tone;
+    const progressText=pl?`${minsText(Math.min(dn,pl))} / ${minsText(pl)}`:(dn?minsText(dn):'0:00');
+    const progressRight=isToday?`Fortschritt heute ${Math.round(dayPct)}%`:`Fortschritt ${Math.round(dayPct)}%`;
+
+    const iconTone=isToday&&pl>0&&dn<pl?'good':tone;
+    const iconHtml=isToday&&pl>0&&dn<pl
+      ?`<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 18v-4M10 18V9M15 18v-7M20 18V5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>`
+      :statusSymbol(iconTone);
+
     return `<div class="past-day-row" data-past-day="${d}">
-      <div class="session-icon past-day-icon ${tone}">${statusSymbol(tone)}</div>
+      <div class="session-icon past-day-icon ${iconTone}">${iconHtml}</div>
       <div class="past-day-main">
-        <div class="past-day-date">${fmtDate(d)}</div>
+        <div class="past-day-head">
+          <div class="past-day-date">${fmtDate(d)}</div>
+          ${isToday?'<span class="past-day-today">Heute</span>':''}
+        </div>
         <div class="past-day-sub">${subtitle}</div>
+        <div class="past-day-progress ${progressTone}"><span style="width:${dayPct}%"></span></div>
+        <div class="past-day-progress-meta ${progressTone}">
+          <span class="done">${progressText}</span>
+          <span>${progressRight}</span>
+        </div>
+        <div class="past-day-status ${tone}">${statusSymbol(tone)}<span>${label}</span></div>
       </div>
-      <div class="past-day-status ${tone}">${statusSymbol(tone)}<span>${label}</span></div>
-    </div>`}).join('')}</div>`:'<div class="muted">Noch keine vergangenen Plan- oder Lerntage.</div>';
+    </div>`}).join('')}</div>
+    <div class="past-days-info">Heute zeigt der Balken den Live-Fortschritt. Nach Tagesende: 100% = Erreicht, sonst offen.</div>`
+    :'<div class="muted">Noch keine Plan- oder Lerntage.</div>';
+
   const backlogEl=$('#pastStudyBacklog');
-  backlogEl.textContent=backlog?`Gesamtrückstand aus den angezeigten Tagen: ${minsText(backlog)}`:'Kein Rückstand in den angezeigten Tagen';
+  backlogEl.textContent=backlog?`Gesamtrückstand aus den angezeigten vergangenen Tagen: ${minsText(backlog)}`:'Kein Rückstand in den angezeigten vergangenen Tagen';
   backlogEl.className=backlog?'bad':'good';
 }
 $('#markTodayDone').onclick=()=>openDailyStudyEntry(todayISO(),true);

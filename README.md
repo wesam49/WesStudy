@@ -45,3 +45,11 @@ WesStudy v5.4.4
 - Fixed Today card mismatch with "Heute geplant".
 - Today detail now uses Semesterplan target or actual study blocks as fallback.
 - Added green Lernziel progress bar to mobile dashboard.
+
+## v5.5.4
+- Added today to the "Vergangene Tage" list.
+- Added per-day progress bars on mobile and desktop.
+- Today's incomplete progress stays green while the day is ongoing.
+- Completed days show 100% green + "Erreicht".
+- Past incomplete days show yellow progress + remaining time "offen".
+- Today's unfinished time is not counted as backlog until the day becomes a past day.
