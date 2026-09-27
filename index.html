@@ -539,12 +539,14 @@ body{background:linear-gradient(180deg,#f7f5f0 0%,#f2f1ec 100%);color:var(--text
 .past-day-icon.warn{background:#fff3dc;color:#b7791f;border-color:#f5dfad}
 .past-day-icon.bad{background:#ffe8eb;color:#c2414b;border-color:#f3c9ce}
 .past-day-icon.neutral{background:var(--panel2);color:var(--muted)}
+.past-day-icon.unplanned{background:#eef9f1;color:#2b9a6a;border-color:#d5eddc}
 .past-day-status{display:inline-flex;align-items:center;gap:8px;padding:11px 16px;border-radius:999px;font-weight:900;white-space:nowrap;font-size:.98rem}
 .past-day-status svg{width:18px;height:18px;display:block}
 .past-day-status.good{background:#e9f8ef;color:#16825d}
 .past-day-status.warn{background:#fff3dc;color:#b7791f}
 .past-day-status.bad{background:#ffe8eb;color:#c2414b}
 .past-day-status.neutral{background:var(--panel2);color:var(--muted)}
+.past-day-status.unplanned{background:#eef9f1;color:#2b9a6a;border:1px solid #d5eddc}
 #pastStudyBacklog{margin-top:18px;font-size:1.04rem;font-weight:900;color:#102347}
 #pastStudyBacklog.good{color:#16825d}
 #pastStudyBacklog.bad{color:#102347}
@@ -1169,6 +1171,7 @@ function sessionIconHTML(color='#6d5dfc',kind='book'){
 function statusSymbol(kind='good'){
   if(kind==='warn') return '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M12 8v4l2.5 1.8" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   if(kind==='bad') return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 8l8 8M16 8l-8 8" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></svg>';
+  if(kind==='unplanned') return '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="6" width="16" height="14" rx="3" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M8 4.8V8M16 4.8V8M4 10h16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>';
   if(kind==='neutral') return '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="2.1" fill="currentColor"/></svg>';
   return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 12 3 3 7-8" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 }
@@ -2546,7 +2549,7 @@ function renderDailyStudyTracking(){
 
     if(isToday){
       if(pl===0&&dn>0){tone='good';label='Zusätzlich gelernt'}
-      else if(pl===0){tone='neutral';label='Nicht geplant'}
+      else if(pl===0){tone='unplanned';label='Nicht geplant'}
       else if(dn>=pl){tone='good';label='Erreicht'}
       else{
         // While the day is still active, progress stays green.
@@ -2555,7 +2558,7 @@ function renderDailyStudyTracking(){
       }
     }else{
       if(pl===0&&dn>0){tone='good';label='Zusätzlich gelernt'}
-      else if(pl===0){tone='neutral';label='Nicht geplant'}
+      else if(pl===0){tone='unplanned';label='Nicht geplant'}
       else if(dn>=pl){tone='good';label='Erreicht'}
       else{
         tone='warn';
@@ -2564,15 +2567,22 @@ function renderDailyStudyTracking(){
       }
     }
 
-    const subtitle=`Geplant ${minsText(pl)} · Erledigt ${minsText(dn)}${extra>0&&pl>0?` · +${minsText(extra)} zusätzlich`:''}`;
+    const noPlan=pl===0;
+    const subtitle=noPlan?'':`Geplant ${minsText(pl)} · Erledigt ${minsText(dn)}${extra>0&&pl>0?` · +${minsText(extra)} zusätzlich`:''}`;
     const progressTone=tone==='bad'?'bad':tone;
     const progressText=pl?`${minsText(Math.min(dn,pl))} / ${minsText(pl)}`:(dn?minsText(dn):'0:00');
     const progressRight=isToday?`Fortschritt heute ${Math.round(dayPct)}%`:`Fortschritt ${Math.round(dayPct)}%`;
 
-    const iconTone=isToday&&pl>0&&dn<pl?'good':tone;
+    const iconTone=noPlan&&dn===0?'unplanned':(isToday&&pl>0&&dn<pl?'good':tone);
     const iconHtml=isToday&&pl>0&&dn<pl
       ?`<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 18v-4M10 18V9M15 18v-7M20 18V5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>`
       :statusSymbol(iconTone);
+    const statusTone=noPlan&&dn===0?'unplanned':tone;
+    const progressHtml=noPlan?'':`<div class="past-day-progress ${progressTone}"><span style="width:${dayPct}%"></span></div>
+        <div class="past-day-progress-meta ${progressTone}">
+          <span class="done">${progressText}</span>
+          <span>${progressRight}</span>
+        </div>`;
 
     return `<div class="past-day-row" data-past-day="${d}">
       <div class="session-icon past-day-icon ${iconTone}">${iconHtml}</div>
@@ -2581,13 +2591,9 @@ function renderDailyStudyTracking(){
           <div class="past-day-date">${fmtDate(d)}</div>
           ${isToday?'<span class="past-day-today">Heute</span>':''}
         </div>
-        <div class="past-day-sub">${subtitle}</div>
-        <div class="past-day-progress ${progressTone}"><span style="width:${dayPct}%"></span></div>
-        <div class="past-day-progress-meta ${progressTone}">
-          <span class="done">${progressText}</span>
-          <span>${progressRight}</span>
-        </div>
-        <div class="past-day-status ${tone}">${statusSymbol(tone)}<span>${label}</span></div>
+        ${subtitle?`<div class="past-day-sub">${subtitle}</div>`:''}
+        ${progressHtml}
+        <div class="past-day-status ${statusTone}">${statusSymbol(statusTone)}<span>${label}</span></div>
       </div>
     </div>`}).join('')}</div>
     <div class="past-days-info">Heute zeigt der Balken den Live-Fortschritt. Nach Tagesende: 100% = Erreicht, sonst offen.</div>`

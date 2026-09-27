@@ -59,3 +59,8 @@ WesStudy v5.4.4
 - Holiday mode: ahead/on-plan is green; behind-plan is red.
 - Semester mode keeps the same logic with "Gesamtplan".
 - Removed the separate lower plan-status card.
+
+## v5.5.6
+- In "Vergangene Tage": unplanned days now use a dedicated light-green style with a calendar icon.
+- If a day has no planned study time, the card hides progress bar, percentage, and the Geplant/Erledigt text.
+- "Nicht geplant" is now visually distinct from completed days.
