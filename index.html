@@ -1078,8 +1078,34 @@ function holidayDailyNeed(){const rem=Math.max(0,holidayPlannedMins()-holidayDon
 function holidayPlannedToDate(){if(!state.holiday)return 0;const today=todayISO();return Object.entries(state.holiday.days||{}).filter(([date])=>date<=today).reduce((sum,[,hours])=>sum+Number(hours||0)*60,0)}
 function holidayDoneToDate(){if(!state.holiday)return 0;const today=todayISO();return state.sessions.filter(x=>x.date<=today&&overlapDate(x.date,state.holiday.start,state.holiday.end)).reduce((sum,x)=>sum+Number(x.minutes||0),0)}
 function holidayPlanPosition(){return holidayDoneToDate()-holidayPlannedToDate()}
-function totalPlanExpectedToDate(){const s=state.semester,today=todayISO(),personalTarget=studyTargetMins(),holidayTarget=Math.min(personalTarget,holidayPlannedMins());let expectedHoliday=0;if(state.holiday){expectedHoliday=today>=state.holiday.end?holidayTarget:Math.min(holidayTarget,holidayPlannedToDate())}if(!s.start||!s.end||today<s.start)return expectedHoliday;const totalDays=daysInclusive(s.start,s.end);if(!totalDays)return expectedHoliday;const elapsed=Math.min(totalDays,daysInclusive(s.start,today));const semesterTarget=Math.max(0,personalTarget-holidayTarget);return holidayTarget+semesterTarget*(elapsed/totalDays)}
-function totalPlanPosition(){return totalStudied()-totalPlanExpectedToDate()}
+function totalPlanExpectedToDate(){
+  const today=todayISO();
+  let expected=0;
+
+  // Ferienplan: only the hours that were actually planned up to today.
+  if(state.holiday){
+    Object.entries(state.holiday.days||{}).forEach(([d,hours])=>{
+      if(d<=today && overlapDate(d,state.holiday.start,state.holiday.end)){
+        expected+=Number(hours||0)*60;
+      }
+    });
+  }
+
+  // Semesterplanung: use the user's real daily Soll values, not a linear
+  // distribution of the semester target across all calendar days.
+  const sem=state.semester||{};
+  Object.entries(state.semesterPlan?.days||{}).forEach(([d,hours])=>{
+    if(d>today)return;
+    if(sem.start && d<sem.start)return;
+    if(sem.end && d>sem.end)return;
+    // Avoid double counting if a holiday-plan date ever overlaps the semester.
+    if(state.holiday && overlapDate(d,state.holiday.start,state.holiday.end))return;
+    expected+=Number(hours||0)*60;
+  });
+
+  return expected;
+}
+function totalPlanPosition(){return totalAllStudied()-totalPlanExpectedToDate()}
 function renderAll(){applyTheme();renderSemester();renderSubjects();renderHome();renderDailyStudyTracking();renderHoliday();renderHistory();renderDailyPlan();populateSubjectSelects()}
 function applyTheme(){document.documentElement.dataset.theme=state.theme;const b=$('#themeBtn');if(b){b.setAttribute('aria-label',state.theme==='dark'?'Helles Design aktivieren':'Dunkles Design aktivieren');b.setAttribute('title',state.theme==='dark'?'Helles Design':'Dunkles Design')}}
 function renderSemester(){const sem=state.semester;$('#hoursPerCreditText').textContent=sem.hoursPerCredit||17;$('#setupNotice').style.display=sem.start&&sem.end?'none':'block'}

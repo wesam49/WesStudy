@@ -71,3 +71,9 @@ WesStudy v5.4.4
 - Corrected wording to "Aus der Semesterplanung".
 - In "Vergangene Tage", today's incomplete progress (icon, bar, status and Heute badge) is yellow.
 - Once today's target reaches 100%, it switches to green "Erreicht".
+
+## v5.5.8
+- Gesamtplan status now follows the actual Ferienplan + Semesterplanung Soll values up to today.
+- Removed the old linear day-by-day distribution of the semester target.
+- Study progress is compared against the real cumulative planned hours.
+- Makeup study sessions also count toward overall completed study time.
