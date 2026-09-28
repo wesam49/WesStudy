@@ -654,6 +654,10 @@ body{background:linear-gradient(180deg,#f7f5f0 0%,#f2f1ec 100%);color:var(--text
   padding:7px 12px;border-radius:999px;background:#e9f8ef;color:#16825d;
   font-weight:900;font-size:.86rem;white-space:nowrap
 }
+.past-day-today.warn{
+  background:#fff3dc;
+  color:#b7791f;
+}
 .past-day-progress{
   width:100%;height:9px;border-radius:999px;overflow:hidden;
   background:#edf1ef;margin-top:4px
@@ -2520,15 +2524,16 @@ function openDailyStudyEntry(date=todayISO(),full=false){
 function renderDailyStudyTracking(){
   const today=todayISO(),planned=plannedStudyMinsForDate(today),done=sessionsOn(today),open=Math.max(0,planned-done),pct=planned?clamp(done/planned*100,0,100):(done?100:0);
   $('#dailyStudyTitle').textContent=`Heute — ${fmtDate(today)}`;
-  $('#dailyStudySource').textContent=planned?`Aus dem ${dailyStudySourceForDate(today)}`:'Für heute ist keine Lernzeit geplant';
+  const todaySource=dailyStudySourceForDate(today);
+  $('#dailyStudySource').textContent=planned?(todaySource==='Semesterplanung'?'Aus der Semesterplanung':'Aus dem Ferienplan'):'Für heute ist keine Lernzeit geplant';
   $('#dailyTrackPlanned').textContent=minsText(planned);
   $('#dailyTrackDone').textContent=minsText(done);
   $('#dailyTrackOpen').textContent=minsText(open);
   $('#dailyTrackPercent').textContent=`${Math.round(pct)}%`;
   $('#dailyTrackProgress').style.width=`${pct}%`;
   const badge=$('#dailyStudyBadge');
-  badge.className='status '+(planned&&done>=planned?'good':planned&&done?'warn':(!planned&&done?'good':''));
-  badge.textContent=planned?(done>=planned?'Erledigt':done?'Offen':'Nicht geplant'):(done?'Zusätzlich gelernt':'Nicht geplant');
+  badge.className='status '+(planned?(done>=planned?'good':'warn'):(done?'good':''));
+  badge.textContent=planned?(done>=planned?'Erreicht':`${minsText(open)} offen`):(done?'Zusätzlich gelernt':'Nicht geplant');
   $('#markTodayDone').disabled=!planned||done>=planned||!state.subjects.length;
   $('#enterTodayHours').disabled=!state.subjects.length;
 
@@ -2552,8 +2557,8 @@ function renderDailyStudyTracking(){
       else if(pl===0){tone='unplanned';label='Nicht geplant'}
       else if(dn>=pl){tone='good';label='Erreicht'}
       else{
-        // While the day is still active, progress stays green.
-        tone='good';
+        // Current day is still open: show warning/yellow until the target is reached.
+        tone='warn';
         label=`${minsText(op)} offen`;
       }
     }else{
@@ -2573,7 +2578,7 @@ function renderDailyStudyTracking(){
     const progressText=pl?`${minsText(Math.min(dn,pl))} / ${minsText(pl)}`:(dn?minsText(dn):'0:00');
     const progressRight=isToday?`Fortschritt heute ${Math.round(dayPct)}%`:`Fortschritt ${Math.round(dayPct)}%`;
 
-    const iconTone=noPlan&&dn===0?'unplanned':(isToday&&pl>0&&dn<pl?'good':tone);
+    const iconTone=noPlan&&dn===0?'unplanned':tone;
     const iconHtml=isToday&&pl>0&&dn<pl
       ?`<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 18v-4M10 18V9M15 18v-7M20 18V5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>`
       :statusSymbol(iconTone);
@@ -2589,14 +2594,14 @@ function renderDailyStudyTracking(){
       <div class="past-day-main">
         <div class="past-day-head">
           <div class="past-day-date">${fmtDate(d)}</div>
-          ${isToday?'<span class="past-day-today">Heute</span>':''}
+          ${isToday?`<span class="past-day-today ${pl>0&&dn<pl?'warn':''}">Heute</span>`:''}
         </div>
         ${subtitle?`<div class="past-day-sub">${subtitle}</div>`:''}
         ${progressHtml}
         <div class="past-day-status ${statusTone}">${statusSymbol(statusTone)}<span>${label}</span></div>
       </div>
     </div>`}).join('')}</div>
-    <div class="past-days-info">Heute zeigt der Balken den Live-Fortschritt. Nach Tagesende: 100% = Erreicht, sonst offen.</div>`
+    <div class="past-days-info">Heute ist der offene Fortschritt gelb. Bei 100% wird der Tag grün und als Erreicht markiert. Vergangene unvollständige Tage bleiben gelb und offen.</div>`
     :'<div class="muted">Noch keine Plan- oder Lerntage.</div>';
 
   const backlogEl=$('#pastStudyBacklog');

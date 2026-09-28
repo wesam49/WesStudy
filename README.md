@@ -64,3 +64,10 @@ WesStudy v5.4.4
 - In "Vergangene Tage": unplanned days now use a dedicated light-green style with a calendar icon.
 - If a day has no planned study time, the card hides progress bar, percentage, and the Geplant/Erledigt text.
 - "Nicht geplant" is now visually distinct from completed days.
+
+## v5.5.7
+- Fixed Today card showing "Nicht geplant" even when a Semesterplanung target exists.
+- Today card now shows the remaining time as "... offen" and uses yellow while incomplete.
+- Corrected wording to "Aus der Semesterplanung".
+- In "Vergangene Tage", today's incomplete progress (icon, bar, status and Heute badge) is yellow.
+- Once today's target reaches 100%, it switches to green "Erreicht".
