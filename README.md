@@ -77,3 +77,9 @@ WesStudy v5.4.4
 - Removed the old linear day-by-day distribution of the semester target.
 - Study progress is compared against the real cumulative planned hours.
 - Makeup study sessions also count toward overall completed study time.
+
+## v5.5.9
+- "Heute gelernt" now compares against the actual daily Soll from Semesterplanung.
+- The weekly required average remains an informational weekly indicator only.
+- If today's plan is reached, the card shows "Tagesplan erreicht" instead of a false remaining amount.
+- If no study time is planned today, it shows "Heute keine Lernzeit geplant" or "Zusätzlich gelernt".

@@ -1147,7 +1147,12 @@ function renderHome(){
  }else{
    const dNeed=dailyNeed();document.getElementById('dailyNeedLabel')&&(document.getElementById('dailyNeedLabel').textContent='Täglich erforderlich');document.getElementById('dailyNeed')&&(document.getElementById('dailyNeed').textContent=minsText(dNeed));document.getElementById('dailyNeedHint')&&(document.getElementById('dailyNeedHint').textContent='Wird täglich aus Reststunden und Resttagen neu berechnet');
    $('#weeklyNeedLabel').textContent='Wöchentlich erforderlich';$('#weeklyNeed').textContent=minsText(dNeed*7);$('#weeklyNeedHint').textContent='Um im Plan zu bleiben';
-   $('#todayStudiedLabel').textContent='Heute gelernt';$('#todayStudied').textContent=minsText(todayMins);$('#todayStatus').textContent=todayMins>=dNeed&&dNeed>0?'Tagesziel erreicht':todayMins?`verbleibend ${minsText(Math.max(0,dNeed-todayMins))}`:'Starte deine erste Session';
+   const todaySoll=plannedStudyMinsForDate(today);
+   $('#todayStudiedLabel').textContent='Heute gelernt';
+   $('#todayStudied').textContent=minsText(todayMins);
+   $('#todayStatus').textContent=todaySoll>0
+     ?(todayMins>=todaySoll?'Tagesplan erreicht':todayMins?`verbleibend ${minsText(Math.max(0,todaySoll-todayMins))}`:`Noch ${minsText(todaySoll)} aus deinem Tagesplan`)
+     :(todayMins?'Zusätzlich gelernt':'Heute keine Lernzeit geplant');
    $('#semesterPreview').classList.add('hidden');const endDays=daysUntil(state.semester.end);$('#countdownNumber').textContent=endDays===null?'—':endDays;$('#countdownTitle').textContent=endDays===0?'Das Semester endet heute':`Noch ${endDays??'—'} Tage bis Semesterende`;$('#countdownDate').textContent=state.semester.end?fmtDate(state.semester.end):'Semesterende noch nicht festgelegt';
  }
  const pos=mode==='holiday'?holidayPlanPosition():totalPlanPosition();const planName=mode==='holiday'?'Ferienplan':'Gesamtplan';if(Math.abs(pos)<1){$('#planStatus').textContent=`Du bist genau im ${planName}`}else{$('#planStatus').textContent=pos>0?`Du bist ${hoursText(pos)} vor dem ${planName}`:`Du bist ${hoursText(Math.abs(pos))} hinter dem ${planName}`};$('#planStatus').className='dashboard-status hero-plan-status '+(pos>=0?'good':'bad');
