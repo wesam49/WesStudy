@@ -83,3 +83,9 @@ WesStudy v5.4.4
 - The weekly required average remains an informational weekly indicator only.
 - If today's plan is reached, the card shows "Tagesplan erreicht" instead of a false remaining amount.
 - If no study time is planned today, it shows "Heute keine Lernzeit geplant" or "Zusätzlich gelernt".
+
+## v5.6.0
+- Fächer list is now automatically sorted by completion percentage.
+- Highest percentage appears first, lowest percentage last.
+- The order updates immediately whenever study progress changes.
+- Ties are sorted by completed study time, then alphabetically.

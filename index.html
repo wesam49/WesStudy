@@ -1112,7 +1112,16 @@ function renderSemester(){const sem=state.semester;$('#hoursPerCreditText').text
 function subjectHTML(s,compact=false){const req=subjectRequired(s),done=studiedForSubject(s.id),rem=Math.max(0,req-done),p=req?clamp(done/req*100,0,100):0,mTotal=makeupForSubject(s.id),mOpen=makeupForSubject(s.id,true),mDone=Math.max(0,mTotal-mOpen);return `<div class="subject"><div class="subject-head"><div class="subject-title"><span class="dot" style="background:${esc(s.color)}"></span><div><strong>${esc(s.name)}</strong><div class="muted" style="font-size:.78rem">${s.credits} CP · ${hoursText(req)}</div></div></div>${compact?'':`<div class="subject-actions"><button class="mini-btn" data-add-makeup-subject="${s.id}" title="Nachholen hinzufügen"></button><button class="mini-btn" data-edit-subject="${s.id}">Bearbeiten</button><button class="mini-btn" data-delete-subject="${s.id}">Löschen</button></div>`}</div><div class="progress" style="margin-top:12px"><i style="width:${p}%"></i></div><div class="metrics"><span class="pill">Erledigt ${hoursText(done)}</span><span class="pill">Verbleibend ${hoursText(rem)}</span><span class="pill">${p.toFixed(0)}%</span>${mTotal?`<span class="pill">Nachholen gesamt ${hoursText(mTotal)}</span><span class="pill">Offen ${hoursText(mOpen)}</span><span class="pill">Nachgeholt ${hoursText(mDone)}</span>`:''}</div></div>`}
 function renderSubjects(){
  const el=$('#subjectsList');
- el.innerHTML=state.subjects.length?state.subjects.map(s=>subjectHTML(s)).join(''):`<div class="card empty"><div class="emoji"></div><h3>Füge dein erstes Fach hinzu</h3><p>Gib Fachname und Credits ein; die benötigte Lernzeit wird automatisch berechnet.</p><button class="btn primary" data-open="subjectDialog">Fach hinzufügen</button></div>`;
+ const sortedSubjects=state.subjects.slice().sort((a,b)=>{
+   const aReq=subjectRequired(a),bReq=subjectRequired(b);
+   const aDone=studiedForSubject(a.id),bDone=studiedForSubject(b.id);
+   const aPct=aReq?clamp(aDone/aReq*100,0,100):0;
+   const bPct=bReq?clamp(bDone/bReq*100,0,100):0;
+   if(bPct!==aPct)return bPct-aPct;
+   if(bDone!==aDone)return bDone-aDone;
+   return String(a.name||'').localeCompare(String(b.name||''),'de');
+ });
+ el.innerHTML=sortedSubjects.length?sortedSubjects.map(s=>subjectHTML(s)).join(''):`<div class="card empty"><div class="emoji"></div><h3>Füge dein erstes Fach hinzu</h3><p>Gib Fachname und Credits ein; die benötigte Lernzeit wird automatisch berechnet.</p><button class="btn primary" data-open="subjectDialog">Fach hinzufügen</button></div>`;
  $('#subCredits').textContent=state.subjects.reduce((a,s)=>a+Number(s.credits),0);$('#subRequired').textContent=hoursText(totalRequired());$('#subStudied').textContent=hoursText(totalStudied());$('#subRemaining').textContent=hoursText(totalRemaining());
  const mm=document.getElementById('subjectsMakeupMetrics');if(mm)mm.innerHTML=`<span class="pill">Nachholen gesamt ${hoursText(makeupTotalMins())}</span><span class="pill">Nachgeholt ${hoursText(makeupDoneMins())}</span><span class="pill">Nachholen offen ${hoursText(makeupOpenMins())}</span><span class="pill">Gesamtbedarf inkl. Nachholen ${hoursText(totalRequiredWithMakeup())}</span>`;
  const ml=document.getElementById('subjectsMakeupList');if(!ml)return;
