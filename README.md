@@ -97,3 +97,10 @@ WesStudy v5.4.4
 - The current week is highlighted.
 - Separate markers show actual progress and this week's Soll.
 - Works responsively on mobile and desktop.
+
+
+## v5.7.0 — Apple-inspired Design Refresh
+- Visual redesign only; no study/calculation/calendar logic changed.
+- Native Apple-style system font stack, warmer canvas, refined cards, buttons and navigation.
+- Weekly target markers, current-day states, Fächer sorting and existing behavior preserved.
+- Responsive mobile/desktop and dark mode styling refreshed.
