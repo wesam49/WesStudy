@@ -89,3 +89,11 @@ WesStudy v5.4.4
 - Highest percentage appears first, lowest percentage last.
 - The order updates immediately whenever study progress changes.
 - Ties are sorted by completed study time, then alphabetically.
+
+## v5.6.1
+- Added a weekly target roadmap to the dashboard progress card.
+- The user-defined study target (for example 85%) is divided evenly across all semester weeks.
+- Small vertical markers show the cumulative Soll percentage for every week.
+- The current week is highlighted.
+- Separate markers show actual progress and this week's Soll.
+- Works responsively on mobile and desktop.
