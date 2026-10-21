@@ -52,46 +52,6 @@
     .dayplan-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:16px}
     .dayplan-date{display:flex;align-items:center;gap:8px}.dayplan-date strong{min-width:160px;text-align:center}
     .dayplan-timeline{display:grid;gap:10px}.dayplan-item{display:grid;grid-template-columns:76px 1fr auto;gap:12px;align-items:center;padding:13px;border:1px solid var(--line);background:var(--panel);border-radius:17px}.dayplan-item.done{opacity:.58}.dayplan-item.done .dayplan-title{text-decoration:line-through}.dayplan-time{font-weight:900;font-variant-numeric:tabular-nums;color:var(--primary)}.dayplan-title{font-weight:850}.dayplan-sub{font-size:.78rem;color:var(--muted);margin-top:3px}.dayplan-actions{display:flex;align-items:center;gap:6px}.dayplan-check{width:24px;height:24px;accent-color:var(--primary)}.dayplan-learning{padding:14px;border-radius:16px;background:var(--panel2);border:1px solid var(--line);margin-bottom:16px}.dayplan-learning.good{border-color:#bdebdc;background:#effbf7}.template-row{display:flex;gap:8px;flex-wrap:wrap}.template-row select{flex:1;min-width:170px;border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:13px;padding:11px}
-
-    .weekly-target-roadmap{
-      margin-top:18px;padding:15px 16px 13px;border-radius:16px;
-      background:rgba(255,255,255,.72);border:1px solid rgba(47,143,109,.14);
-      position:relative;z-index:2;color:var(--text)
-    }
-    .weekly-target-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:12px}
-    .weekly-target-head>div{display:flex;flex-direction:column;gap:2px}
-    .weekly-target-head strong{font-size:.88rem;color:#102347}
-    .weekly-target-head span{font-size:.74rem;color:#6b7b89}
-    .weekly-target-track{height:14px;border-radius:999px;background:#e5ece8;position:relative;overflow:visible;margin:0 2px}
-    .weekly-target-fill{position:absolute;inset:0 auto 0 0;width:0;border-radius:999px;background:#2f8f6d;z-index:1}
-    .weekly-target-goal-zone{position:absolute;top:0;bottom:0;right:0;border-radius:0 999px 999px 0;background:rgba(47,143,109,.08);z-index:0}
-    .weekly-target-ticks{position:absolute;inset:0;z-index:2;pointer-events:none}
-    .weekly-target-tick{position:absolute;top:-3px;width:1px;height:20px;background:rgba(16,35,71,.28)}
-    .weekly-target-tick.current{width:2px;background:#d69a23}
-    .weekly-target-marker{position:absolute;top:-8px;width:2px;height:30px;z-index:4;transform:translateX(-1px)}
-    .weekly-target-marker span{position:absolute;top:-2px;left:50%;width:8px;height:8px;border-radius:50%;transform:translate(-50%,-50%)}
-    .weekly-target-marker.actual{background:#2f8f6d}.weekly-target-marker.actual span{background:#2f8f6d}
-    .weekly-target-marker.expected{background:#d69a23}.weekly-target-marker.expected span{background:#d69a23}
-    .weekly-target-labels{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:15px;font-size:.73rem;color:#60717f}
-    .weekly-target-labels span:nth-child(2){text-align:center}.weekly-target-labels span:last-child{text-align:right}
-    .weekly-target-weekline{display:flex;align-items:center;gap:4px;margin-top:11px;overflow:hidden}
-    .weekly-target-week-dot{height:5px;flex:1;min-width:3px;border-radius:999px;background:#dbe4df}
-    .weekly-target-week-dot.past{background:#8abda8}
-    .weekly-target-week-dot.current{background:#d69a23;height:7px}
-    [data-theme="dark"] .weekly-target-roadmap{background:rgba(255,255,255,.04);border-color:#31464d;color:#f4f7fb}
-    [data-theme="dark"] .weekly-target-head strong{color:#f4f7fb}
-    [data-theme="dark"] .weekly-target-head span,[data-theme="dark"] .weekly-target-labels{color:#aeb9bf}
-    [data-theme="dark"] .weekly-target-track{background:#26383f}
-    [data-theme="dark"] .weekly-target-tick{background:rgba(255,255,255,.26)}
-    @media(max-width:560px){
-      .weekly-target-roadmap{margin-top:14px;padding:13px 12px 11px}
-      .weekly-target-head{margin-bottom:11px}
-      .weekly-target-head strong{font-size:.82rem}
-      .weekly-target-head span{font-size:.69rem}
-      .weekly-target-labels{font-size:.66rem;gap:4px}
-      .weekly-target-weekline{gap:2px}
-    }
-
     @media(max-width:560px){.nav{grid-template-columns:repeat(6,1fr);gap:2px}.nav button{font-size:.62rem;padding:7px 1px}.nav-svg svg{width:19px;height:19px}.dayplan-item{grid-template-columns:62px 1fr;}.dayplan-actions{grid-column:2;justify-content:flex-end}.dayplan-date{width:100%;justify-content:space-between}.dayplan-date strong{min-width:0;flex:1}}
 
     .cloud-card{border:1px solid var(--line);background:var(--panel2);border-radius:18px;padding:14px}.cloud-head{display:flex;align-items:center;justify-content:space-between;gap:12px}.cloud-head strong{display:block;margin-bottom:3px}.cloud-card .timer-controls{justify-content:flex-start}.cloud-card .btn{box-shadow:none}.cloud-card input{background:var(--panel);}
@@ -772,30 +732,6 @@ body{background:linear-gradient(180deg,#f7f5f0 0%,#f2f1ec 100%);color:var(--text
   }
 }
 
-\n/* WesStudy v5.7.0 — Apple-inspired visual refresh (design only) */
-:root{--a-bg:#f6f5f2;--a-card:rgba(255,255,255,.88);--a-line:rgba(15,39,72,.10);--a-text:#102747;--a-sub:#6d7b8c;--a-green:#23986f;--a-green-soft:#ebf7f1;--a-yellow:#b97918;--a-yellow-soft:#fff4df;--a-red:#c24c57;--a-red-soft:#fff0f1;--a-shadow:0 10px 28px rgba(30,43,60,.065),0 1px 3px rgba(30,43,60,.05)}
-html{background:var(--a-bg);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
-body{background:radial-gradient(circle at 16% -8%,rgba(255,255,255,.95),transparent 34%),radial-gradient(circle at 92% 7%,rgba(218,230,223,.36),transparent 28%),var(--a-bg);color:var(--a-text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue",Arial,sans-serif;letter-spacing:-.01em}
-h1,h2,h3,.brand,.big-number,.count-number{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Arial,sans-serif!important;color:var(--a-text);letter-spacing:-.035em}h1,h2{font-weight:760}h3{font-weight:700}
-header{background:rgba(248,247,244,.78)!important;border-bottom:1px solid rgba(15,39,72,.07)!important;backdrop-filter:saturate(160%) blur(22px);-webkit-backdrop-filter:saturate(160%) blur(22px);box-shadow:none!important}.brand{font-weight:760!important}.brand-mark{border-radius:18px!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),0 5px 18px rgba(15,39,72,.14)}
-main{max-width:1280px}
-.card,.dashboard-countdown,.dashboard-mode,.subject-card,.modal-card,.dialog-card{background:var(--a-card)!important;border:1px solid var(--a-line)!important;border-radius:22px!important;box-shadow:var(--a-shadow)!important;backdrop-filter:saturate(135%) blur(16px);-webkit-backdrop-filter:saturate(135%) blur(16px)}
-.card.hero{background:radial-gradient(circle at 92% 12%,rgba(35,152,111,.11),transparent 31%),rgba(255,255,255,.90)!important;border-color:rgba(35,152,111,.16)!important;overflow:hidden}.hero-row{gap:24px!important;align-items:center!important}
-.muted{color:var(--a-sub)!important}.eyebrow{color:#667689!important;letter-spacing:.12em!important;font-size:.72rem!important;font-weight:720!important}.big-number{font-weight:780!important;line-height:1.04!important}
-.btn{border-radius:14px!important;font-weight:650!important;box-shadow:none!important;min-height:42px;border:1px solid rgba(15,39,72,.14)!important;transition:transform .16s ease}.btn:active{transform:scale(.985)}.btn.primary{background:var(--a-text)!important;color:#fff!important;border-color:transparent!important}.btn.soft{background:rgba(255,255,255,.74)!important;color:var(--a-text)!important}
-.icon-btn{background:rgba(255,255,255,.76)!important;border:1px solid var(--a-line)!important;border-radius:16px!important;box-shadow:0 6px 18px rgba(30,43,60,.045)!important}
-.dashboard-mode{padding:5px!important;background:rgba(255,255,255,.75)!important}.dashboard-mode button{border-radius:15px!important;font-weight:680!important;color:#5c6c7d!important;min-height:44px}.dashboard-mode button.active,.dashboard-mode button[aria-pressed="true"]{background:var(--a-text)!important;color:#fff!important;box-shadow:0 5px 12px rgba(15,39,72,.14)!important}
-.dashboard-countdown{padding:18px 22px!important}.count-number{font-weight:780!important}.progress{height:10px!important;border-radius:999px!important;background:#e5ece8!important;overflow:hidden}.progress>i{border-radius:999px!important;background:linear-gradient(90deg,#65b897,#23986f)!important}
-.ring{background:radial-gradient(circle closest-side,#fff 76%,transparent 78% 99%),conic-gradient(var(--a-green) calc(var(--p,0)*1%),#dce8e2 0)!important;box-shadow:inset 0 0 0 1px rgba(35,152,111,.08)}.ring strong{color:var(--a-text)!important}
-.status,.dashboard-status{border-radius:999px!important;font-weight:680!important}.dashboard-status.good,.status.good,.status.success{background:var(--a-green-soft)!important;color:#0a7a57!important;border-color:rgba(35,152,111,.16)!important}.dashboard-status.bad,.status.bad{background:var(--a-red-soft)!important;color:var(--a-red)!important;border-color:rgba(194,76,87,.16)!important}.status.warn,.status.open,.past-day-status.open,.past-day-status.warn{background:var(--a-yellow-soft)!important;color:var(--a-yellow)!important;border-color:rgba(185,121,24,.20)!important}.past-day-status.unplanned{background:#eef8f3!important;color:#4f806e!important;border-color:rgba(79,128,110,.15)!important}
-.weekly-target-roadmap{background:rgba(255,255,255,.65)!important;border:1px solid rgba(15,39,72,.08)!important;border-radius:18px!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.55)}.weekly-target-track{background:#e5ece8!important;height:12px!important}.weekly-target-fill{background:linear-gradient(90deg,#75bea2,#23986f)!important}.weekly-target-marker.actual,.weekly-target-marker.actual span{background:var(--a-green)!important}.weekly-target-marker.expected,.weekly-target-marker.expected span{background:#d59a2d!important}.weekly-target-marker.actual span{box-shadow:0 0 0 4px rgba(35,152,111,.12)}.weekly-target-marker.expected span{box-shadow:0 0 0 4px rgba(213,154,45,.12)}.weekly-target-tick{background:rgba(15,39,72,.18)!important}.weekly-target-tick.current{background:#d59a2d!important}.weekly-target-week-dot{background:#dfe6e2!important}.weekly-target-week-dot.past{background:#90c4ad!important}.weekly-target-week-dot.current{background:#d59a2d!important}
-.subject-card{padding:18px!important;margin-bottom:12px!important;transition:transform .16s ease,box-shadow .16s ease}.subject-card:hover{transform:translateY(-1px);box-shadow:0 12px 26px rgba(30,43,60,.08)!important}.subject-card .progress{height:8px!important}
-.calendar-event{border-radius:10px!important;border:1px solid rgba(15,39,72,.06)!important;box-shadow:0 2px 8px rgba(30,43,60,.04)!important}
-.bottom-nav{left:50%!important;transform:translateX(-50%);width:min(94%,760px)!important;bottom:10px!important;border:1px solid rgba(15,39,72,.10)!important;border-radius:24px!important;background:rgba(255,255,255,.86)!important;backdrop-filter:saturate(160%) blur(24px);-webkit-backdrop-filter:saturate(160%) blur(24px);box-shadow:0 12px 30px rgba(30,43,60,.12)!important;padding:6px!important}.bottom-nav button,.bottom-nav a{border-radius:17px!important}.bottom-nav .active{background:#edf7f2!important;color:var(--a-green)!important}
-input,select,textarea{border-radius:13px!important;border:1px solid rgba(15,39,72,.14)!important;background:rgba(255,255,255,.86)!important;color:var(--a-text)!important;min-height:43px}input:focus,select:focus,textarea:focus{outline:none!important;border-color:rgba(10,108,255,.42)!important;box-shadow:0 0 0 4px rgba(10,108,255,.10)!important}
-@media(min-width:900px){main{padding-top:22px!important}.grid.cols-4{gap:16px!important}.grid.cols-4>.card{min-height:144px}.card{padding:22px!important}.card.hero{padding:26px!important}}
-@media(max-width:700px){body{background:#f7f6f3}main{padding-left:12px!important;padding-right:12px!important;padding-bottom:106px!important}.card,.dashboard-countdown,.dashboard-mode{border-radius:20px!important}.card{padding:17px!important}.grid.cols-4{gap:10px!important}.grid.cols-4>.card{min-height:128px}.hero-row{align-items:flex-start!important}.ring{width:92px!important;height:92px!important;flex:0 0 92px!important}.bottom-nav{width:calc(100% - 20px)!important;bottom:max(8px,env(safe-area-inset-bottom))!important}.subject-card{padding:15px!important}}
-[data-theme="dark"]{--a-bg:#0d1117;--a-card:rgba(20,27,34,.90);--a-line:rgba(255,255,255,.08);--a-text:#f4f7fb;--a-sub:#a8b1bc}[data-theme="dark"] body{background:#0d1117!important;color:var(--a-text)!important}[data-theme="dark"] header{background:rgba(13,17,23,.80)!important}[data-theme="dark"] .card,[data-theme="dark"] .dashboard-countdown,[data-theme="dark"] .dashboard-mode,[data-theme="dark"] .subject-card{background:var(--a-card)!important;border-color:var(--a-line)!important}[data-theme="dark"] .card.hero{background:radial-gradient(circle at 92% 12%,rgba(35,152,111,.11),transparent 31%),rgba(20,27,34,.92)!important}[data-theme="dark"] .ring{background:radial-gradient(circle closest-side,#151b22 76%,transparent 78% 99%),conic-gradient(var(--a-green) calc(var(--p,0)*1%),#263039 0)!important}[data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea{background:#151b22!important;color:#f4f7fb!important}[data-theme="dark"] .bottom-nav{background:rgba(20,27,34,.90)!important}
 </style>
 </head>
 <body>
@@ -811,41 +747,7 @@ input,select,textarea{border-radius:13px!important;border:1px solid rgba(15,39,7
       <div id="setupNotice" class="card" style="margin-bottom:16px;display:none"><div class="section-head"><div><h2>Semester einrichten</h2><div class="muted">Lege den Zeitraum fest und füge deine Fächer hinzu.</div></div><button class="btn primary" data-open="semesterDialog">Jetzt einrichten</button></div></div>
       <div class="dashboard-mode" id="dashboardMode"><button type="button" data-mode="holiday">Ferien</button><button type="button" data-mode="semester">Semester</button></div>
       <div class="dashboard-countdown" id="dashboardCountdown"><div class="count-number" id="countdownNumber">—</div><div><strong id="countdownTitle">Zeitraum einrichten</strong><div class="muted" id="countdownDate">Lege Semester- und Feriendaten fest.</div></div></div>
-      <div class="card hero" style="margin-bottom:16px">
-        <div class="hero-row">
-          <div>
-            <div style="opacity:.85;font-size:.86rem">Fortschritt zum Lernziel</div>
-            <div class="dashboard-status hero-plan-status good" id="planStatus">Du bist genau im Ferienplan</div>
-            <div class="big-number" id="heroStudied">0 Std.</div>
-            <div style="opacity:.85;margin:8px 0" id="heroRemaining">verbleibend 0 Std.</div>
-            <button class="btn" style="background:white;color:#5c4de0;box-shadow:none" data-open="manualSessionDialog">Lernzeit eintragen</button>
-          </div>
-          <div class="ring" id="overallRing"><strong id="overallPercent">0%</strong></div>
-        </div>
-
-        <div class="weekly-target-roadmap" id="weeklyTargetRoadmap">
-          <div class="weekly-target-head">
-            <div>
-              <strong>Wochen-Zielpfad</strong><span class="eyebrow" style="margin-left:8px">Soll pro Woche</span>
-              <span id="weeklyTargetSummary">Semesterziel wird auf die Wochen verteilt</span>
-            </div>
-            <strong id="weeklyTargetEnd">100%</strong>
-          </div>
-          <div class="weekly-target-track" id="weeklyTargetTrack">
-            <div class="weekly-target-fill" id="weeklyTargetFill"></div>
-            <div class="weekly-target-goal-zone" id="weeklyTargetGoalZone"></div>
-            <div class="weekly-target-ticks" id="weeklyTargetTicks"></div>
-            <div class="weekly-target-marker actual" id="weeklyActualMarker"><span></span></div>
-            <div class="weekly-target-marker expected" id="weeklyExpectedMarker"><span></span></div>
-          </div>
-          <div class="weekly-target-labels">
-            <span id="weeklyActualLabel">Aktuell 0%</span>
-            <span id="weeklyExpectedLabel">Diese Woche Soll 0%</span>
-            <span id="weeklyGoalLabel">Semesterziel 100%</span>
-          </div>
-          <div class="weekly-target-weekline" id="weeklyTargetWeekline"></div>
-        </div>
-      </div>
+      <div class="card hero" style="margin-bottom:16px"><div class="hero-row"><div><div style="opacity:.85;font-size:.86rem">Fortschritt zum Lernziel</div><div class="dashboard-status hero-plan-status good" id="planStatus">Du bist genau im Ferienplan</div><div class="big-number" id="heroStudied">0 Std.</div><div style="opacity:.85;margin:8px 0" id="heroRemaining">verbleibend 0 Std.</div><button class="btn" style="background:white;color:#5c4de0;box-shadow:none" data-open="manualSessionDialog">Lernzeit eintragen</button></div><div class="ring" id="overallRing"><strong id="overallPercent">0%</strong></div></div></div>
       <div class="grid cols-4" style="margin-bottom:16px">
         <div class="card"><div class="eyebrow" id="weeklyNeedLabel">Wöchentlich erforderlich</div><div class="big-number" id="weeklyNeed">0:00</div><div class="muted" id="weeklyNeedHint">Um im Plan zu bleiben</div></div>
         <div class="card"><div class="eyebrow" id="todayStudiedLabel">Heute gelernt</div><div class="big-number" id="todayStudied">0:00</div><div class="muted" id="todayStatus">Starte deine erste Session</div></div>
@@ -1236,65 +1138,11 @@ function getEffectiveTodayTargetMinutes(dateStr){
   return Math.round(dayStudyItems.reduce((acc,x)=>acc+Math.max(0,minutes(x.end)-minutes(x.start)),0));
 }
 
-
-function renderWeeklyTargetRoadmap(){
-  const start=state.semester?.start,end=state.semester?.end,today=todayISO();
-  const wrap=document.getElementById('weeklyTargetRoadmap');
-  if(!wrap)return;
-  if(!start||!end){
-    wrap.style.display='none';
-    return;
-  }
-  wrap.style.display='block';
-
-  const weeks=Math.max(1,Math.ceil(daysInclusive(start,end)/7));
-  let currentWeek=1;
-  if(today<=start)currentWeek=1;
-  else if(today>=end)currentWeek=weeks;
-  else currentWeek=Math.min(weeks,Math.max(1,Math.ceil(daysInclusive(start,today)/7)));
-
-  const targetPct=studyTargetPercent();
-  const perWeek=targetPct/weeks;
-  const expectedPct=Math.min(targetPct,perWeek*currentWeek);
-  const required=totalRequired();
-  const actualPct=required?clamp(totalStudied()/required*100,0,100):0;
-
-  const ticks=document.getElementById('weeklyTargetTicks');
-  ticks.innerHTML='';
-  for(let i=1;i<=weeks;i++){
-    const tick=document.createElement('i');
-    tick.className='weekly-target-tick'+(i===currentWeek?' current':'');
-    tick.style.left=`${Math.min(100,perWeek*i)}%`;
-    tick.title=`Woche ${i}: ${(perWeek*i).toFixed(1)}%`;
-    ticks.appendChild(tick);
-  }
-
-  document.getElementById('weeklyTargetFill').style.width=`${actualPct}%`;
-  document.getElementById('weeklyTargetGoalZone').style.left=`${targetPct}%`;
-  document.getElementById('weeklyActualMarker').style.left=`${actualPct}%`;
-  document.getElementById('weeklyExpectedMarker').style.left=`${expectedPct}%`;
-
-  document.getElementById('weeklyTargetEnd').textContent=`${targetPct.toFixed(0)}%`;
-  document.getElementById('weeklyTargetSummary').textContent=`${weeks} Wochen · ca. ${perWeek.toFixed(1)}% pro Woche`;
-  document.getElementById('weeklyActualLabel').textContent=`Aktuell ${actualPct.toFixed(1)}%`;
-  document.getElementById('weeklyExpectedLabel').textContent=`Woche ${currentWeek} Soll ${expectedPct.toFixed(1)}%`;
-  document.getElementById('weeklyGoalLabel').textContent=`Semesterziel ${targetPct.toFixed(0)}%`;
-
-  const weekline=document.getElementById('weeklyTargetWeekline');
-  weekline.innerHTML='';
-  for(let i=1;i<=weeks;i++){
-    const dot=document.createElement('i');
-    dot.className='weekly-target-week-dot'+(i<currentWeek?' past':i===currentWeek?' current':'');
-    dot.title=`Woche ${i} · Soll ${(perWeek*i).toFixed(1)}%`;
-    weekline.appendChild(dot);
-  }
-}
-
 function renderHome(){
  const req=totalRequired(),target=studyTargetMins(),done=totalStudied()+makeupDoneMins(),rem=studyTargetRemaining(),p=target?clamp(done/target*100,0,100):0,mode=activeDashboardMode(),today=todayISO(),todayMins=sessionsOn(today);
  const todayPlannedHours=mode==='holiday'?Number(state.holiday?.days?.[today]||0):Number(state.semesterPlan?.days?.[today]||0),todayPlannedMins=todayPlannedHours*60;$('#todayPlanned').textContent=minsText(todayPlannedMins);$('#todayPlannedStatus').textContent=todayPlannedMins?(todayMins>=todayPlannedMins?'Geplante Lernzeit erreicht':`Noch ${minsText(Math.max(0,todayPlannedMins-todayMins))} von deinem Tagesplan`):'Für heute nichts geplant';
  $$('#dashboardMode button').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));
- $('#heroStudied').textContent=hoursText(done);$('#heroRemaining').textContent=`vom Lernziel verbleibend ${hoursText(rem)}`;$('#overallPercent').textContent=`${p.toFixed(0)}%`;$('#overallRing').style.setProperty('--p',p);renderWeeklyTargetRoadmap();
+ $('#heroStudied').textContent=hoursText(done);$('#heroRemaining').textContent=`vom Lernziel verbleibend ${hoursText(rem)}`;$('#overallPercent').textContent=`${p.toFixed(0)}%`;$('#overallRing').style.setProperty('--p',p);
  const targetPct=studyTargetPercent(),baseTarget=baseStudyTargetMins(),holidayForTarget=Math.min(baseTarget,holidayPlannedMins()),semesterTarget=Math.max(0,baseTarget-holidayForTarget)+makeupOpenMins(),semesterPlanned=Object.values(state.semesterPlan?.days||{}).reduce((a,h)=>a+Number(h||0)*60,0),semesterOpen=Math.max(0,semesterTarget-semesterPlanned);
  const targetInput=document.getElementById('studyTargetPercentInput');if(targetInput&&document.activeElement!==targetInput)targetInput.value=String(Math.round(targetPct));
  const targetMetrics=document.getElementById('studyTargetMetrics');if(targetMetrics)targetMetrics.innerHTML=`<span class="pill">Basisbedarf ${hoursText(req)}</span><span class="pill">Nachholen gesamt ${hoursText(makeupTotalMins())}</span><span class="pill">Gesamtbedarf inkl. Nachholen ${hoursText(totalRequiredWithMakeup())}</span><span class="pill">Dein Lernziel ${targetPct.toFixed(0)}% + Nachholen = ${hoursText(target)}</span><span class="pill">Nachholen offen ${hoursText(makeupOpenMins())}</span><span class="pill">Ferien geplant ${hoursText(holidayForTarget)}</span><span class="pill">Im Semester einzuplanen ${hoursText(semesterTarget)}</span><span class="pill">Semester noch offen ${hoursText(semesterOpen)}</span>`;
