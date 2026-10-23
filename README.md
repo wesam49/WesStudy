@@ -97,3 +97,14 @@ WesStudy v5.4.4
 - The current week is highlighted.
 - Separate markers show actual progress and this week's Soll.
 - Works responsively on mobile and desktop.
+
+## v5.8.0 — GitHub source fix
+- Fixed directly on the current GitHub source, not on an older exported build.
+- Wochenplan now has a real internal vertical scroll covering 00:00–24:00.
+- Weekday headers stay visible while scrolling.
+- Activities may cross midnight (example 22:00–01:30).
+- Overnight activities continue visually after 00:00 in the next day column.
+- Added Open Days directly before Lernumfang.
+- Open Days collects every incomplete past planned study day from the whole semester.
+- Past 10-day list remains unchanged.
+- Backlog now uses all open past days.

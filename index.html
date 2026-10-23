@@ -158,7 +158,7 @@ dialog[open]{position:fixed;inset:0;margin:auto}
 .week-metric .eyebrow{margin-bottom:6px}
 .week-metric strong{font-size:1.75rem;display:block}
 .week-summary-bar{padding:12px 14px;border:1px solid #bfe8d3;background:#eefaf2;border-radius:14px;color:#166b45;font-weight:800}
-.week-grid-shell{border:1px solid var(--line);border-radius:18px;overflow-x:auto;overflow-y:hidden;background:var(--panel);width:100%}
+.week-grid-shell{border:1px solid var(--line);border-radius:18px;overflow:auto;background:var(--panel);width:100%;max-height:72vh;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-gutter:stable}
 .week-grid{display:grid;grid-template-columns:74px repeat(7,minmax(135px,1fr));align-items:stretch;min-width:1040px;width:100%}
 .week-grid .wg-head-left{padding:12px 10px;background:var(--panel2);border-bottom:1px solid var(--line);font-weight:900}
 .week-grid .wg-head{background:var(--panel2);border-left:1px solid var(--line);border-bottom:1px solid var(--line);padding:8px 8px 10px;min-width:0}
@@ -168,9 +168,9 @@ dialog[open]{position:fixed;inset:0;margin:auto}
 .week-grid .wg-summary:active{transform:translateY(0)}
 .week-grid .wg-summary.good{background:#e8f7ee;color:#186443}
 .week-grid .wg-summary.warn{background:#fff0e6;color:#8b4d1f}
-.week-grid .wg-time-col{position:relative;height:1008px;background:var(--panel)}
+.week-grid .wg-time-col{position:relative;background:var(--panel)}
 .week-grid .wg-time-label{position:absolute;left:10px;transform:translateY(-50%);font-weight:800;color:var(--muted);font-variant-numeric:tabular-nums}
-.week-grid .wg-day-col{position:relative;height:1008px;border-left:1px solid var(--line);background:repeating-linear-gradient(to bottom,var(--panel) 0,var(--panel) 55px,var(--line) 56px)}
+.week-grid .wg-day-col{position:relative;border-left:1px solid var(--line);background:repeating-linear-gradient(to bottom,var(--panel) 0,var(--panel) 55px,var(--line) 56px)}
 .week-grid .wg-day-col::before{content:'';position:absolute;inset:0;background:linear-gradient(to right,transparent calc(100% - 1px),rgba(0,0,0,.03) 0)}
 .week-block{position:absolute;left:6px;right:6px;border-radius:14px;padding:8px 10px;border:1px solid transparent;box-shadow:0 2px 6px rgba(20,24,40,.05);overflow:hidden}
 .week-block .wb-time{font-size:.76rem;font-weight:800;opacity:.8;margin-bottom:2px}
@@ -772,6 +772,29 @@ body{background:linear-gradient(180deg,#f7f5f0 0%,#f2f1ec 100%);color:var(--text
   }
 }
 
+
+
+/* GitHub fixed build: 24h scroll + Open Days */
+.week-grid .wg-head,
+.week-grid .wg-head-left{
+  position:sticky;
+  top:0;
+  z-index:20;
+}
+.week-grid .wg-head{background:var(--panel2)}
+.week-grid .wg-head-left{background:var(--panel2);left:0;z-index:22}
+#openDaysCard .past-days-list{margin-top:10px}
+.open-days-summary{
+  display:flex;justify-content:space-between;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:14px;
+  background:#fff7e8;border:1px solid #f0d8a5;margin-bottom:10px
+}
+.week-block.overnight-carry{border-top-style:dashed!important}
+@media(max-width:700px){
+  .week-grid-shell{max-height:64vh}
+  .open-days-summary{align-items:flex-start;flex-direction:column}
+}
+
 </style>
 </head>
 <body>
@@ -848,6 +871,17 @@ body{background:linear-gradient(180deg,#f7f5f0 0%,#f2f1ec 100%);color:var(--text
         <div class="dashboard-status" id="pastStudyBacklog" style="margin-top:12px"></div>
       </div>
       
+
+
+      <div class="card" id="openDaysCard" style="margin-bottom:16px">
+        <div class="section-head">
+          <div>
+            <h2>Open Days</h2>
+            <div class="muted">Alle offenen vergangenen Lerntage gesammelt – sie bleiben hier, bis sie 100% erreicht haben.</div>
+          </div>
+        </div>
+        <div id="openStudyDays"></div>
+      </div>
 
       <div class="card" id="studyTargetCard" style="margin-bottom:16px">
         <div class="section-head">
@@ -1400,7 +1434,15 @@ function syncSemesterPlanMissingDaysFromDailyStudy(start=state.semester?.start,e
 }
 function dailyPlanState(){if(!state.dailyPlan)state.dailyPlan={items:[],templates:[]};if(!Array.isArray(state.dailyPlan.items))state.dailyPlan.items=[];if(!Array.isArray(state.dailyPlan.templates))state.dailyPlan.templates=[];return state.dailyPlan}
 function timeToMins(v){if(!v||!v.includes(':'))return 0;const [h,m]=v.split(':').map(Number);return h*60+m}
-function dayPlanDuration(x){return Math.max(0,timeToMins(x.end)-timeToMins(x.start))}
+function clockDuration(start,end){
+  if(!start||!end)return 0;
+  const st=timeToMins(start),en=timeToMins(end);
+  return en>=st?en-st:(1440-st)+en;
+}
+function dayPlanDuration(x){return clockDuration(x.start,x.end)}
+function shiftISODate(date,delta){
+  const d=parseDate(date);d.setDate(d.getDate()+Number(delta||0));return localISO(d);
+}
 function dayPlanItems(date=dayPlanDate){return dailyPlanState().items.filter(x=>x.date===date).sort((a,b)=>(a.start||'99:99').localeCompare(b.start||'99:99'))}
 function studyPlanForDate(date){if(state.holiday&&overlapDate(date,state.holiday.start,state.holiday.end))return Number(state.holiday.days?.[date]||0)*60;return Number(state.semesterPlan?.days?.[date]||0)*60}
 function renderDailyPlan(){const wrap=$('#dayPlanTimeline');if(!wrap)return;const d=parseDate(dayPlanDate),items=dayPlanItems(),total=items.reduce((a,x)=>a+dayPlanDuration(x),0),done=items.filter(x=>x.done).reduce((a,x)=>a+dayPlanDuration(x),0),study=items.filter(itemCountsAsLearning).reduce((a,x)=>a+dayPlanDuration(x),0),target=studyPlanForDate(dayPlanDate);$('#dayPlanDateLabel').textContent=(dayPlanDate===todayISO()?'Heute · ':'')+new Intl.DateTimeFormat('de-DE',{weekday:'short',day:'2-digit',month:'2-digit',year:'numeric'}).format(d);$('#dayPlanTotal').textContent=minsText(total);$('#dayPlanDone').textContent=minsText(done);$('#dayPlanCount').textContent=items.length;$('#dayPlanStudy').textContent=minsText(study);const st=$('#dayPlanLearningStatus');if(target){const diff=target-study;st.classList.toggle('good',diff<=0);st.innerHTML=`<strong> Lernziel laut ${state.holiday&&overlapDate(dayPlanDate,state.holiday.start,state.holiday.end)?'Ferienplan':'Semesterplanung'}: ${minsText(target)}</strong><div class="muted" style="margin-top:5px">Im Tagesplan eingeplant: ${minsText(study)} · ${diff>0?`Noch ${minsText(diff)} einplanen`:'Lernziel vollständig eingeplant ✓'}</div>`}else{st.classList.remove('good');st.innerHTML=`<strong> Für diesen Tag ist kein Lernziel im Ferien-/Semesterplan eingetragen.</strong><div class="muted" style="margin-top:5px">Du kannst trotzdem Lernblöcke frei in deinen Tagesplan setzen.</div>`}wrap.innerHTML=items.length?items.map(x=>{const [icon,label]=dayPlanTypes[x.type]||dayPlanTypes.other;return `<div class="dayplan-item ${x.done?'done':''}"><div class="dayplan-time">${esc(x.start)}<div class="muted" style="font-size:.72rem">bis ${esc(x.end)}</div></div><div><div class="dayplan-title">${icon?icon+' ':''}${esc(x.title)}</div><div class="dayplan-sub">${label} · ${minsText(dayPlanDuration(x))}${x.repeatMode==='biweekly'?' · alle 2 Wochen':x.repeatMode==='weekly'?' · wöchentlich':x.repeatMode==='daily'?' · täglich':x.repeatMode==='weekdays'?' · Mo–Fr':''}</div></div><div class="dayplan-actions"><input class="dayplan-check" type="checkbox" data-dayplan-done="${x.id}" ${x.done?'checked':''} aria-label="Erledigt"><button class="mini-btn" data-dayplan-edit="${x.id}">Bearbeiten</button></div></div>`}).join(''):`<div class="card empty"><div class="empty-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M8 3v4M16 3v4M3 10h18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></div><h3>Noch nichts geplant</h3><p>Füge Lernen, Gym, Lesen, Uni, Arbeit oder andere Aktivitäten hinzu.</p><button class="btn primary" id="dayPlanEmptyAdd">+ Erste Aktivität</button></div>`;renderDayTemplates()}
@@ -1445,7 +1487,7 @@ $('#dayPlanTimeline').addEventListener('change',e=>{if(!e.target.matches('[data-
 $('#dayPlanForm').addEventListener('submit',e=>{
   if(e.submitter?.value==='cancel')return;e.preventDefault();
   const start=$('#dayPlanStart').value,end=$('#dayPlanEnd').value;
-  if(timeToMins(end)<=timeToMins(start))return toast('Die Endzeit muss nach der Startzeit liegen.');
+  /* Endzeit vor/gleich Startzeit bedeutet: Ende am nächsten Tag. */
   const id=$('#dayPlanItemId').value,type=$('#dayPlanType').value,title=$('#dayPlanTitle').value.trim(),date=$('#dayPlanItemDate').value,mode=$('#dayPlanRepeat').value,until=$('#dayPlanRepeatUntil').value;
   if(!title||!date)return;
   const plan=dailyPlanState(),affected=new Set();
@@ -1463,7 +1505,7 @@ $('#dayPlanForm').addEventListener('submit',e=>{
         const oldDate=x.date,oldStart=x.start;
         const dateDelta=Math.round((parseDate(date)-parseDate(oldDate))/86400000);
         const timeDelta=timeToMins(start)-timeToMins(oldStart);
-        const newDuration=timeToMins(end)-timeToMins(start);
+        const newDuration=clockDuration(start,end);
         sameGroup.forEach(i=>{
           affected.add(i.date);
           const nd=parseDate(i.date);nd.setDate(nd.getDate()+dateDelta);
@@ -2135,9 +2177,9 @@ function renderWeekPlanner(){
   const planned=dates.reduce((sum,d)=>sum+plannedLearningMinutesForDate(d),0);
   const open=Math.max(0,target-planned);
   const makeupOpen=makeupOpenMins();
-  const timeStart=7*60,timeEnd=25*60,totalMins=timeEnd-timeStart,rowHeight=56,canvasHeight=Math.round(totalMins/60*rowHeight);
+  const timeStart=0,timeEnd=24*60,totalMins=timeEnd-timeStart,rowHeight=56,canvasHeight=Math.round(totalMins/60*rowHeight);
   const labels=[];
-  for(let m=timeStart;m<=timeEnd;m+=60){labels.push({label:minsToClock(m),top:((m-timeStart)/totalMins)*100});}
+  for(let m=timeStart;m<timeEnd;m+=60){labels.push({label:minsToClock(m),top:((m-timeStart)/totalMins)*100});}
   const weekdayFmt=new Intl.DateTimeFormat('de-DE',{weekday:'long'});
   const shortFmt=new Intl.DateTimeFormat('de-DE',{weekday:'short',day:'2-digit',month:'2-digit'});
   const metricCard=(title,value)=>`<div class="week-metric"><div class="eyebrow">${title}</div><strong>${value}</strong></div>`;
@@ -2146,10 +2188,25 @@ function renderWeekPlanner(){
     return `<div class="wg-head"><div class="wg-day-name">${esc(weekdayFmt.format(parseDate(date)))}<br>${esc(shortFmt.format(parseDate(date)).split(', ').pop()||fmtDate(date))}</div>${dayHeaderSummaryHtml(date,targetDay,plannedDay)}</div>`;
   }).join('');
   const colHtml=dates.map(date=>{
-    const raw=dayPlanItems(date).filter(x=>x.start&&x.end).map((x,idx)=>{
-      let st=timeToMins(x.start),en=timeToMins(x.end); if(st<timeStart) st+=1440; if(en<=st) en+=1440;
-      return {x,idx,st,en};
-    }).sort((a,b)=>a.st-b.st||a.en-b.en||a.idx-b.idx);
+    const own=dayPlanItems(date).filter(x=>x.start&&x.end);
+    const prevDate=shiftISODate(date,-1);
+    const carry=dayPlanItems(prevDate).filter(x=>x.start&&x.end&&timeToMins(x.end)<=timeToMins(x.start));
+    const raw=[
+      ...own.map((x,idx)=>{
+        const st=timeToMins(x.start),endRaw=timeToMins(x.end),overnight=endRaw<=st;
+        return {x,idx,st,en:overnight?1440:endRaw,displayStart:x.start,displayEnd:x.end,segment:'start'};
+      }),
+      ...carry.map((x,idx)=>({
+        x:{...x,_carryFrom:prevDate},
+        idx:10000+idx,
+        st:0,
+        en:timeToMins(x.end),
+        displayStart:'00:00',
+        displayEnd:x.end,
+        segment:'carry'
+      }))
+    ].filter(ev=>ev.en>ev.st)
+     .sort((a,b)=>a.st-b.st||a.en-b.en||a.idx-b.idx);
 
     // iPhone-like overlap layout: overlapping events are shown side-by-side.
     const laid=[];
@@ -2174,19 +2231,21 @@ function renderWeekPlanner(){
     }
 
     const items=laid.map(ev=>{
-      const {x,st,en,col,cols}=ev;
+      const {x,st,en,col,cols,displayStart,displayEnd,segment}=ev;
       const top=((st-timeStart)/totalMins)*100, h=Math.max(2,((en-st)/totalMins)*100);
       const cls=weekBlockClass(x.type);
       const sub=(dayPlanTypes[x.type]||dayPlanTypes.other)[1];
       const gap=4;
       const width=`calc((100% - ${gap*(cols-1)}px) / ${cols})`;
       const left=`calc(${(col/cols)*100}% + ${col?gap*col/cols:0}px)`;
-      return `<div class="week-block ${cls} ${cols>1?'overlap':''}" ${x.id?`data-week-item-id="${esc(x.id)}"`:''} data-week-item-date="${esc(date)}" style="top:${top}%;height:${h}%;left:${left};width:${width};right:auto" title="${esc(x.title)}"><div class="wb-time">${esc(x.start)} – ${esc(x.end)}</div><div class="wb-title">${esc(x.title)}</div><div class="wb-sub">${esc(sub)}</div></div>`;
+      const editDate=x._carryFrom||date;
+      const continuation=segment==='carry'?' · Fortsetzung':'';
+      return `<div class="week-block ${cls} ${cols>1?'overlap':''} ${segment==='carry'?'overnight-carry':''}" ${x.id?`data-week-item-id="${esc(x.id)}"`:''} data-week-item-date="${esc(editDate)}" style="top:${top}%;height:${h}%;left:${left};width:${width};right:auto" title="${esc(x.title)}${continuation}"><div class="wb-time">${esc(displayStart||x.start)} – ${esc(displayEnd||x.end)}</div><div class="wb-title">${esc(x.title)}</div><div class="wb-sub">${esc(sub)}${continuation}</div></div>`;
     }).join('');
     return `<div class="wg-day-col" data-week-date="${date}" style="height:${canvasHeight}px">${items}</div>`;
   }).join('');
   const timesHtml=labels.map(x=>`<div class="wg-time-label" style="top:${x.top}%">${x.label}</div>`).join('');
-  document.getElementById('weekOverview').innerHTML=`<div class="week-board"><div class="week-metrics">${metricCard('Lernziel',minsText(target))}${metricCard('Geplant',minsText(planned))}${metricCard('Noch offen',minsText(open))}${metricCard('Nachholen offen',minsText(makeupOpen))}</div><div class="week-summary-bar ${open?'pending':'complete'}">Wochenplanung: Soll ${minsText(target)} · als Lernen eingeplant ${minsText(planned)} · ${open?`noch offen ${minsText(open)}`:'vollständig eingeplant ✓'}</div><div class="week-grid-shell"><div class="week-grid"><div class="wg-head-left">Uhrzeit</div>${headHtml}<div class="wg-time-col" style="height:${canvasHeight}px">${timesHtml}</div>${colHtml}</div></div><div class="week-legend"><span class="lg u"><i></i> Uni / Pflichttermine</span><span class="lg s"><i></i> Lernen</span><span class="lg m"><i></i> Nachholen</span><span class="lg g"><i></i> Gym</span></div></div>`;
+  document.getElementById('weekOverview').innerHTML=`<div class="week-board"><div class="week-metrics">${metricCard('Lernziel',minsText(target))}${metricCard('Geplant',minsText(planned))}${metricCard('Noch offen',minsText(open))}${metricCard('Nachholen offen',minsText(makeupOpen))}</div><div class="week-summary-bar ${open?'pending':'complete'}">Wochenplanung: Soll ${minsText(target)} · als Lernen eingeplant ${minsText(planned)} · ${open?`noch offen ${minsText(open)}`:'vollständig eingeplant ✓'}</div><div class="week-grid-shell"><div class="week-grid" style="height:${canvasHeight}px"><div class="wg-head-left">Uhrzeit</div>${headHtml}<div class="wg-time-col" style="height:${canvasHeight}px">${timesHtml}</div>${colHtml}</div></div><div class="week-legend"><span class="lg u"><i></i> Uni / Pflichttermine</span><span class="lg s"><i></i> Lernen</span><span class="lg m"><i></i> Nachholen</span><span class="lg g"><i></i> Gym</span></div></div>`;
 }
 function renderPlannerRules(){
   const w=plannerState();
@@ -2772,13 +2831,44 @@ function renderDailyStudyTracking(){
     <div class="past-days-info">Heute ist der offene Fortschritt gelb. Bei 100% wird der Tag grün und als Erreicht markiert. Vergangene unvollständige Tage bleiben gelb und offen.</div>`
     :'<div class="muted">Noch keine Plan- oder Lerntage.</div>';
 
+  const allOpenDays=[...dates]
+    .filter(d=>{
+      if(d>=today)return false;
+      const pl=plannedStudyMinsForDate(d),dn=sessionsOn(d);
+      return pl>0&&dn<pl;
+    })
+    .sort()
+    .reverse();
+
+  const openDaysEl=$('#openStudyDays');
+  if(openDaysEl){
+    openDaysEl.innerHTML=allOpenDays.length
+      ?`<div class="open-days-summary"><strong>${allOpenDays.length} offene ${allOpenDays.length===1?'Tag':'Tage'}</strong><span class="muted">Gesammelt aus dem gesamten Semester</span></div>
+        <div class="past-days-list">${allOpenDays.map(d=>{
+          const pl=plannedStudyMinsForDate(d),dn=sessionsOn(d),op=Math.max(0,pl-dn),dayPct=pl?clamp(dn/pl*100,0,100):0;
+          return `<div class="past-day-row" data-open-day="${d}">
+            <div class="session-icon past-day-icon warn">${statusSymbol('warn')}</div>
+            <div class="past-day-main">
+              <div class="past-day-head"><div class="past-day-date">${fmtDate(d)}</div></div>
+              <div class="past-day-sub">Geplant ${minsText(pl)} · Erledigt ${minsText(dn)}</div>
+              <div class="past-day-progress warn"><span style="width:${dayPct}%"></span></div>
+              <div class="past-day-progress-meta warn"><span class="done">${minsText(Math.min(dn,pl))} / ${minsText(pl)}</span><span>Fortschritt ${Math.round(dayPct)}%</span></div>
+              <div class="past-day-status warn">${statusSymbol('warn')}<span>${minsText(op)} offen</span></div>
+            </div>
+          </div>`;
+        }).join('')}</div>`
+      :'<div class="muted">Keine offenen vergangenen Tage.</div>';
+  }
+
+  const totalBacklog=allOpenDays.reduce((sum,d)=>sum+Math.max(0,plannedStudyMinsForDate(d)-sessionsOn(d)),0);
   const backlogEl=$('#pastStudyBacklog');
-  backlogEl.textContent=backlog?`Gesamtrückstand aus den angezeigten vergangenen Tagen: ${minsText(backlog)}`:'Kein Rückstand in den angezeigten vergangenen Tagen';
-  backlogEl.className=backlog?'bad':'good';
+  backlogEl.textContent=totalBacklog?`Gesamtrückstand aus allen offenen vergangenen Tagen: ${minsText(totalBacklog)}`:'Kein Rückstand aus vergangenen Tagen';
+  backlogEl.className=totalBacklog?'bad':'good';
 }
 $('#markTodayDone').onclick=()=>openDailyStudyEntry(todayISO(),true);
 $('#enterTodayHours').onclick=()=>openDailyStudyEntry(todayISO(),false);
 $('#pastStudyDays').addEventListener('click',e=>{const row=e.target.closest('[data-past-day]');if(row)openDailyStudyEntry(row.dataset.pastDay,false)});
+$('#openStudyDays').addEventListener('click',e=>{const row=e.target.closest('[data-open-day]');if(row)openDailyStudyEntry(row.dataset.openDay,false)});
 $('#dailyStudyForm').addEventListener('submit',e=>{if(e.submitter?.value==='cancel')return;e.preventDefault();const minutes=Number($('#dailyStudyHours').value||0)*60+Number($('#dailyStudyMinutes').value||0),subjectId=$('#dailyStudySubject').value,date=$('#dailyStudyDate').value,studyType=$('#dailyStudyType').value;if(!subjectId||minutes<=0)return toast('Wähle ein Fach und gib eine Lernzeit ein.');if(studyType==='makeup'&&makeupRequiredForSubject(subjectId)<=0)return toast('Für dieses Fach ist kein Nachholbedarf eingetragen.');state.sessions.push({id:uid(),subjectId,date,minutes:Math.round(minutes),studyType,createdAt:new Date().toISOString(),source:'manual-daily'});save();$('#dailyStudyDialog').close();toast(studyType==='makeup'?'Nachholzeit wurde gespeichert':'Lernzeit wurde gespeichert')});
 function setupTimer(){if(timer.running)return;const subj=$('#timerSubject').value;if(!subj)return toast('Füge zuerst ein Fach hinzu und wähle es aus.');const preset=$('#timerPreset').value;timer.open=preset==='open';timer.focusSec=Math.max(60,Number($('#focusMinutes').value||25)*60);timer.breakSec=Math.max(0,Number($('#breakMinutes').value||5)*60);timer.totalRounds=Math.max(1,Number($('#roundCount').value||1));timer.round=1;timer.mode='focus';timer.remaining=timer.open?0:timer.focusSec;timer.accumulatedFocus=0;timer.startedAt=Date.now();timer.running=true;timer.paused=false;lockTimerSettings(true);$('#timerStart').textContent='Läuft';$('#timerStart').disabled=true;$('#timerPause').disabled=false;$('#timerStop').disabled=false;tick();timer.interval=setInterval(tick,1000);renderRounds()}
 function tick(){if(!timer.running||timer.paused)return;if(timer.open){const elapsed=Math.floor((Date.now()-timer.startedAt)/1000);timer.remaining=elapsed;$('#timerDisplay').textContent=formatSec(elapsed);$('#timerProgress').style.width='100%';return}timer.remaining--;if(timer.mode==='focus')timer.accumulatedFocus++;if(timer.remaining<=0)advanceTimer();renderTimerDisplay()}
