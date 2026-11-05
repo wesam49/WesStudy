@@ -114,3 +114,8 @@ WesStudy v5.4.4
 - Added 8. Semester to module origin/plan semester selectors.
 - Existing semesters 1–7 and Sommer remain unchanged.
 - Added a compatibility hook in app.js so semester 8 is available even if that script is used independently later.
+
+## v5.8.2 — 8. Semester render fix
+- Fixed Studienfortschritt grouping: 8. Semester is now rendered as its own semester card.
+- Modules assigned to plan semester 8 no longer disappear.
+- Updated both index.html and app.js so both code paths support semester 8.
