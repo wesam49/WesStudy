@@ -108,3 +108,9 @@ WesStudy v5.4.4
 - Open Days collects every incomplete past planned study day from the whole semester.
 - Past 10-day list remains unchanged.
 - Backlog now uses all open past days.
+
+## v5.8.1 — 8. Semester
+- Added 8. Semester to Aktuelles Plansemester.
+- Added 8. Semester to module origin/plan semester selectors.
+- Existing semesters 1–7 and Sommer remain unchanged.
+- Added a compatibility hook in app.js so semester 8 is available even if that script is used independently later.

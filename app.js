@@ -1709,3 +1709,16 @@ window.WesStudyCloudBridge={
 generateAutoSemesterAttendance(false);
 renderAll();
 })();
+
+
+/* v5.8.1 — Semester 8 compatibility */
+function ensureSemester8Options(){
+  ['currentPlanSemester','lpOriginSemester','lpPlanSemester'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el||[...el.options].some(o=>o.value==='8'))return;
+    const opt=document.createElement('option');
+    opt.value='8';opt.textContent='8. Semester';el.appendChild(opt);
+  });
+}
+document.addEventListener('DOMContentLoaded',ensureSemester8Options);
+
